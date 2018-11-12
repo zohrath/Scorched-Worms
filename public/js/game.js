@@ -1,8 +1,8 @@
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-  width: 800,
-  height: 600,
+  width: 1024,
+  height: 768,
   physics: {
     default: 'arcade',
     arcade: {
@@ -22,10 +22,12 @@ var game = new Phaser.Game(config);
 
 function preload() {
   this.load.image('tank', 'assets/tank-large.png');
+  this.load.image('background', 'assets/background_vulcano.png')
 }
 
 function create() {
   var self = this;
+  this.background = this.add.sprite(512, 384, 'background');
   this.socket = io();
   this.otherPlayers = this.physics.add.group();
   this.socket.on('currentPlayers', function (players) {
