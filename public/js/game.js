@@ -22,12 +22,16 @@ var game = new Phaser.Game(config);
 
 function preload() {
   this.load.image('tank', 'assets/tank-large.png');
-  this.load.image('background', 'assets/background_vulcano.png')
+  this.load.image('background', 'assets/background_vulcano.png');
+  this.load.image('ground', 'assets/ground.png');
 }
 
 function create() {
   var self = this;
+  this.platforms = this.add.group();
+  this.platforms.enableBody = true;
   this.background = this.add.sprite(512, 384, 'background');
+  this.ground = this.platforms.create(0, 0, 'ground');
   this.socket = io();
   this.otherPlayers = this.physics.add.group();
   this.socket.on('currentPlayers', function (players) {
