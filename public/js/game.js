@@ -7,7 +7,7 @@ var config = {
     default: 'arcade',
     arcade: {
       debug: false,
-      gravity: { y: 100 }
+      gravity: { y: 300 }
     }
   },
   scene: {
@@ -42,12 +42,13 @@ function preload() {
 
 function create() {
   var self = this;
-  platforms = this.physics.add.staticGroup();
-  platforms = this.add.group();
-  platforms.enableBody = true;
   this.background = this.add.sprite(512, 384, 'background');
 
-  platforms.create(512, 400, 'ground');
+  platforms = this.physics.add.staticGroup();
+  platforms = this.add.group();
+  platforms.enableBody = true;  
+  platforms.create(512, 300, 'ground');
+  
   this.socket = io();
   this.otherPlayers = this.physics.add.group();
   this.socket.on('currentPlayers', function (players) {
@@ -56,7 +57,7 @@ function create() {
         addPlayer(self, players[id]);
         console.log("add self")
       } else {
-        addOtherPlayers(self, players[id]);
+        addPlayer(self, players[id]);
         console.log("add other")
 
       }
@@ -74,9 +75,12 @@ function create() {
     });
   });
 
-  this.cursors = this.input.keyboard.createCursorKeys();
+  cursors = this.input.keyboard.createCursorKeys();
   this.tank = this.physics.add.sprite(200, 200, 'tank');
+  this.tank.setBounce(0.3);
+  this.tank.setCollideWorldBounds(true);
   this.physics.add.collider(this.tank, platforms);
+  
   //self.physics.arcade.enable(this.tank);
   //this.turret = this.add.sprite(this.tank.x + 30, this.tank.y + 14, 'turret');
   // this.fireButton = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
@@ -97,16 +101,16 @@ function addPlayer(self, playerInfo) {
 
 function update() {
   if (this.tank) {
-    if (this.cursors.left.isDown) {
+    if (cursors.left.isDown) {
         this.tank.body.velocity.x = -150;
-    } else if (this.cursors.right.isDown) {
+    } else if (cursors.right.isDown) {
         this.tank.body.velocity.x = 150;
     } else {
         this.tank.body.velocity.x = 0;
     }
   
-    if (this.cursors.up.isDown) {
-      //Set angle
+    if (cursors.up.isDown) {
+      this.tank.body.velocity.y = -100;
     } else {
       this.tank.setAcceleration(0);
     }
