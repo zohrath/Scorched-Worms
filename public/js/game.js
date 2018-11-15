@@ -21,12 +21,14 @@ var config = {
 let game = new Phaser.Game(config);
 let platforms;
 let cursors;
+let particles;
 
 function preload() {
   this.load.image("tank", "assets/tank.png");
   this.load.image("background", "assets/background_vulcano.png");
   this.load.image("ground", "assets/ground.png");
   this.load.image("turret", "assets/turret.png");
+  this.load.image('smoke', 'assets/smoke-puff.png');
 }
 
 function create() {
@@ -82,6 +84,13 @@ function create() {
     self.tank.setCollideWorldBounds(true);
     self.tank.body.setGravity(3);
     self.physics.add.collider(self.tank, platforms);
+    self.particles = self.add.particles('smoke');
+    self.emitter = self.particles.createEmitter({
+        speed: 100,
+        scale: { start: 0.15, end: 0 },
+        blendMode: 'ADD'
+    });
+    self.emitter.startFollow(self.tank, -30, 8);
   }
 }
 
