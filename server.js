@@ -3,7 +3,7 @@ let app = express();
 let server = require('http').Server(app);
 let io = require('socket.io').listen(server);
 
-let players = {};
+var players = {};
 
 let WIDTH = 800;
 let HEIGHT = 600;
@@ -25,7 +25,7 @@ io.on('connection', function (socket) {
   };
   // send the players object to the new player
   socket.emit('currentPlayers', players);
-
+  socket.broadcast.emit('newPlayer', players[socket.id]);
   // when a player disconnects, remove them from our players object
   socket.on('disconnect', function () {
     console.log('user disconnected');
@@ -33,9 +33,13 @@ io.on('connection', function (socket) {
     delete players[socket.id];
     // emit a message to all players to remove this player
     io.emit('disconnect', socket.id);
-
   });
-
+  socket.on('playerMovement', function(movementData) {
+    players[socket.id].x = movementData.x;
+    players[socket.id].y = movementData.y;
+    players[socket.id].rotation = movementData.rotation;
+    socket.broadcast.emit('playerMoved', players[socket.id]);
+  });
 });
 
 
