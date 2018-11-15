@@ -1,5 +1,6 @@
 let socketio = require("socket.io");
 let players = {};
+let io;
 
 let WIDTH = 800;
 let HEIGHT = 600;
@@ -40,4 +41,4 @@ function startGameServer(server) {
   });
 }
 
-module.exports = { startGameServer };
+module.exports = { startGameServer, players, WIDTH, HEIGHT};
