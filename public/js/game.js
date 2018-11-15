@@ -48,13 +48,7 @@ function create() {
   this.background = this.add.sprite(512, 384, 'background');
 
   platforms = this.physics.add.staticGroup();
-  //platforms = this.add.group();
-  //platforms.enableBody = true;  
   platforms.create(512, 300, 'ground');
-  
-
-  //players = this.physics.add.group();
-  //players = this.add.group();
 
   cursors = this.input.keyboard.createCursorKeys();
   tank = this.physics.add.sprite(200, 200, 'tank');
@@ -89,11 +83,7 @@ function create() {
   });
 
   this.physics.add.collider(platforms, tank);
-  
-  //self.physics.arcade.enable(tank);
-  //this.turret = this.add.sprite(tank.x + 30, tank.y + 14, 'turret');
-  // this.fireButton = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-  // this.fireButton.onDown.add(this.fireBullet, this);
+
 };
 
 function fireBullet() {
@@ -102,15 +92,10 @@ function fireBullet() {
 };
 
 function addPlayer(self, playerInfo) {
-  //  tank = this.add.sprite(playerInfo.x, playerInfo.y, 'tank').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
-  //self.tank = self.physics.add.image(playerInfo.x, playerInfo.y, 'tank').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
-
-
+  
 };
 
 function update() {
-
-  //this.physics.collide(tank, platforms)
 
   if (tank) {
     if (cursors.left.isDown) {
@@ -127,20 +112,20 @@ function update() {
       tank.setAcceleration(0);
     }
 
-    // // emit player movement
-    // var x = tank.x;
-    // var y = tank.y;
-    // var r = tank.rotation;
-    // if (tank.oldPosition && (x !== tank.oldPosition.x || y !== tank.oldPosition.y || r !== tank.oldPosition.rotation)) {
-    //   this.socket.emit('playerMovement', { x: tank.x, y: tank.y, rotation: tank.rotation });
-    // }
+    // emit player movement
+    var x = tank.x;
+    var y = tank.y;
+    var r = tank.rotation;
+    if (tank.oldPosition && (x !== tank.oldPosition.x || y !== tank.oldPosition.y || r !== tank.oldPosition.rotation)) {
+      this.socket.emit('playerMovement', { x: tank.x, y: tank.y, rotation: tank.rotation });
+    }
      
-    // // save old position data
-    // tank.oldPosition = {
-    //   x: tank.x,
-    //   y: tank.y,
-    //   rotation: tank.rotation
-    // };
+    // save old position data
+    tank.oldPosition = {
+      x: tank.x,
+      y: tank.y,
+      rotation: tank.rotation
+    };
   
     this.physics.world.wrap(tank, 5);
   }
