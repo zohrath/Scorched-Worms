@@ -21,7 +21,6 @@ var config = {
 let game = new Phaser.Game(config);
 let platforms;
 let cursors;
-let particles;
 
 function preload() {
   this.load.image("tank", "assets/tank.png");
@@ -86,11 +85,12 @@ function create() {
     self.physics.add.collider(self.tank, platforms);
     self.particles = self.add.particles('smoke');
     self.emitter = self.particles.createEmitter({
+        on: false,
+        active: true,
         speed: 100,
         scale: { start: 0.15, end: 0 },
         blendMode: 'ADD'
     });
-    self.emitter.startFollow(self.tank, -30, 8);
   }
 }
 
@@ -140,6 +140,17 @@ function update() {
       y: this.tank.y,
       rotation: this.tank.rotation
     };
+    if (this.tank.body.velocity.x > 0){
+      this.emitter.startFollow(this.tank, -30, 8);
+      this.emitter.on = true;
+    }
+    else if(this.tank.body.velocity.x < 0){
+      this.emitter.startFollow(this.tank, 30, 8);
+      this.emitter.on = true;
+    }
+    else{
+      this.emitter.on = false;
+    }
     this.physics.world.wrap(this.tank, 5);
   }
 }
