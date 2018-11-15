@@ -1,26 +1,27 @@
 //const io = require('socket.io-client');
-const http = require('http');
-const socketIO = require('socket.io');
-const socketIOClient = require('socket.io-client');
-const express = require('express');
-const request = require('supertest');
+const http = require("http");
+const socketIO = require("socket.io");
+const socketIOClient = require("socket.io-client");
+const express = require("express");
+const request = require("supertest");
+let gameServer = require("../server/app.js");
 
-const port = 8081;
+const port = 8080;
 let server;
 let httpServerAddr;
 
-let app;
+let expressApp;
 let socketServer;
 /**
  * Setup Basic serrver at localhost and open a socket
  */
-beforeAll((done) => {
-  
-  app = express();
-  server = http.Server(app);
+beforeAll(done => {
+  expressApp = express();
+  server = http.Server(expressApp);
+  gameServer.startGameServer(server)
   httpServer = server.listen(port);
   httpServerAddr = httpServer.address();
-  socketServer = socketIO(server)
+  socketServer = socketIO(server);
 
   done();
 });
@@ -28,7 +29,7 @@ beforeAll((done) => {
 /**
  *  Cleanup sockets and servers
  */
-afterAll((done) => {
+afterAll(done => {
   server.close();
   socketServer.close();
   socketClient.close();
@@ -38,11 +39,11 @@ afterAll((done) => {
 /**
  * Run before each test
  */
-beforeEach((done) => {
+beforeEach(done => {
   // Setup
   // Do not hardcode server port and address, square brackets are used for IPv6
-  socketClient = socketIOClient.connect('http://localhost:8081');
-  socketClient.on('connect', () => {
+  socketClient = socketIOClient.connect("http://localhost:"+port);
+  socketClient.on("connect", () => {
     done();
   });
 });
@@ -50,7 +51,7 @@ beforeEach((done) => {
 /**
  * Run after each test
  */
-afterEach((done) => {
+afterEach(done => {
   // Cleanup
   if (socketClient.connected) {
     socketClient.disconnect();
@@ -58,22 +59,22 @@ afterEach((done) => {
   done();
 });
 
-describe('basic socket.io example', () => {
-  test('should communicate', (done) => {
+describe("basic socket.io example", () => {
+  test("should communicate", done => {
     // once connected, emit Hello World
-    socketServer.emit('echo', 'Hello World');
-    socketClient.once('echo', (message) => {
+    socketServer.emit("echo", "Hello World");
+    socketClient.once("echo", message => {
       // Check that the message matches
-      expect(message).toBe('Hello World');
+      expect(message).toBe("Hello World");
       done();
     });
-    socketServer.on('connection', (mySocket) => {
+    socketServer.on("connection", mySocket => {
       expect(mySocket).toBeDefined();
     });
   });
-  test('should communicate with waiting for socket.io handshakes', (done) => {
+  test("should communicate with waiting for socket.io handshakes", done => {
     // Emit sth from Client do Server
-    socketClient.emit('examlpe', 'some messages');
+    socketClient.emit("examlpe", "some messages");
     // Use timeout to wait for socket.io server handshakes
     setTimeout(() => {
       // Put your server side expect() here
