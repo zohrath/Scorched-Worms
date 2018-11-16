@@ -7,6 +7,7 @@ let HEIGHT = 600;
 
 function startGameServer(server) {
   io = socketio.listen(server);
+  console.log("in app.js")
   io.sockets.on("connection", function(socket) {
     console.log("a user connected");
     // create a new player and add it to our players object
@@ -24,10 +25,13 @@ function startGameServer(server) {
     // when a player disconnects, remove them from our players object
     socket.on("disconnect", function() {
       console.log("user disconnected");
+      
+      io.emit("disconnect", socket.id);
       // remove this player from our players object
+      socket.disconnect();
       delete players[socket.id];
       // emit a message to all players to remove this player
-      io.emit("disconnect", socket.id);
+      console.log("after disc: ",players)
     });
 
     // when a player moves, update the player data
