@@ -41,15 +41,10 @@ function create() {
   socket = io();
   this.otherPlayers = this.physics.add.group();
   socket.on("currentPlayers", function(players) {
-    console.log(players, socket.id);
-    Object.keys(players).forEach(function(id) {
-      if (players[id].playerId === socket.id) {
-        addPlayer(self, players[id]);
-        console.log("add self");
-      } else {
-        addOtherPlayer(self, players[id]);
-        console.log("add other");
-      }
+    Object.values(players).forEach(value => {
+      value.playerId === socket.id
+        ? addPlayer(self, value)
+        : addOtherPlayer(self, value);
     });
   });
 
@@ -58,7 +53,7 @@ function create() {
     addOtherPlayer(self, playerInfo);
   });
 
-  socket.on("playerMoved", function(playerInfo){
+  socket.on("playerMoved", function(playerInfo) {
     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
       if (playerInfo.playerId === otherPlayer.playerId) {
         otherPlayer.setRotation(playerInfo.roation);
@@ -75,7 +70,6 @@ function create() {
     });
   });
 
-  
   function addPlayer(self, playerInfo) {
     self.tank = self.physics.add.sprite(playerInfo.x, playerInfo.y, "tank");
     self.tank.setBounce(0.3);
@@ -85,14 +79,15 @@ function create() {
   }
 }
 
-
-
 function fireBullet() {
   tank.body;
 }
 
 function addOtherPlayer(self, playerInfo) {
-  const otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'tank').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
+  const otherPlayer = self.physics.add
+    .sprite(playerInfo.x, playerInfo.y, "tank")
+    .setOrigin(0.5, 0.5)
+    .setDisplaySize(53, 40);
   self.physics.add.collider(otherPlayer, platforms);
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers.add(otherPlayer);
