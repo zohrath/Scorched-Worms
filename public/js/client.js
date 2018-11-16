@@ -21,6 +21,10 @@ var config = {
 let game = new Phaser.Game(config);
 let platforms;
 let cursors;
+let bounce = 0.3;
+let gravity = 3;
+let velocityX = 150;
+let velocityY = 100;
 
 function preload() {
   this.load.image("tank", "assets/tank.png");
@@ -40,7 +44,7 @@ function create() {
 
   socket = io();
   this.otherPlayers = this.physics.add.group();
-  socket.on("currentPlayers", function(players) {
+  socket.on("currentPlayers", players => {
     Object.values(players).forEach(value => {
       value.playerId === socket.id
         ? addPlayer(self, value)
@@ -48,13 +52,12 @@ function create() {
     });
   });
 
-  socket.on("newPlayer", function(playerInfo) {
-    console.log("Activating newplayer");
+  socket.on("newPlayer", playerInfo => {
     addOtherPlayer(self, playerInfo);
   });
 
-  socket.on("playerMoved", function(playerInfo) {
-    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
+  socket.on("playerMoved", playerInfo => {
+    self.otherPlayers.getChildren().forEach(otherPlayer => {
       if (playerInfo.playerId === otherPlayer.playerId) {
         otherPlayer.setRotation(playerInfo.roation);
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
@@ -62,25 +65,25 @@ function create() {
     });
   });
 
-  socket.on("disconnect", function(playerId) {
-    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
+  socket.on("disconnect", playerId => {
+    self.otherPlayers.getChildren().forEach(otherPlayer => {
       if (playerId === otherPlayer.playerId) {
         otherPlayer.destroy();
       }
     });
   });
+}
 
-  function addPlayer(self, playerInfo) {
-    self.tank = self.physics.add.sprite(playerInfo.x, playerInfo.y, "tank");
-    self.tank.setBounce(0.3);
-    self.tank.setCollideWorldBounds(true);
-    self.tank.body.setGravity(3);
-    self.physics.add.collider(self.tank, platforms);
-  }
+function addPlayer(self, playerInfo) {
+  self.tank = self.physics.add.sprite(playerInfo.x, playerInfo.y, "tank");
+  self.tank.setBounce(bounce);
+  self.tank.setCollideWorldBounds(true);
+  self.tank.body.setGravity(gravity);
+  self.physics.add.collider(self.tank, platforms);
 }
 
 function fireBullet() {
-  tank.body;
+  
 }
 
 function addOtherPlayer(self, playerInfo) {
@@ -96,14 +99,14 @@ function addOtherPlayer(self, playerInfo) {
 function update() {
   if (this.tank) {
     if (cursors.left.isDown) {
-      this.tank.body.velocity.x = -150;
+      this.tank.body.velocity.x = -velocityX;
     } else if (cursors.right.isDown) {
-      this.tank.body.velocity.x = 150;
+      this.tank.body.velocity.x = velocityX;
     } else {
       this.tank.body.velocity.x = 0;
     }
-    if (cursors.up.isDown) {
-      this.tank.body.velocity.y = -100;
+    if (cursors.up.isDown && this.tank.body.touching.down) {
+      this.tank.body.velocity.y = -velocityY;
     } else {
       this.tank.setAcceleration(0);
     }
