@@ -83,7 +83,6 @@ function addPlayer(self, playerInfo) {
 }
 
 function fireBullet() {
-  
 }
 
 function addOtherPlayer(self, playerInfo) {

@@ -6,7 +6,7 @@ let HEIGHT = 600;
 
 function startGameServer(server) {
   io = socketio.listen(server);
-  io.sockets.on("connection", function(socket) {
+  io.sockets.on("connection", socket => {
     console.log("a user connected");
     // create a new player and add it to our players object
     players[socket.id] = {
@@ -21,7 +21,7 @@ function startGameServer(server) {
     socket.broadcast.emit("newPlayer", players[socket.id]);
 
     // when a player disconnects, remove them from our players object
-    socket.on("disconnect", function() {
+    socket.on("disconnect", () => {
       console.log("user disconnected");
       // remove this player from our players object
       delete players[socket.id];
@@ -30,7 +30,7 @@ function startGameServer(server) {
     });
 
     // when a player moves, update the player data
-    socket.on("playerMovement", function(movementData) {
+    socket.on("playerMovement", movementData => {
       players[socket.id].x = movementData.x;
       players[socket.id].y = movementData.y;
       players[socket.id].rotation = movementData.rotation;
