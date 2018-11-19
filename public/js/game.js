@@ -22,6 +22,7 @@ var config = {
 let game = new Phaser.Game(config);
 let platforms;
 let cursors;
+let keyX;
 var player;
 var playerContainer;
 var tank;
@@ -45,6 +46,7 @@ function create() {
   platforms = this.physics.add.staticGroup();
   platforms.create(512, 753, "ground");
 
+  keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
   cursors = this.input.keyboard.createCursorKeys();
 
   socket = io();
@@ -67,7 +69,7 @@ function create() {
   socket.on("playerMoved", function(playerInfo) {
     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
       if (playerInfo.playerId === otherPlayer.playerId) {
-        otherPlayer.setRotation(playerInfo.roation);
+        otherPlayer.setRotation(playerInfo.rotation);
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
       }
     });
@@ -94,6 +96,7 @@ function createTank(self, playerInfo) {
 
   self.physics.world.enable(playerContainer);
   playerContainer.body.setBounce(0.3).setCollideWorldBounds(true);
+  playerContainer.body.setMaxVelocity(300).setDragX(300);
   
   console.log(playerContainer);
 
@@ -133,25 +136,31 @@ function addOtherPlayer(self, playerInfo) {
 function update() {
   if (playerContainer) {
     if (cursors.left.isDown) {
-      playerContainer.body.velocity.x = -150;
+      playerContainer.body.setAccelerationX(-500);
     } else if (cursors.right.isDown) {
-      playerContainer.body.velocity.x = 150;
+      playerContainer.body.setAccelerationX(500);
     } else {
-      playerContainer.body.velocity.x = 0;
+      playerContainer.body.setAccelerationX(0);
     }
-    if (cursors.up.isDown && playerContainer.body.touching.down) {
-      playerContainer.body.velocity.y = -200;
-    } else {
-      //playerContainer.setAcceleration(0);
+    if (cursors.up.isDown) {
+      playerContainer.body.velocity.y = -100;
+      //console.log("Aim up");
+    } else if (cursors.down.isDown) {
+      console.log("Aim down");
+    }
+     // The if statement below this is never true. Something is wrong with keyX.
+    if(keyX.isdown && playerContainer.body.touching.down) {
+      console.log("Jumping?")
+      playerContainer.body.velocity.y = -100;
     }
 
-    if(cursors.space.isDown){
+    if(cursors.space.isDown) {
       console.log("SPACE NERE!");
-      if(time > this.nextTic) {
-        console.log(time);
-        this.nextTic = time + 1000;
-        fireBullet(this,this.tank.x,this.tank.y,30,800);
-      }
+      //if(time > this.nextTic) {
+      //  console.log(time);
+      //  this.nextTic = time + 1000;
+      //  fireBullet(this,this.tank.x,this.tank.y,30,800);
+      //}
     }
     // emit player movement
     if (
