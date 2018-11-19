@@ -30,6 +30,7 @@ var physicsContainer;
 function preload() {
   this.load.image("tank_right", "assets/tank_right.png");
   this.load.image("tank_left", "assets/tank_left.png");
+  this.load.image("tank", "assets/tank_right.png");
   this.load.image("background", "assets/background_vulcano.png");
   this.load.image("ground", "assets/ground.png");
   this.load.image("turret", "assets/turret.png");
@@ -53,14 +54,14 @@ function create() {
       if (value.playerId === socket.id){
         addPlayer(self, value)
       } else {
-        addPlayer(self, value);
+        addOtherPlayer(self, value);
       }
     });
   });
 
   socket.on("newPlayer", function(playerInfo) {
     console.log("Activating newplayer");
-    addPlayer(self, playerInfo);
+    addOtherPlayer(self, playerInfo);
   });
 
   socket.on("playerMoved", function(playerInfo) {
@@ -78,36 +79,41 @@ function create() {
         otherPlayer.destroy();
       }
     });
-  });
-
-  function addPlayer(self, playerInfo) {
-    console.log("Adding player!")
-    self.tank = self.add.sprite(0, 0, 'tank');
-    self.turret = self.add.sprite(20, -3, 'turret');
-    playerContainer = self.add.container(playerInfo.x, playerInfo.y, [self.tank]);    
-    playerContainer.add(self.turret);
-    playerContainer.add(self.tank);
-    playerContainer.setSize(64,60);
-
-    self.physics.world.enable(playerContainer);
-    playerContainer.body.setBounce(0.3).setCollideWorldBounds(true);
-    
-    console.log(playerContainer);
+  }); 
   
-  
-    self.particles = self.add.particles('smoke');
-    self.emitter = self.particles.createEmitter({
-        on: false,
-        active: true,
-        speed: 100,
-        scale: { start: 0.15, end: 0 },
-        blendMode: 'ADD'
-    });
-    
-    self.physics.add.collider(playerContainer, platforms);
-  }
 }
 
+function createTank(self, playerInfo) {
+  console.log("Adding player!")
+  self.tank = self.add.sprite(0, 0, 'tank');
+  self.turret = self.add.sprite(20, -3, 'turret');
+  playerContainer = self.add.container(playerInfo.x, playerInfo.y, [self.tank]);    
+  playerContainer.add(self.turret);
+  playerContainer.add(self.tank);
+  playerContainer.setSize(64,60);
+
+  self.physics.world.enable(playerContainer);
+  playerContainer.body.setBounce(0.3).setCollideWorldBounds(true);
+  
+  console.log(playerContainer);
+
+
+  self.particles = self.add.particles('smoke');
+  self.emitter = self.particles.createEmitter({
+      on: false,
+      active: true,
+      speed: 100,
+      scale: { start: 0.15, end: 0 },
+      blendMode: 'ADD'
+  });
+  self.physics.add.collider(playerContainer, platforms);
+  return playerContainer;
+}
+
+function addPlayer(self, playerInfo) {
+  var player = createTank(self, playerInfo);
+  console.log(player);
+}
 
 function fireBullet(self,x,y,angle,speed) {
     var bullet = self.bullets.get();
@@ -119,8 +125,7 @@ function fireBullet(self,x,y,angle,speed) {
 }
 
 function addOtherPlayer(self, playerInfo) {
-  const otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'tank_right').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
-  self.physics.add.collider(otherPlayer, platforms);
+  otherPlayer = createTank(self, playerInfo);
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers.add(otherPlayer);
 }
@@ -155,7 +160,7 @@ function update() {
         playerContainer.y !== playerContainer.oldPosition.y ||
         playerContainer.r !== playerContainer.oldPosition.rotation)
     ) {
-      socket.emit("playerContainerMovement", {
+      socket.emit("playerMovement", {
         x: playerContainer.x,
         y: playerContainer.y,
         rotation: playerContainer.rotation
