@@ -84,6 +84,7 @@ function create() {
     self.tank = self.physics.add.sprite(playerInfo.x, playerInfo.y, "tank_right");
     self.tank.setBounce(0.3);
     self.tank.setCollideWorldBounds(true);
+    self.tank.setMaxVelocity(300).setDragX(300);
     self.physics.add.collider(self.tank, platforms);
     self.particles = self.add.particles('smoke');
     self.emitter = self.particles.createEmitter({
@@ -117,16 +118,14 @@ function addOtherPlayer(self, playerInfo) {
 function update(time) {
   if (this.tank) {
     if (cursors.left.isDown) {
-      this.tank.body.velocity.x = -150;
+      this.tank.body.setAccelerationX(-500);
     } else if (cursors.right.isDown) {
-      this.tank.body.velocity.x = 150;
+      this.tank.body.setAccelerationX(500);
     } else {
-      this.tank.body.velocity.x = 0;
+      this.tank.body.setAccelerationX(0);
     }
     if (cursors.up.isDown) {
       this.tank.body.velocity.y = -100;
-    } else {
-      this.tank.setAcceleration(0);
     }
 
     if(cursors.space.isDown){
