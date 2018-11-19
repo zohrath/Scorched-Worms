@@ -76,7 +76,7 @@ function create() {
   socket.on("playerMoved", function(playerInfo) {
     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
       if (playerInfo.playerId === otherPlayer.playerId) {
-        otherPlayer.setRotation(playerInfo.roation);
+        otherPlayer.setRotation(playerInfo.rotation);
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
       }
     });
@@ -98,6 +98,7 @@ function create() {
     );
     self.tank.setBounce(0.3);
     self.tank.setCollideWorldBounds(true);
+    self.tank.setMaxVelocity(300).setDragX(300);
     self.physics.add.collider(self.tank, platforms);
     self.particles = self.add.particles("smoke");
     self.emitter = self.particles.createEmitter({
@@ -135,16 +136,14 @@ function update(time, delta) {
   if (this.tank) {
     // MOVEMENT KEYS
     if (cursors.left.isDown) {
-      this.tank.body.velocity.x = -150;
+      this.tank.body.setAccelerationX(-500);
     } else if (cursors.right.isDown) {
-      this.tank.body.velocity.x = 150;
+      this.tank.body.setAccelerationX(500);
     } else {
-      this.tank.body.velocity.x = 0;
+      this.tank.body.setAccelerationX(0);
     }
     if (cursors.up.isDown) {
       this.tank.body.velocity.y = -100;
-    } else {
-      this.tank.setAcceleration(0);
     }
 
     // SPACE
