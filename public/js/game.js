@@ -1,3 +1,4 @@
+
 var config = {
   type: Phaser.AUTO,
   parent: "ScorchedWorms",
@@ -32,9 +33,10 @@ function preload() {
 }
 
 function create() {
+  this.nextTic = 0;
   var self = this;
   this.background = this.add.sprite(512, 384, "background");
-
+  this.bullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
   platforms = this.physics.add.staticGroup();
   platforms.create(512, 753, "ground");
 
@@ -82,7 +84,6 @@ function create() {
     self.tank = self.physics.add.sprite(playerInfo.x, playerInfo.y, "tank_right");
     self.tank.setBounce(0.3);
     self.tank.setCollideWorldBounds(true);
-    self.tank.body.setGravity(3);
     self.physics.add.collider(self.tank, platforms);
     self.particles = self.add.particles('smoke');
     self.emitter = self.particles.createEmitter({
@@ -97,8 +98,13 @@ function create() {
 
 
 
-function fireBullet() {
-  tank.body;
+function fireBullet(self,x,y,angle,speed) {
+    var bullet = self.bullets.get();
+    if (bullet)
+    {
+        bullet.fire(x, y, angle,speed);
+    }
+
 }
 
 function addOtherPlayer(self, playerInfo) {
@@ -108,7 +114,7 @@ function addOtherPlayer(self, playerInfo) {
   self.otherPlayers.add(otherPlayer);
 }
 
-function update() {
+function update(time) {
   if (this.tank) {
     if (cursors.left.isDown) {
       this.tank.body.velocity.x = -150;
@@ -121,6 +127,15 @@ function update() {
       this.tank.body.velocity.y = -100;
     } else {
       this.tank.setAcceleration(0);
+    }
+
+    if(cursors.space.isDown){
+      console.log("SPACE NERE!");
+      if(time > this.nextTic) {
+        console.log(time);
+        this.nextTic = time + 1000;
+        fireBullet(this,this.tank.x,this.tank.y,30,800);
+      }
     }
     // emit player movement
     if (
