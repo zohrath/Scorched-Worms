@@ -5,7 +5,8 @@ var Bullet = new Phaser.Class({
     Phaser.GameObjects.Sprite.call(this, scene, 0, 0, "bullet");
     this.dx = 0;
     this.dy = 0;
-    this.lifespan = 0;
+    this.lifespan = 10000;
+    // this.setCollideWorldBounds(true);
 },
 
 fire: function(x, y, angle,speed) {
@@ -24,7 +25,6 @@ fire: function(x, y, angle,speed) {
     // this.body.setAccelerationY(Math.sin(angle)*1000);
     // this.body.setMaxVelocity(50,50);
 
-    this.lifespan = 3000;
   },
 
   update: function(time, delta) {

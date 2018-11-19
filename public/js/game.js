@@ -1,5 +1,4 @@
-
-var config = {
+let config = {
   type: Phaser.AUTO,
   parent: "ScorchedWorms",
   width: 1024,
@@ -8,7 +7,7 @@ var config = {
     default: "arcade",
     arcade: {
       debug: true,
-      gravity: { y: 1000 }
+      gravity: { y: 300 }
     }
   },
   scene: {
@@ -27,6 +26,9 @@ var player;
 var playerContainer;
 var tank;
 var physicsContainer;
+let powerText;
+let power = 0;
+let angle = 0;
 
 function preload() {
   this.load.image("tank_right", "assets/tank_right.png");
@@ -35,19 +37,33 @@ function preload() {
   this.load.image("background", "assets/background_vulcano.png");
   this.load.image("ground", "assets/ground.png");
   this.load.image("turret", "assets/turret.png");
-  this.load.image('smoke', 'assets/smoke-puff.png');
+  this.load.image("smoke", "assets/smoke-puff.png");
 }
 
 function create() {
+
+
   this.nextTic = 0;
-  var self = this;
+  let self = this;
   this.background = this.add.sprite(512, 384, "background");
-  this.bullets = this.physics.add.group({ classType: Bullet, runChildUpdate: true });
+  this.bullets = this.physics.add.group({
+    classType: Bullet,
+    runChildUpdate: true
+  });
   platforms = this.physics.add.staticGroup();
   platforms.create(512, 753, "ground");
+  
+  powerText = this.add.text(16, 16, "Power: 0", {
+    fontSize: "32px",
+    fill: "#999"
+  });
 
   keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
   cursors = this.input.keyboard.createCursorKeys();
+  this.physics.world.setBoundsCollision(true, true, false, true);
+  this.physics.world.on('worldbounds', function(){
+    console.log("ASLDHAJKLSd")
+  });
 
   socket = io();
   this.otherPlayers = this.physics.add.group();
@@ -62,7 +78,6 @@ function create() {
   });
 
   socket.on("newPlayer", function(playerInfo) {
-    console.log("Activating newplayer");
     addOtherPlayer(self, playerInfo);
   });
 
@@ -83,6 +98,10 @@ function create() {
     });
   }); 
   
+  this.input.on('pointermove', function (pointer) {
+    let cursor = pointer;
+    angle = Phaser.Math.Angle.Between(playerContainer.x, playerContainer.y, cursor.x + this.cameras.main.scrollX, cursor.y + this.cameras.main.scrollY)
+}, this);
 }
 
 function createTank(self, playerInfo) {
@@ -116,15 +135,18 @@ function createTank(self, playerInfo) {
 function addPlayer(self, playerInfo) {
   var player = createTank(self, playerInfo);
   console.log(player);
-}
+};
 
-function fireBullet(self,x,y,angle,speed) {
-    var bullet = self.bullets.get();
-    if (bullet)
-    {
-        bullet.fire(x, y, angle,speed);
-    }
 
+
+
+
+
+function fireBullet(self, x, y, angle, speed) {
+  let bullet = self.bullets.get();
+  if (bullet) {
+    bullet.fire(x, y, angle, speed);
+  }
 }
 
 function addOtherPlayer(self, playerInfo) {
@@ -133,7 +155,7 @@ function addOtherPlayer(self, playerInfo) {
   self.otherPlayers.add(otherPlayer);
 }
 
-function update() {
+function update(time, delta) {
   if (playerContainer) {
     if (cursors.left.isDown) {
       playerContainer.body.setAccelerationX(-500);
@@ -154,14 +176,20 @@ function update() {
       playerContainer.body.velocity.y = -100;
     }
 
-    if(cursors.space.isDown) {
-      console.log("SPACE NERE!");
-      //if(time > this.nextTic) {
-      //  console.log(time);
-      //  this.nextTic = time + 1000;
-      //  fireBullet(this,this.tank.x,this.tank.y,30,800);
-      //}
+    // SPACE
+    if (cursors.space.isDown) {
+      this.spaceDown = true;
+      power = (power + Math.floor(delta / 2)) % 800;
+      powerText.setText("Power: " + power);
+    } else if (cursors.space.isUp) {
+      if (this.spaceDown && time > this.nextTic) {
+        this.nextTic = time + 500;
+        fireBullet(this, playerContainer.x, playerContainer.y, angle, power);
+        this.spaceDown = false;
+        power = 0;
+      }
     }
+
     // emit player movement
     if (
       playerContainer.oldPosition &&
@@ -188,10 +216,8 @@ function update() {
     else if(playerContainer.body.velocity.x < 0){
       this.emitter.startFollow(playerContainer, 30, 8);
       this.emitter.on = true;
-    }
-    else{
+    } else {
       this.emitter.on = false;
     }
-    this.physics.world.wrap(playerContainer, 5);
   }
 }
