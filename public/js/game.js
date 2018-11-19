@@ -6,8 +6,8 @@ var config = {
   physics: {
     default: "arcade",
     arcade: {
-      debug: false,
-      gravity: { y: 300 }
+      debug: true,
+      gravity: { y: 1000 }
     }
   },
   scene: {
@@ -21,6 +21,10 @@ var config = {
 let game = new Phaser.Game(config);
 let platforms;
 let cursors;
+var player;
+var playerContainer;
+var tank;
+var physicsContainer;
 
 function preload() {
   this.load.image("tank", "assets/tank.png");
@@ -71,11 +75,23 @@ function create() {
   });
 
   function addPlayer(self, playerInfo) {
-    self.tank = self.physics.add.sprite(playerInfo.x, playerInfo.y, "tank");
-    self.tank.setBounce(0.3);
-    self.tank.setCollideWorldBounds(true);
-    self.tank.body.setGravity(3);
-    self.physics.add.collider(self.tank, platforms);
+    console.log("Adding player!")
+    self.tank = self.add.sprite(0, 0, 'tank');
+    self.turret = self.add.sprite(20, -3, 'turret');
+    playerContainer = self.add.container(playerInfo.x, playerInfo.y, [self.tank]);    
+    playerContainer.add(self.turret);
+    playerContainer.add(self.tank);
+    playerContainer.setSize(64,60);
+
+    self.physics.world.enable(playerContainer);
+    playerContainer.body.setBounce(0.3).setCollideWorldBounds(true);
+    
+    console.log(playerContainer);
+  
+    
+    
+    
+    self.physics.add.collider(playerContainer, platforms);
   }
 }
 
@@ -84,6 +100,7 @@ function fireBullet() {
 }
 
 function addOtherPlayer(self, playerInfo) {
+  console.log("Adding another player!")
   const otherPlayer = self.physics.add
     .sprite(playerInfo.x, playerInfo.y, "tank")
     .setOrigin(0.5, 0.5)
@@ -94,38 +111,38 @@ function addOtherPlayer(self, playerInfo) {
 }
 
 function update() {
-  if (this.tank) {
+  if (playerContainer) {
     if (cursors.left.isDown) {
-      this.tank.body.velocity.x = -150;
+      playerContainer.body.velocity.x = -150;
     } else if (cursors.right.isDown) {
-      this.tank.body.velocity.x = 150;
+      playerContainer.body.velocity.x = 150;
     } else {
-      this.tank.body.velocity.x = 0;
+      playerContainer.body.velocity.x = 0;
     }
-    if (cursors.up.isDown) {
-      this.tank.body.velocity.y = -100;
+    if (cursors.up.isDown && playerContainer.body.touching.down) {
+      playerContainer.body.velocity.y = -200;
     } else {
-      this.tank.setAcceleration(0);
+      //playerContainer.setAcceleration(0);
     }
-    // emit player movement
+    // emit playerContainer movement
     if (
-      this.tank.oldPosition &&
-      (this.tank.x !== this.tank.oldPosition.x ||
-        this.tank.y !== this.tank.oldPosition.y ||
-        this.tank.r !== this.tank.oldPosition.rotation)
+      playerContainer.oldPosition &&
+      (playerContainer.x !== playerContainer.oldPosition.x ||
+        playerContainer.y !== playerContainer.oldPosition.y ||
+        playerContainer.r !== playerContainer.oldPosition.rotation)
     ) {
-      socket.emit("playerMovement", {
-        x: this.tank.x,
-        y: this.tank.y,
-        rotation: this.tank.rotation
+      socket.emit("playerContainerMovement", {
+        x: playerContainer.x,
+        y: playerContainer.y,
+        rotation: playerContainer.rotation
       });
     }
     // save old position data
-    this.tank.oldPosition = {
-      x: this.tank.x,
-      y: this.tank.y,
-      rotation: this.tank.rotation
+    playerContainer.oldPosition = {
+      x: playerContainer.x,
+      y: playerContainer.y,
+      rotation: playerContainer.rotation
     };
-    this.physics.world.wrap(this.tank, 5);
+    this.physics.world.wrap(playerContainer, 5);
   }
 }
