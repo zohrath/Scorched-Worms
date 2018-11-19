@@ -23,7 +23,8 @@ let platforms;
 let cursors;
 
 function preload() {
-  this.load.image("tank", "assets/tank.png");
+  this.load.image("tank_right", "assets/tank_right.png");
+  this.load.image("tank_left", "assets/tank_left.png");
   this.load.image("background", "assets/background_vulcano.png");
   this.load.image("ground", "assets/ground.png");
   this.load.image("turret", "assets/turret.png");
@@ -78,7 +79,7 @@ function create() {
 
   
   function addPlayer(self, playerInfo) {
-    self.tank = self.physics.add.sprite(playerInfo.x, playerInfo.y, "tank");
+    self.tank = self.physics.add.sprite(playerInfo.x, playerInfo.y, "tank_right");
     self.tank.setBounce(0.3);
     self.tank.setCollideWorldBounds(true);
     self.tank.body.setGravity(3);
@@ -101,7 +102,7 @@ function fireBullet() {
 }
 
 function addOtherPlayer(self, playerInfo) {
-  const otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'tank').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
+  const otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'tank_right').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
   self.physics.add.collider(otherPlayer, platforms);
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers.add(otherPlayer);
