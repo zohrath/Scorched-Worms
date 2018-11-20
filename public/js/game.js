@@ -107,7 +107,8 @@ function create() {
 function createTank(self, playerInfo) {
   console.log("Adding player!")
   self.tank = self.add.sprite(0, 0, 'tank');
-  self.turret = self.add.sprite(20, -3, 'turret');
+  self.turret = self.add.sprite(-5, -6, 'turret');
+  self.turret.setOrigin(0);
   playerContainer = self.add.container(playerInfo.x, playerInfo.y, [self.tank]);    
   playerContainer.add(self.turret);
   playerContainer.add(self.tank);
