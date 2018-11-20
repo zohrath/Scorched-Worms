@@ -226,4 +226,3 @@ function update(time, delta) {
     }
   }
 }
-
