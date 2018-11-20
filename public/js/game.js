@@ -113,7 +113,7 @@ function createTank(self, playerInfo) {
   playerContainer = self.add.container(playerInfo.x, playerInfo.y, [self.tank]);    
   playerContainer.add(self.turret);
   playerContainer.add(self.tank);
-  playerContainer.setSize(64,60);
+  playerContainer.setSize(64,40);
 
   self.physics.world.enable(playerContainer);
   playerContainer.body.setBounce(0.3).setCollideWorldBounds(true);
@@ -140,10 +140,6 @@ function addPlayer(self, playerInfo) {
 };
 
 
-
-
-
-
 function fireBullet(self, x, y, angle, speed) {
   let bullet = self.bullets.get();
   if (bullet) {
@@ -159,7 +155,7 @@ function addOtherPlayer(self, playerInfo) {
 
 function update(time, delta) {
   if (playerContainer) {
-    playerContainer.list[1].rotation = mouseAngle;
+    turretInContainer.rotation = mouseAngle;
     if (cursors.left.isDown) {
       playerContainer.body.setAccelerationX(-500);
     } else if (cursors.right.isDown) {
