@@ -25,10 +25,10 @@ let keyX;
 var player;
 var playerContainer;
 var tank;
-var physicsContainer;
+let turretInContainer;
 let powerText;
 let power = 0;
-let angle = 0;
+let mouseAngle = 0;
 
 function preload() {
   this.load.image("tank_right", "assets/tank_right.png");
@@ -70,7 +70,8 @@ function create() {
   socket.on("currentPlayers", function(players) {
     Object.values(players).forEach(value => {
       if (value.playerId === socket.id){
-        addPlayer(self, value)
+        addPlayer(self, value);
+        turretInContainer = playerContainer.list[1];
       } else {
         addOtherPlayer(self, value);
       }
@@ -100,14 +101,14 @@ function create() {
   
   this.input.on('pointermove', function (pointer) {
     let cursor = pointer;
-    angle = Phaser.Math.Angle.Between(playerContainer.x, playerContainer.y, cursor.x + this.cameras.main.scrollX, cursor.y + this.cameras.main.scrollY)
+    mouseAngle = Phaser.Math.Angle.Between(playerContainer.x, playerContainer.y, cursor.x + this.cameras.main.scrollX, cursor.y + this.cameras.main.scrollY)
 }, this);
 }
 
 function createTank(self, playerInfo) {
   console.log("Adding player!")
   self.tank = self.add.sprite(0, 0, 'tank');
-  self.turret = self.add.sprite(-5, -6, 'turret');
+  self.turret = self.add.sprite(-2, -3, 'turret');
   self.turret.setOrigin(0);
   playerContainer = self.add.container(playerInfo.x, playerInfo.y, [self.tank]);    
   playerContainer.add(self.turret);
@@ -158,7 +159,7 @@ function addOtherPlayer(self, playerInfo) {
 
 function update(time, delta) {
   if (playerContainer) {
-    playerContainer.list[1].rotation = angle;
+    playerContainer.list[1].rotation = mouseAngle;
     if (cursors.left.isDown) {
       playerContainer.body.setAccelerationX(-500);
     } else if (cursors.right.isDown) {
@@ -166,11 +167,12 @@ function update(time, delta) {
     } else {
       playerContainer.body.setAccelerationX(0);
     }
-    if (cursors.up.isDown) {
+    if (cursors.up.isDown && playerContainer.body.touching.down) {
       playerContainer.body.velocity.y = -100;
       //console.log("Aim up");
     } else if (cursors.down.isDown) {
       console.log("Aim down");
+      turretInContainer.rotation--;
     }
      // The if statement below this is never true. Something is wrong with keyX.
     if(keyX.isdown && playerContainer.body.touching.down) {
@@ -181,12 +183,12 @@ function update(time, delta) {
     // SPACE
     if (cursors.space.isDown) {
       this.spaceDown = true;
-      power = (power + Math.floor(delta / 2)) % 800;
+      power = (power + Math.floor(delta / 2)) % 1000;
       powerText.setText("Power: " + power);
     } else if (cursors.space.isUp) {
       if (this.spaceDown && time > this.nextTic) {
         this.nextTic = time + 500;
-        fireBullet(this, playerContainer.x, playerContainer.y, angle, power);
+        fireBullet(this, playerContainer.x, playerContainer.y, turretInContainer.rotation, power);
         this.spaceDown = false;
         power = 0;
       }
