@@ -24,7 +24,6 @@ let cursors;
 let keyX;
 var player;
 var playerContainer;
-var tank;
 let turretInContainer;
 let powerText;
 let power = 0;
@@ -71,7 +70,7 @@ function create() {
     Object.values(players).forEach(value => {
       if (value.playerId === socket.id){
         addPlayer(self, value);
-        turretInContainer = playerContainer.list[1];
+        turretInContainer = playerContainer.list[1]; // Is this the position of the turret always?
       } else {
         addOtherPlayer(self, value);
       }
@@ -101,27 +100,34 @@ function create() {
   
   this.input.on('pointermove', function (pointer) {
     let cursor = pointer;
-    mouseAngle = Phaser.Math.Angle.Between(playerContainer.x, playerContainer.y, cursor.x + this.cameras.main.scrollX, cursor.y + this.cameras.main.scrollY)
+    if (typeof(playerContainer) == "object") {
+      console.log("PlayerContainer is an object.");
+      mouseAngle = Phaser.Math.Angle.Between(playerContainer.x, playerContainer.y, cursor.x + this.cameras.main.scrollX, cursor.y + this.cameras.main.scrollY)
+    }
 }, this);
 }
 
 function createTank(self, playerInfo) {
   console.log("Adding player!")
-  self.tank = self.add.sprite(0, 0, 'tank');
-  self.turret = self.add.sprite(-2, -3, 'turret');
-  self.turret.setOrigin(0);
-  playerContainer = self.add.container(playerInfo.x, playerInfo.y, [self.tank]);    
-  playerContainer.add(self.turret);
-  playerContainer.add(self.tank);
-  playerContainer.setSize(64,40);
+  let tank = self.add.sprite(0, 0, 'tank');
+  let turret = self.add.sprite(-2, -3, 'turret');
+  turret.setOrigin(0);
+  let tankContainer = self.add.container(playerInfo.x, playerInfo.y, [tank]);    
+  tankContainer.add(turret);
+  tankContainer.add(tank);
+  tankContainer.setSize(64,40);
 
-  self.physics.world.enable(playerContainer);
-  playerContainer.body.setBounce(0.3).setCollideWorldBounds(true);
-  playerContainer.body.setMaxVelocity(300).setDragX(300);
+  self.physics.world.enable(tankContainer);
+  tankContainer.body.setBounce(0.3).setCollideWorldBounds(true);
+  tankContainer.body.setMaxVelocity(300).setDragX(300);
   
-  console.log(playerContainer);
+  console.log(tankContainer);
+ 
+  self.physics.add.collider(tankContainer, platforms);
+  return tankContainer;
+}
 
-
+function createEmitter(self) {
   self.particles = self.add.particles('smoke');
   self.emitter = self.particles.createEmitter({
       on: false,
@@ -130,13 +136,12 @@ function createTank(self, playerInfo) {
       scale: { start: 0.15, end: 0 },
       blendMode: 'ADD'
   });
-  self.physics.add.collider(playerContainer, platforms);
-  return playerContainer;
 }
 
 function addPlayer(self, playerInfo) {
-  var player = createTank(self, playerInfo);
-  console.log(player);
+  createEmitter(self);
+  playerContainer = createTank(self, playerInfo);
+  console.log(playerContainer);
 };
 
 
@@ -221,3 +226,4 @@ function update(time, delta) {
     }
   }
 }
+
