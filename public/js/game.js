@@ -38,11 +38,10 @@ function preload() {
   this.load.image("ground", "assets/ground.png");
   this.load.image("turret", "assets/turret.png");
   this.load.image("smoke", "assets/smoke-puff.png");
+  // this.load.spritesheet('bulletImage', 'assets/tank-large.png', {frameWidth: 25, frameHeight: 25});
 }
 
 function create() {
-
-
   this.nextTic = 0;
   let self = this;
   this.background = this.add.sprite(512, 384, "background");
@@ -52,7 +51,7 @@ function create() {
   });
   platforms = this.physics.add.staticGroup();
   platforms.create(512, 753, "ground");
-  
+
   powerText = this.add.text(16, 16, "Power: 0", {
     fontSize: "32px",
     fill: "#999"
@@ -61,21 +60,32 @@ function create() {
   keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
   cursors = this.input.keyboard.createCursorKeys();
   this.physics.world.setBoundsCollision(true, true, false, true);
-  this.physics.world.on('worldbounds', function(){
-    console.log("ASLDHAJKLSd")
+  this.physics.world.on("worldbounds", function() {
+    console.log("ASLDHAJKLSd");
   });
 
   socket = io();
   this.otherPlayers = this.physics.add.group();
+
   socket.on("currentPlayers", function(players) {
     Object.values(players).forEach(value => {
-      if (value.playerId === socket.id){
-        addPlayer(self, value)
+      if (value.playerId === socket.id) {
+        addPlayer(self, value);
       } else {
         addOtherPlayer(self, value);
       }
     });
   });
+
+  //COLLIDERS
+  this.physics.add.collider(this.bullets, platforms, explodeBullet, null, self);
+  this.physics.add.collider(
+    this.bullets,
+    this.otherPlayers,
+    explodeBullet,
+    null,
+    self
+  );
 
   socket.on("newPlayer", function(playerInfo) {
     addOtherPlayer(self, playerInfo);
@@ -90,43 +100,51 @@ function create() {
     });
   });
 
-  socket.on("disconnect", function(playerId) {
+  socket.on("removePlayer", function(playerId) {
     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
       if (playerId === otherPlayer.playerId) {
         otherPlayer.destroy();
       }
     });
-  }); 
-  
-  this.input.on('pointermove', function (pointer) {
-    let cursor = pointer;
-    angle = Phaser.Math.Angle.Between(playerContainer.x, playerContainer.y, cursor.x + this.cameras.main.scrollX, cursor.y + this.cameras.main.scrollY)
-}, this);
+  });
+
+  this.input.on(
+    "pointermove",
+    function(pointer) {
+      let cursor = pointer;
+      angle = Phaser.Math.Angle.Between(
+        playerContainer.x,
+        playerContainer.y,
+        cursor.x + this.cameras.main.scrollX,
+        cursor.y + this.cameras.main.scrollY
+      );
+    },
+    this
+  );
 }
 
 function createTank(self, playerInfo) {
-  console.log("Adding player!")
-  self.tank = self.add.sprite(0, 0, 'tank');
-  self.turret = self.add.sprite(20, -3, 'turret');
-  playerContainer = self.add.container(playerInfo.x, playerInfo.y, [self.tank]);    
+  console.log("Adding player!");
+  self.tank = self.add.sprite(0, 0, "tank");
+  self.turret = self.add.sprite(20, -3, "turret");
+  playerContainer = self.add.container(playerInfo.x, playerInfo.y, [self.tank]);
   playerContainer.add(self.turret);
   playerContainer.add(self.tank);
-  playerContainer.setSize(64,60);
+  playerContainer.setSize(64, 60);
 
   self.physics.world.enable(playerContainer);
   playerContainer.body.setBounce(0.3).setCollideWorldBounds(true);
   playerContainer.body.setMaxVelocity(300).setDragX(300);
-  
+
   console.log(playerContainer);
 
-
-  self.particles = self.add.particles('smoke');
+  self.particles = self.add.particles("smoke");
   self.emitter = self.particles.createEmitter({
-      on: false,
-      active: true,
-      speed: 100,
-      scale: { start: 0.15, end: 0 },
-      blendMode: 'ADD'
+    on: false,
+    active: true,
+    speed: 100,
+    scale: { start: 0.15, end: 0 },
+    blendMode: "ADD"
   });
   self.physics.add.collider(playerContainer, platforms);
   return playerContainer;
@@ -135,12 +153,7 @@ function createTank(self, playerInfo) {
 function addPlayer(self, playerInfo) {
   var player = createTank(self, playerInfo);
   console.log(player);
-};
-
-
-
-
-
+}
 
 function fireBullet(self, x, y, angle, speed) {
   let bullet = self.bullets.get();
@@ -166,13 +179,13 @@ function update(time, delta) {
     }
     if (cursors.up.isDown) {
       playerContainer.body.velocity.y = -100;
-      //console.log("Aim up");
+      //console.log('Aim up');
     } else if (cursors.down.isDown) {
       console.log("Aim down");
     }
-     // The if statement below this is never true. Something is wrong with keyX.
-    if(keyX.isdown && playerContainer.body.touching.down) {
-      console.log("Jumping?")
+    // The if statement below this is never true. Something is wrong with keyX.
+    if (keyX.isdown && playerContainer.body.touching.down) {
+      console.log("Jumping?");
       playerContainer.body.velocity.y = -100;
     }
 
@@ -209,15 +222,29 @@ function update(time, delta) {
       y: playerContainer.y,
       rotation: playerContainer.rotation
     };
-    if (playerContainer.body.velocity.x > 0){
+    if (playerContainer.body.velocity.x > 0) {
       this.emitter.startFollow(playerContainer, -30, 8);
       this.emitter.on = true;
-    }
-    else if(playerContainer.body.velocity.x < 0){
+    } else if (playerContainer.body.velocity.x < 0) {
       this.emitter.startFollow(playerContainer, 30, 8);
       this.emitter.on = true;
     } else {
       this.emitter.on = false;
     }
   }
+}
+
+function explodeBullet(bullet, object) {
+  console.log(object);
+  if (object.hasOwnProperty("playerId")) {
+    console.log("otherplayer hit!");
+    bullet.hide();
+    socket.emit("playerHit", object.playerId);
+  }
+  bullet.hide();
+  console.log("platform hit");
+}
+
+function varExists(obj) {
+  return obj.hasOwnProper !== "undefined";
 }
