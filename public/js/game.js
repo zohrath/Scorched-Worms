@@ -37,8 +37,7 @@ function preload() {
   this.load.image("ground", "assets/ground.png");
   this.load.image("turret", "assets/turret.png");
   this.load.image("smoke", "assets/smoke-puff.png");
-  // this.load.spritesheet('bulletImage', 'assets/tank-large.png', {frameWidth: 25, frameHeight: 25});
-}
+ }
 
 function create() {
   this.nextTic = 0;
@@ -59,9 +58,6 @@ function create() {
   keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
   cursors = this.input.keyboard.createCursorKeys();
   this.physics.world.setBoundsCollision(true, true, false, true);
-  this.physics.world.on("worldbounds", function() {
-    console.log("ASLDHAJKLSd");
-  });
 
   socket = io();
   this.otherPlayers = this.physics.add.group();
@@ -101,9 +97,32 @@ function create() {
   });
 
   socket.on("removePlayer", function(playerId) {
+    if (socket.id == playerId) {
+      playerContainer.setActive(false);
+      playerContainer.setVisible(false);
+      playerContainer.destroy();
+    }
     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
       if (playerId === otherPlayer.playerId) {
         otherPlayer.destroy();
+      }
+    });
+  });
+
+  socket.on("fireBullet", function(bulletInfo) {
+    fireBullet(
+      self,
+      bulletInfo.x,
+      bulletInfo.y,
+      bulletInfo.angle,
+      bulletInfo.power
+    );
+  });
+
+  socket.on("moveTurret", function(turretInfo) {
+    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
+      if (turretInfo.playerId === otherPlayer.playerId) {
+        rotateTurret(otherPlayer,turretInfo.turretRotation);
       }
     });
   });
@@ -126,20 +145,18 @@ function create() {
 }
 
 function createTank(self, playerInfo) {
-  console.log("Adding player!");
   let tank = self.add.sprite(0, 0, "tank");
   let turret = self.add.sprite(-2, -3, "turret");
   turret.setOrigin(0);
   let tankContainer = self.add.container(playerInfo.x, playerInfo.y, [tank]);
   tankContainer.add(turret);
-  tankContainer.add(tank);
+  //tankContainer.add(tank); TODO?
   tankContainer.setSize(64, 40);
 
   self.physics.world.enable(tankContainer);
   tankContainer.body.setBounce(0.3).setCollideWorldBounds(true);
   tankContainer.body.setMaxVelocity(300).setDragX(300);
-
-  console.log(tankContainer);
+  tankContainer.turretRotation = 0;
 
   self.physics.add.collider(tankContainer, platforms);
   return tankContainer;
@@ -156,16 +173,19 @@ function createEmitter(self) {
   });
 }
 
+function rotateTurret(tank,newAngle){
+  tank.list[1].setRotation(newAngle); 
+}
+
 function addPlayer(self, playerInfo) {
   createEmitter(self);
   playerContainer = createTank(self, playerInfo);
-  console.log(playerContainer);
 }
 
-function fireBullet(self, x, y, angle, speed) {
+function fireBullet(self, x, y, angle, power) {
   let bullet = self.bullets.get();
   if (bullet) {
-    bullet.fire(x, y, angle, speed);
+    bullet.fire(x, y, angle, power);
   }
 }
 
@@ -176,7 +196,7 @@ function addOtherPlayer(self, playerInfo) {
 }
 
 function update(time, delta) {
-  if (playerContainer) {
+  if (typeof playerContainer !== "undefined" && playerContainer.active) {
     turretInContainer.rotation = mouseAngle;
     if (cursors.left.isDown) {
       playerContainer.body.setAccelerationX(-500);
@@ -187,14 +207,11 @@ function update(time, delta) {
     }
     if (cursors.up.isDown && playerContainer.body.touching.down) {
       playerContainer.body.velocity.y = -100;
-      //console.log('Aim up');
     } else if (cursors.down.isDown) {
-      console.log("Aim down");
       turretInContainer.rotation--;
     }
     // The if statement below this is never true. Something is wrong with keyX.
     if (keyX.isdown && playerContainer.body.touching.down) {
-      console.log("Jumping?");
       playerContainer.body.velocity.y = -100;
     }
 
@@ -206,36 +223,46 @@ function update(time, delta) {
     } else if (cursors.space.isUp) {
       if (this.spaceDown && time > this.nextTic) {
         this.nextTic = time + 500;
-        fireBullet(
-          this,
-          playerContainer.x,
-          playerContainer.y,
-          turretInContainer.rotation,
-          power
-        );
+        shotInfo = {
+          power: power,
+          angle: turretInContainer.rotation
+        };
+        socket.emit("bulletFired", shotInfo);
+
         this.spaceDown = false;
         power = 0;
       }
     }
 
     // emit player movement
-    if (
-      playerContainer.oldPosition &&
-      (playerContainer.x !== playerContainer.oldPosition.x ||
+    if (playerContainer.oldPosition) {
+      if (
+        playerContainer.x !== playerContainer.oldPosition.x ||
         playerContainer.y !== playerContainer.oldPosition.y ||
-        playerContainer.r !== playerContainer.oldPosition.rotation)
-    ) {
-      socket.emit("playerMovement", {
-        x: playerContainer.x,
-        y: playerContainer.y,
-        rotation: playerContainer.rotation
-      });
+        playerContainer.rotation !== playerContainer.oldPosition.rotation
+      ) {
+        socket.emit("playerMovement", {
+          x: playerContainer.x,
+          y: playerContainer.y,
+          rotation: playerContainer.rotation
+        });
+      }
+
+      if (
+        turretInContainer.rotation !== playerContainer.oldPosition.turretRotation
+      ) {
+        socket.emit("toOtherClients", {
+          event: "moveTurret",
+          turretRotation: playerContainer.oldPosition.turretRotation
+        });
+      }
     }
     // save old position data
     playerContainer.oldPosition = {
       x: playerContainer.x,
       y: playerContainer.y,
-      rotation: playerContainer.rotation
+      rotation: playerContainer.rotation,
+      turretRotation: turretInContainer.rotation
     };
     if (playerContainer.body.velocity.x > 0) {
       this.emitter.startFollow(playerContainer, -30, 8);
@@ -250,14 +277,11 @@ function update(time, delta) {
 }
 
 function explodeBullet(bullet, object) {
-  console.log(object);
   if (object.hasOwnProperty("playerId")) {
-    console.log("otherplayer hit!");
     bullet.hide();
     socket.emit("playerHit", object.playerId);
   }
   bullet.hide();
-  console.log("platform hit");
 }
 
 function varExists(obj) {

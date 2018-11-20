@@ -7,7 +7,7 @@ let HEIGHT = 600;
 
 function startGameServer(server) {
   io = socketio.listen(server);
-  console.log("in app.js")
+
   io.sockets.on("connection", function(socket) {
     console.log("a user connected");
     // create a new player and add it to our players object
@@ -15,7 +15,8 @@ function startGameServer(server) {
       rotation: 0,
       x: Math.floor(Math.random() * 700) + 50,
       y: HEIGHT - 50,
-      playerId: socket.id
+      playerId: socket.id,
+      active: true // not used, remove?
     };
     // send the players object to the new player
     socket.emit("currentPlayers", players);
@@ -31,7 +32,6 @@ function startGameServer(server) {
       socket.disconnect();
       delete players[socket.id];
       // emit a message to all players to remove this player
-      console.log("after disc: ",players)
     });
 
     // when a player moves, update the player data
@@ -46,9 +46,28 @@ function startGameServer(server) {
     });
     socket.on("playerHit",function(socketId){
       io.emit("removePlayer", socketId);
-      delete players[socketId];
+      players[socketId].active = false;
+    });
+    socket.on('bulletFired', function(inputInfo){
+      player = players[socket.id];
+  
+      bulletInfo ={
+        x: player.x,
+        y: player.y,
+        power: inputInfo.power,
+        angle: inputInfo.angle
+      }
+  
+      io.emit('fireBullet',bulletInfo);
+    });
+    socket.on('toOtherClients', function(data){
+      var eventname = data["event"];
+      delete data["event"];
+      data["playerId"] = socket.id
+      socket.broadcast.emit(eventname, data);
     });
   });
 }
+
 
 module.exports = { startGameServer, players, WIDTH, HEIGHT};
