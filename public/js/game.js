@@ -157,6 +157,7 @@ function addOtherPlayer(self, playerInfo) {
 
 function update(time, delta) {
   if (playerContainer) {
+    playerContainer.list[1].rotation = angle;
     if (cursors.left.isDown) {
       playerContainer.body.setAccelerationX(-500);
     } else if (cursors.right.isDown) {
