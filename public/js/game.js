@@ -1,13 +1,13 @@
-var config = {
+let config = {
   type: Phaser.AUTO,
-  parent: 'phaser-example',
-  width: 800,
-  height: 600,
+  parent: "ScorchedWorms",
+  width: 1024,
+  height: 768,
   physics: {
-    default: 'arcade',
+    default: "arcade",
     arcade: {
-      debug: false,
-      gravity: { y: 0 }
+      debug: true,
+      gravity: { y: 300 }
     }
   },
   scene: {
@@ -15,47 +15,74 @@ var config = {
     create: create,
     update: update
     //render:?
-  } 
+  }
 };
 
-var game = new Phaser.Game(config);
+let game = new Phaser.Game(config);
+let platforms;
+let cursors;
+let keyX;
+var player;
+var playerContainer;
+var tank;
+var physicsContainer;
+let powerText;
+let power = 0;
+let angle = 0;
 
 function preload() {
-  this.load.image('tank', 'assets/tank-large.png');
-  this.load.image('otherPlayer', 'assets/tank-large.png');
-
+  this.load.image("tank_right", "assets/tank_right.png");
+  this.load.image("tank_left", "assets/tank_left.png");
+  this.load.image("tank", "assets/tank_right.png");
+  this.load.image("background", "assets/background_vulcano.png");
+  this.load.image("ground", "assets/ground.png");
+  this.load.image("turret", "assets/turret.png");
+  this.load.image("smoke", "assets/smoke-puff.png");
 }
 
 function create() {
-  var self = this;
-  this.socket = io();
-  this.otherPlayers = this.physics.add.group();
-  this.socket.on('currentPlayers', function (players) {
-    Object.keys(players).forEach(function (id) {
-      if (players[id].playerId === self.socket.id) {
-        addPlayer(self, players[id]);
-        console.log("add self")
-      } else {
-        addOtherPlayers(self, players[id]);
-        console.log("add other")
 
-      }
-    });
+
+  this.nextTic = 0;
+  let self = this;
+  this.background = this.add.sprite(512, 384, "background");
+  this.bullets = this.physics.add.group({
+    classType: Bullet,
+    runChildUpdate: true
   });
+  platforms = this.physics.add.staticGroup();
+  platforms.create(512, 753, "ground");
   
-  this.socket.on('newPlayer', function (playerInfo) {
-    addOtherPlayers(self, playerInfo);
+  powerText = this.add.text(16, 16, "Power: 0", {
+    fontSize: "32px",
+    fill: "#999"
   });
-  this.socket.on('disconnect', function (playerId) {
-    self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-      if (playerId === otherPlayer.playerId) {
-        otherPlayer.destroy();
+
+  keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
+  cursors = this.input.keyboard.createCursorKeys();
+  this.physics.world.setBoundsCollision(true, true, false, true);
+  this.physics.world.on('worldbounds', function(){
+    console.log("ASLDHAJKLSd")
+  });
+
+  socket = io();
+  this.otherPlayers = this.physics.add.group();
+  socket.on("currentPlayers", function(players) {
+    Object.values(players).forEach(value => {
+      if (value.playerId === socket.id){
+        addPlayer(self, value)
+      } else {
+        addOtherPlayer(self, value);
       }
     });
   });
 
-  this.socket.on('playerMoved', function (playerInfo) {
-    self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+  socket.on("newPlayer", function(playerInfo) {
+    addOtherPlayer(self, playerInfo);
+  });
+
+  socket.on("playerMoved", function(playerInfo) {
+    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
       if (playerInfo.playerId === otherPlayer.playerId) {
         otherPlayer.setRotation(playerInfo.rotation);
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
@@ -63,71 +90,134 @@ function create() {
     });
   });
 
-  this.cursors = this.input.keyboard.createCursorKeys();
+  socket.on("disconnect", function(playerId) {
+    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
+      if (playerId === otherPlayer.playerId) {
+        otherPlayer.destroy();
+      }
+    });
+  }); 
+  
+  this.input.on('pointermove', function (pointer) {
+    let cursor = pointer;
+    angle = Phaser.Math.Angle.Between(playerContainer.x, playerContainer.y, cursor.x + this.cameras.main.scrollX, cursor.y + this.cameras.main.scrollY)
+}, this);
+}
+
+function createTank(self, playerInfo) {
+  console.log("Adding player!")
+  self.tank = self.add.sprite(0, 0, 'tank');
+  self.turret = self.add.sprite(20, -3, 'turret');
+  playerContainer = self.add.container(playerInfo.x, playerInfo.y, [self.tank]);    
+  playerContainer.add(self.turret);
+  playerContainer.add(self.tank);
+  playerContainer.setSize(64,60);
+
+  self.physics.world.enable(playerContainer);
+  playerContainer.body.setBounce(0.3).setCollideWorldBounds(true);
+  playerContainer.body.setMaxVelocity(300).setDragX(300);
+  
+  console.log(playerContainer);
+
+
+  self.particles = self.add.particles('smoke');
+  self.emitter = self.particles.createEmitter({
+      on: false,
+      active: true,
+      speed: 100,
+      scale: { start: 0.15, end: 0 },
+      blendMode: 'ADD'
+  });
+  self.physics.add.collider(playerContainer, platforms);
+  return playerContainer;
 }
 
 function addPlayer(self, playerInfo) {
+  var player = createTank(self, playerInfo);
+  console.log(player);
+};
 
-  self.tank = self.physics.add.image(playerInfo.x, playerInfo.y, 'tank').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
-/*
-  self.ship.setDrag(100);
-  self.ship.setAngularDrag(100);
-  self.ship.setMaxVelocity(200);
 
-*/
 
+
+
+
+function fireBullet(self, x, y, angle, speed) {
+  let bullet = self.bullets.get();
+  if (bullet) {
+    bullet.fire(x, y, angle, speed);
+  }
 }
 
-function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
-  if (playerInfo.team === 'blue') {
-    otherPlayer.setTint(0x0000ff);
-  } else {
-    otherPlayer.setTint(0xff0000);
-  }
+function addOtherPlayer(self, playerInfo) {
+  otherPlayer = createTank(self, playerInfo);
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers.add(otherPlayer);
 }
 
-function update() {
-
-//    velocityFromAngle: function (angle, speed, vec2)
-//      this.player.body.velocity.x = 200;
-
-
-if (this.tank) {
-    if (this.cursors.left.isDown) {
-        this.tank.body.velocity.x = -150;
-    } else if (this.cursors.right.isDown) {
-        this.tank.body.velocity.x = 150;
+function update(time, delta) {
+  if (playerContainer) {
+    if (cursors.left.isDown) {
+      playerContainer.body.setAccelerationX(-500);
+    } else if (cursors.right.isDown) {
+      playerContainer.body.setAccelerationX(500);
     } else {
-        this.tank.body.velocity.x = 0;
+      playerContainer.body.setAccelerationX(0);
     }
-  
-    if (this.cursors.up.isDown) {
-      //Set angle
-    } else {
-      this.tank.setAcceleration(0);
+    if (cursors.up.isDown) {
+      playerContainer.body.velocity.y = -100;
+      //console.log("Aim up");
+    } else if (cursors.down.isDown) {
+      console.log("Aim down");
+    }
+     // The if statement below this is never true. Something is wrong with keyX.
+    if(keyX.isdown && playerContainer.body.touching.down) {
+      console.log("Jumping?")
+      playerContainer.body.velocity.y = -100;
+    }
+
+    // SPACE
+    if (cursors.space.isDown) {
+      this.spaceDown = true;
+      power = (power + Math.floor(delta / 2)) % 800;
+      powerText.setText("Power: " + power);
+    } else if (cursors.space.isUp) {
+      if (this.spaceDown && time > this.nextTic) {
+        this.nextTic = time + 500;
+        fireBullet(this, playerContainer.x, playerContainer.y, angle, power);
+        this.spaceDown = false;
+        power = 0;
+      }
     }
 
     // emit player movement
-    var x = this.tank.x;
-    var y = this.tank.y;
-    var r = this.tank.rotation;
-    if (this.tank.oldPosition && (x !== this.tank.oldPosition.x || y !== this.tank.oldPosition.y || r !== this.tank.oldPosition.rotation)) {
-      this.socket.emit('playerMovement', { x: this.tank.x, y: this.tank.y, rotation: this.tank.rotation });
+    if (
+      playerContainer.oldPosition &&
+      (playerContainer.x !== playerContainer.oldPosition.x ||
+        playerContainer.y !== playerContainer.oldPosition.y ||
+        playerContainer.r !== playerContainer.oldPosition.rotation)
+    ) {
+      socket.emit("playerMovement", {
+        x: playerContainer.x,
+        y: playerContainer.y,
+        rotation: playerContainer.rotation
+      });
     }
-     
     // save old position data
-    this.tank.oldPosition = {
-      x: this.tank.x,
-      y: this.tank.y,
-      rotation: this.tank.rotation
+    playerContainer.oldPosition = {
+      x: playerContainer.x,
+      y: playerContainer.y,
+      rotation: playerContainer.rotation
     };
-  
-    this.physics.world.wrap(this.tank, 5);
+    if (playerContainer.body.velocity.x > 0){
+      this.emitter.startFollow(playerContainer, -30, 8);
+      this.emitter.on = true;
+    }
+    else if(playerContainer.body.velocity.x < 0){
+      this.emitter.startFollow(playerContainer, 30, 8);
+      this.emitter.on = true;
+    } else {
+      this.emitter.on = false;
+    }
   }
-
-
-
 }
