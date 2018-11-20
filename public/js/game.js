@@ -37,6 +37,7 @@ function preload() {
   this.load.image("ground", "assets/ground.png");
   this.load.image("turret", "assets/turret.png");
   this.load.image("smoke", "assets/smoke-puff.png");
+  this.load.image("bullet", "assets/bullet.png");
 }
 
 function create() {
