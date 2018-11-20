@@ -107,12 +107,12 @@ function create() {
 function createTank(self, playerInfo) {
   console.log("Adding player!")
   self.tank = self.add.sprite(0, 0, 'tank');
-  self.turret = self.add.sprite(-5, -6, 'turret');
+  self.turret = self.add.sprite(-3, -7, 'turret');
   self.turret.setOrigin(0);
   playerContainer = self.add.container(playerInfo.x, playerInfo.y, [self.tank]);    
   playerContainer.add(self.turret);
   playerContainer.add(self.tank);
-  playerContainer.setSize(64,60);
+  playerContainer.setSize(64,40);
 
   self.physics.world.enable(playerContainer);
   playerContainer.body.setBounce(0.3).setCollideWorldBounds(true);
