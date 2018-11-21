@@ -41,6 +41,8 @@ function preload() {
 function create() {
   this.nextTic = 0;
   let self = this;
+  this.isMyTurn = false;
+
   createWorld(this);
 
 
@@ -50,7 +52,7 @@ function create() {
   socket = io();
   this.otherPlayers = this.physics.add.group();
   
-  console.dir(this);
+
   createSocketListners(self);
   //COLLIDERS
   this.physics.add.collider(this.bullets, this.terrain, explodeBullet, null, self);
@@ -80,7 +82,7 @@ function create() {
 }
 
 function update(time, delta) {
-  if (typeof this.playerContainer !== "undefined" && this.playerContainer.active) {
+  if (typeof this.playerContainer !== "undefined" && this.playerContainer.active && this.isMyTurn) {
     this.turretInContainer.rotation = mouseAngle;
     movePlayer(this,time,delta);
     // save old position data

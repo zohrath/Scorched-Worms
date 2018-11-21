@@ -1,5 +1,7 @@
 let socketio = require("socket.io");
 let players = {};
+let playerOrder = [];// IDs, TODO: randomize 
+let playerTurnIndex = 0; //flag for whose turn it is
 let io;
 
 let WIDTH = 800;
@@ -9,6 +11,8 @@ function startGameServer(server) {
   io = socketio.listen(server);
 
   io.sockets.on("connection", function(socket) {
+    console.log("test key: ", Object.keys(io.sockets.sockets));
+
     console.log("a user connected");
     // create a new player and add it to our players object
     players[socket.id] = {
@@ -16,12 +20,16 @@ function startGameServer(server) {
       x: Math.floor(Math.random() * 700) + 50,
       y: HEIGHT - 50,
       playerId: socket.id,
-      active: true // not used, remove?
+      playerTurn: playerOrder.length == 0 //TODO randomize for 1 player to be true
     };
+    // add id to playerOrder
+    playerOrder.push(socket.id);
+    
     // send the players object to the new player
     socket.emit("currentPlayers", players);
     // update all other players of the new player
     socket.broadcast.emit("newPlayer", players[socket.id]);
+    socket.emit("nextPlayerTurn",playerTurnIndex);
 
     // when a player disconnects, remove them from our players object
     socket.on("disconnect", () => {
@@ -29,9 +37,15 @@ function startGameServer(server) {
       
       io.emit("removePlayer", socket.id);
       // remove this player from our players object
+      playerOrder.forEach( function(id, i){
+        if(socket.id == id){
+          playerOrder.splice(i, 1); //remove from index i and 1 element 
+        }
+      });
       socket.disconnect();
       delete players[socket.id];
       // emit a message to all players to remove this player
+
     });
 
     // when a player moves, update the player data
@@ -66,6 +80,15 @@ function startGameServer(server) {
       data["playerId"] = socket.id
       socket.broadcast.emit(eventname, data);
     });
+
+    socket.on("finishedTurn", function(){
+      playerTurnIndex = (playerTurnIndex + 1) % playerOrder.length;
+      let nextPlayer = playerOrder[playerTurnIndex];
+      let nextPlayerSocket = io.sockets.sockets[nextPlayer]
+      nextPlayerSocket.emit("startTurn");
+      io.emit("nextPlayerTurn", playerTurnIndex)
+    });
+
   });
 }
 

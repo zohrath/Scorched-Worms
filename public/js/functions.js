@@ -41,6 +41,7 @@ function rotateTurret(tank, newAngle) {
 
 function addPlayer(self, playerInfo) {
   createEmitter(self);
+  self.isMyTurn = playerInfo.playerTurn;
   self.playerContainer = createTank(self, playerInfo);
 }
 
@@ -88,7 +89,8 @@ function movePlayer(self, time, delta) {
         angle: self.turretInContainer.rotation
       };
       socket.emit("bulletFired", shotInfo);
-
+      socket.emit("finishedTurn"); // TODO: after bullet died, or smth else
+      self.isMyTurn = false;
       self.spaceDown = false;
       power = 0;
     }
@@ -119,4 +121,5 @@ function movePlayer(self, time, delta) {
       });
     }
   }
+  
 }

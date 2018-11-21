@@ -3,6 +3,7 @@ function createWorld(self) {
   createBullets(self);
   createTerrain(self);
   createPowerText(self);
+  createTurnText(self);
   self.physics.world.setBoundsCollision(true, true, false, true);
 }
 
@@ -27,3 +28,11 @@ function createPowerText(self) {
     fill: "#999"
   });
 }
+
+function createTurnText(self) {
+    self.turnText = self.add.text(16, 64, "Turn: ", {
+      fontSize: "32px",
+      fill: "#999"
+    });
+  }
+  

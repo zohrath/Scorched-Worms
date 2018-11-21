@@ -5,6 +5,8 @@ function createSocketListners(self) {
     createRemovePlayerListener(self);
     createFireBulletListener(self);
     createMoveTurretListener(self);
+    createStartTurn(self);
+    createNextPlayerTurn(self);
 }
 
 function createCurrentPlayersListener(self){
@@ -69,4 +71,16 @@ function createMoveTurretListener(self){
       }
     });
   });
+}
+
+function createStartTurn(self){
+  socket.on("startTurn", function(){
+    self.isMyTurn = true;
+  });
+}
+
+function createNextPlayerTurn(self){
+   socket.on("nextPlayerTurn", function(playerNumber){
+     self.turnText.setText("Turn: Player"+playerNumber);
+   });
 }
