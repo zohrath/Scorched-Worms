@@ -18,14 +18,14 @@ let config = {
   }
 };
 
+
+//GLOBAL VARIABLES
 let game = new Phaser.Game(config);
-let platforms;
 let cursors;
 let keyX;
 let player;
 let playerContainer;
 let turretInContainer;
-let powerText;
 let power = 0;
 let mouseAngle = 0;
 let socket;
@@ -44,30 +44,20 @@ function preload() {
 function create() {
   this.nextTic = 0;
   let self = this;
-  this.background = this.add.sprite(512, 384, "background");
-  this.bullets = this.physics.add.group({
-    classType: Bullet,
-    runChildUpdate: true
-  });
-  platforms = this.physics.add.staticGroup();
-  platforms.create(512, 753, "ground");
+  createWorld(this);
 
-  powerText = this.add.text(16, 16, "Power: 0", {
-    fontSize: "32px",
-    fill: "#999"
-  });
 
-  this.physics.world.setBoundsCollision(true, true, false, true);
   keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
   cursors = this.input.keyboard.createCursorKeys();
 
   socket = io();
   this.otherPlayers = this.physics.add.group();
-
-
+  
+  // console.log(this.);
+  console.dir(this);
   createSocketListners(self);
   //COLLIDERS
-  this.physics.add.collider(this.bullets, platforms, explodeBullet, null, self);
+  this.physics.add.collider(this.bullets, this.terrain, explodeBullet, null, self);
   this.physics.add.collider(
     this.bullets,
     this.otherPlayers,
@@ -110,7 +100,7 @@ function createTank(self, playerInfo) {
   tankContainer.body.setMaxVelocity(300).setDragX(300);
   tankContainer.turretRotation = 0;
 
-  self.physics.add.collider(tankContainer, platforms);
+  self.physics.add.collider(tankContainer, self.terrain);
   return tankContainer;
 }
 
@@ -171,7 +161,7 @@ function update(time, delta) {
     if (cursors.space.isDown) {
       this.spaceDown = true;
       power = (power + Math.floor(delta / 2)) % 1000;
-      powerText.setText("Power: " + power);
+      this.powerText.setText("Power: " + power);
     } else if (cursors.space.isUp) {
       if (this.spaceDown && time > this.nextTic) {
         this.nextTic = time + 500;
@@ -236,8 +226,4 @@ function explodeBullet(bullet, object) {
     socket.emit("playerHit", object.playerId);
   }
   bullet.hide();
-}
-
-function varExists(obj) {
-  return obj.hasOwnProper !== "undefined";
 }
