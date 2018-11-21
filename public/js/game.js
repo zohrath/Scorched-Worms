@@ -22,12 +22,13 @@ let game = new Phaser.Game(config);
 let platforms;
 let cursors;
 let keyX;
-var player;
-var playerContainer;
+let player;
+let playerContainer;
 let turretInContainer;
 let powerText;
 let power = 0;
 let mouseAngle = 0;
+let socket;
 
 function preload() {
   this.load.image("tank_right", "assets/tank_right.png");
@@ -56,24 +57,15 @@ function create() {
     fill: "#999"
   });
 
+  this.physics.world.setBoundsCollision(true, true, false, true);
   keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
   cursors = this.input.keyboard.createCursorKeys();
-  this.physics.world.setBoundsCollision(true, true, false, true);
 
   socket = io();
   this.otherPlayers = this.physics.add.group();
 
-  socket.on("currentPlayers", function(players) {
-    Object.values(players).forEach(value => {
-      if (value.playerId === socket.id) {
-        addPlayer(self, value);
-        turretInContainer = playerContainer.list[1]; // Is this the position of the turret always?
-      } else {
-        addOtherPlayer(self, value);
-      }
-    });
-  });
 
+  createSocketListners(self);
   //COLLIDERS
   this.physics.add.collider(this.bullets, platforms, explodeBullet, null, self);
   this.physics.add.collider(
@@ -84,50 +76,7 @@ function create() {
     self
   );
 
-  socket.on("newPlayer", function(playerInfo) {
-    addOtherPlayer(self, playerInfo);
-  });
 
-  socket.on("playerMoved", playerInfo => {
-    self.otherPlayers.getChildren().forEach(otherPlayer => {
-      if (playerInfo.playerId === otherPlayer.playerId) {
-        otherPlayer.setRotation(playerInfo.rotation);
-        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-      }
-    });
-  });
-
-  socket.on("removePlayer", function(playerId) {
-    if (socket.id == playerId) {
-      playerContainer.setActive(false);
-      playerContainer.setVisible(false);
-      playerContainer.destroy();
-    }
-    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
-      if (playerId === otherPlayer.playerId) {
-        otherPlayer.destroy();
-      }
-    });
-  });
-
-
-  socket.on("fireBullet", function(bulletInfo) {
-    fireBullet(
-      self,
-      bulletInfo.x,
-      bulletInfo.y,
-      bulletInfo.angle,
-      bulletInfo.power
-    );
-  });
-
-  socket.on("moveTurret", function(turretInfo) {
-    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
-      if (turretInfo.playerId === otherPlayer.playerId) {
-        rotateTurret(otherPlayer,turretInfo.turretRotation);
-      }
-    });
-  });
 
   this.input.on(
     "pointermove",
