@@ -12,7 +12,7 @@ socket.on("currentPlayers", function(players) {
     Object.values(players).forEach(value => {
       if (value.playerId === socket.id) {
         addPlayer(self, value);
-        turretInContainer = playerContainer.list[1]; // Is this the position of the turret always?
+        self.turretInContainer = self.playerContainer.list[1]; // Is this the position of the turret always?
       } else {
         addOtherPlayer(self, value);
       }
@@ -38,9 +38,9 @@ function createPlayerMovedListener(self){
 function createRemovePlayerListener(self){
       socket.on("removePlayer", function(playerId) {
           if (socket.id == playerId) {
-              playerContainer.setActive(false);
-              playerContainer.setVisible(false);
-              playerContainer.destroy();
+              self.playerContainer.setActive(false);
+              self.playerContainer.setVisible(false);
+              self.playerContainer.destroy();
             }
             self.otherPlayers.getChildren().forEach(function(otherPlayer) {
                 if (playerId === otherPlayer.playerId) {
