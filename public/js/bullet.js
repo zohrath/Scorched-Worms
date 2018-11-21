@@ -2,7 +2,7 @@ var Bullet = new Phaser.Class({
   Extends: Phaser.GameObjects.Image,
 
   initialize: function Bullet(scene) {
-    Phaser.GameObjects.Sprite.call(this, scene, 0, 0, 'bulletImage');
+    Phaser.GameObjects.Sprite.call(this, scene, 0, 0, 'bullet');
     this.dx = 0;
     this.dy = 0;
     this.lifespan = 10000;

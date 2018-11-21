@@ -37,7 +37,8 @@ function preload() {
   this.load.image("ground", "assets/ground.png");
   this.load.image("turret", "assets/turret.png");
   this.load.image("smoke", "assets/smoke-puff.png");
- }
+  this.load.image("bullet", "assets/bullet.png");
+}
 
 function create() {
   this.nextTic = 0;
@@ -146,10 +147,11 @@ function create() {
 }
 
 function createTank(self, playerInfo) {
-  let tank = self.add.sprite(0, 0, "tank");
-  let turret = self.add.sprite(-2, -3, "turret");
-  turret.setOrigin(0);
-  let tankContainer = self.add.container(playerInfo.x, playerInfo.y, [tank]);
+  console.log("Adding player!")
+  let tank = self.add.sprite(0, 0, 'tank');
+  let turret = self.add.sprite(0, -7, 'turret');
+  turret.setOrigin(0, 0.5);
+  let tankContainer = self.add.container(playerInfo.x, playerInfo.y, [tank]);    
   tankContainer.add(turret);
   //tankContainer.add(tank); TODO?
   tankContainer.setSize(64, 40);
@@ -267,9 +269,11 @@ function update(time, delta) {
     };
     if (playerContainer.body.velocity.x > 0) {
       this.emitter.startFollow(playerContainer, -30, 8);
+      playerContainer.list[0].flipX = false;
       this.emitter.on = true;
     } else if (playerContainer.body.velocity.x < 0) {
       this.emitter.startFollow(playerContainer, 30, 8);
+      playerContainer.list[0].flipX = true;
       this.emitter.on = true;
     } else {
       this.emitter.on = false;
