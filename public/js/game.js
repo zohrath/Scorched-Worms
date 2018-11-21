@@ -65,6 +65,8 @@ function create() {
     console.log("ASLDHAJKLSd")
   });
 
+  //test = new Player(this, 'tank', 'turret', {x: 100, y: 200, rotation: 0});
+  //console.log(test);
   socket = io();
   this.otherPlayers = this.physics.add.group();
   socket.on("currentPlayers", function(players) {
@@ -110,21 +112,7 @@ function create() {
 
 function createTank(self, playerInfo) {
   console.log("Adding player!")
-  let tank = self.add.sprite(0, 0, 'tank');
-  let turret = self.add.sprite(0, -7, 'turret');
-  turret.setOrigin(0, 0.5);
-  let tankContainer = self.add.container(playerInfo.x, playerInfo.y, [tank]);    
-  tankContainer.add(turret);
-  tankContainer.add(tank);
-  tankContainer.setSize(64,40);
-
-  self.physics.world.enable(tankContainer);
-  tankContainer.body.setBounce(0.3).setCollideWorldBounds(true);
-  tankContainer.body.setMaxVelocity(300).setDragX(300);
-  
-  console.log(tankContainer);
- 
-  self.physics.add.collider(tankContainer, platforms);
+  let tankContainer = new Player(self, 'tank', 'turret', playerInfo);
   return tankContainer;
 }
 
