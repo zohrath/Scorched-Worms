@@ -11,8 +11,6 @@ function startGameServer(server) {
   io = socketio.listen(server);
 
   io.sockets.on("connection", function(socket) {
-    console.log("test key: ", Object.keys(io.sockets.sockets));
-
     console.log("a user connected");
     // create a new player and add it to our players object
     players[socket.id] = {
@@ -37,11 +35,7 @@ function startGameServer(server) {
       
       io.emit("removePlayer", socket.id);
       // remove this player from our players object
-      playerOrder.forEach( function(id, i){
-        if(socket.id == id){
-          playerOrder.splice(i, 1); //remove from index i and 1 element 
-        }
-      });
+      removeFromPlayerOrder(socket.id);
       socket.disconnect();
       delete players[socket.id];
       // emit a message to all players to remove this player
@@ -60,7 +54,16 @@ function startGameServer(server) {
     });
     socket.on("playerHit",function(socketId){
       io.emit("removePlayer", socketId);
+      // if next turn's players is dead, skip
+      // TODO: handle multi kill (recursive?)
+      // let nextPlayerTurnIndex = getNextPlayerTurnIndex();
+      // if(playerOrder[nextPlayerTurnIndex] == socketId){
+      //     playerTurnIndex = getNextPlayerTurnIndex(offset=2);
+      // }
+      removeFromPlayerOrder(socketId);
       players[socketId].active = false;
+      //io.emit("nextPlayerTurn", playerTurnIndex); //TODO: correct?
+
     });
     socket.on('bulletFired', function(inputInfo){
       player = players[socket.id];
@@ -82,15 +85,26 @@ function startGameServer(server) {
     });
 
     socket.on("finishedTurn", function(){
-      playerTurnIndex = (playerTurnIndex + 1) % playerOrder.length;
+      playerTurnIndex = getNextPlayerTurnIndex();
       let nextPlayer = playerOrder[playerTurnIndex];
-      let nextPlayerSocket = io.sockets.sockets[nextPlayer]
+      let nextPlayerSocket = io.sockets.sockets[nextPlayer];
       nextPlayerSocket.emit("startTurn");
-      io.emit("nextPlayerTurn", playerTurnIndex)
+      io.emit("nextPlayerTurn", playerTurnIndex);
     });
 
   });
 }
 
+function removeFromPlayerOrder(targetID){
+  playerOrder.forEach( function(id, i){
+    if(targetID == id){
+      playerOrder.splice(i, 1); //remove from index i and 1 element 
+    }
+  });
+}
+
+function getNextPlayerTurnIndex(offset=1){
+  return ((playerTurnIndex + offset) % (playerOrder.length)) ;
+}
 
 module.exports = { startGameServer, players, WIDTH, HEIGHT};

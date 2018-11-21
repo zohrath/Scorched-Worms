@@ -43,6 +43,10 @@ function createRemovePlayerListener(self){
               self.playerContainer.setActive(false);
               self.playerContainer.setVisible(false);
               self.playerContainer.destroy();
+              if(self.isMyTurn){
+                socket.emit("finishedTurn");
+                self.isMyTurn = false;
+              }
             }
             self.otherPlayers.getChildren().forEach(function(otherPlayer) {
                 if (playerId === otherPlayer.playerId) {
