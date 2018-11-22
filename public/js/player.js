@@ -4,6 +4,7 @@ class Player extends Phaser.GameObjects.Container{
         let weaponSprite = self.add.sprite(0, -7, weapon);
         weaponSprite.setOrigin(0, 0.5);
         super(self, playerInfo.x, playerInfo.y, []);
+        this.playerId = playerInfo.playerId;
         this.add(characterSprite);
         this.add(weaponSprite);
         this.setSize(64,40);
@@ -11,7 +12,6 @@ class Player extends Phaser.GameObjects.Container{
         this.body.setBounce(0.3).setCollideWorldBounds(true);
         this.body.setMaxVelocity(300).setDragX(300);
         self.physics.add.collider(this, platforms);
-        console.log(this.list[0].visible)
     }
 
     getWeaponAngle () {
