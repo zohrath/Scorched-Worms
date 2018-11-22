@@ -14,6 +14,10 @@ class Player extends Phaser.GameObjects.Container{
         console.log(this.list[0].visible)
     }
 
+    getWeaponAngle () {
+        return this.list[1].rotation;
+    }
+
     setWeaponAngle (angle) {
         this.list[1].rotation = angle;
     }
