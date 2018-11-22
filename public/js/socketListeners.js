@@ -7,6 +7,7 @@ function createSocketListners(self) {
     createMoveTurretListener(self);
     createStartTurn(self);
     createNextPlayerTurn(self);
+    createClearScene(self);
 }
 
 function createCurrentPlayersListener(self){
@@ -14,6 +15,7 @@ socket.on("currentPlayers", function(players) {
     Object.values(players).forEach(value => {
       if (value.playerId === socket.id) {
         addPlayer(self, value);
+        self.ready = true;
         self.turretInContainer = self.playerContainer.list[1]; // Is this the position of the turret always?
       } else {
         addOtherPlayer(self, value);
@@ -41,7 +43,6 @@ function createRemovePlayerListener(self){
       socket.on("removePlayer", function(playerId) {
           if (socket.id == playerId) {
               self.playerContainer.setActive(false);
-              self.playerContainer.setVisible(false);
               self.playerContainer.destroy();
               if(self.isMyTurn){
                 socket.emit("finishedTurn");
@@ -87,4 +88,15 @@ function createNextPlayerTurn(self){
    socket.on("nextPlayerTurn", function(playerNumber){
      self.turnText.setText("Turn: Player"+playerNumber);
    });
+}
+
+function createClearScene(self){
+  socket.on('clearScene', function(){
+    self.otherPlayers.getChildren().forEach(function(player){
+      player.destroy();
+    });
+    if (self.playerContainer){
+      self.playerContainer.destroy();
+    }
+  });
 }

@@ -7,21 +7,21 @@ function explodeBullet(bullet, object) {
 }
 
 function createTank(self, playerInfo) {
-  console.log("Adding player!");
-  let tank = self.add.sprite(0, 0, "tank");
-  let turret = self.add.sprite(0, -7, "turret");
-  turret.setOrigin(0, 0.5);
-  let tankContainer = self.add.container(playerInfo.x, playerInfo.y, [tank]);
-  tankContainer.add(turret);
-  //tankContainer.add(tank); TODO?
-  tankContainer.setSize(64, 40);
+    console.log("Adding player!");
+    let tank = self.add.sprite(0, 0, "tank");
+    let turret = self.add.sprite(0, -7, "turret");
+    turret.setOrigin(0, 0.5);
+    let tankContainer = self.add.container(playerInfo.x, playerInfo.y, [tank]);
+    tankContainer.add(turret);
+    //tankContainer.add(tank); TODO?
+    tankContainer.setSize(64, 40);
 
-  self.physics.world.enable(tankContainer);
-  tankContainer.body.setBounce(0.3).setCollideWorldBounds(true);
-  tankContainer.body.setMaxVelocity(300).setDragX(300);
-  tankContainer.turretRotation = 0;
-  self.physics.add.collider(tankContainer, self.terrain);
-  return tankContainer;
+    self.physics.world.enable(tankContainer);
+    tankContainer.body.setBounce(0.3).setCollideWorldBounds(true);
+    tankContainer.body.setMaxVelocity(300).setDragX(300);
+    tankContainer.turretRotation = 0;
+    self.physics.add.collider(tankContainer, self.terrain);
+    return tankContainer;
 }
 
 function createEmitter(self) {
@@ -121,5 +121,4 @@ function movePlayer(self, time, delta) {
       });
     }
   }
-  
 }

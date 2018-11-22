@@ -18,7 +18,6 @@ let config = {
   }
 };
 
-
 //GLOBAL VARIABLES
 let game = new Phaser.Game(config);
 let keyX;
@@ -26,6 +25,7 @@ let player;
 let power = 0;
 let mouseAngle = 0;
 let socket;
+let keyR;
 
 function preload() {
   this.load.image("tank_right", "assets/tank_right.png");
@@ -42,20 +42,25 @@ function create() {
   this.nextTic = 0;
   let self = this;
   this.isMyTurn = false;
-
+  this.ready = false;
   createWorld(this);
 
-
   keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
+  keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
   this.cursors = this.input.keyboard.createCursorKeys();
 
   socket = io();
   this.otherPlayers = this.physics.add.group();
-  
 
   createSocketListners(self);
   //COLLIDERS
-  this.physics.add.collider(this.bullets, this.terrain, explodeBullet, null, self);
+  this.physics.add.collider(
+    this.bullets,
+    this.terrain,
+    explodeBullet,
+    null,
+    self
+  );
   this.physics.add.collider(
     this.bullets,
     this.otherPlayers,
@@ -82,9 +87,30 @@ function create() {
 }
 
 function update(time, delta) {
-  if (typeof this.playerContainer !== "undefined" && this.playerContainer.active && this.isMyTurn) {
+  if (keyX.isDown) {
+    console.log(this);
+    console.log(
+      typeof this.playerContainer,
+      this.playerContainer.active,
+      this.isMyTurn
+    );
+  }
+  
+  if (!this.ready) {
+    if (keyR.isDown) {
+      socket.emit("clientReady");
+      this.ready = true;
+    }
+    return;
+  }
+
+  if (
+    typeof this.playerContainer !== "undefined" &&
+    this.playerContainer.active &&
+    this.isMyTurn
+  ) {
     this.turretInContainer.rotation = mouseAngle;
-    movePlayer(this,time,delta);
+    movePlayer(this, time, delta);
     // save old position data
     this.playerContainer.oldPosition = {
       x: this.playerContainer.x,
@@ -105,4 +131,3 @@ function update(time, delta) {
     }
   }
 }
-
