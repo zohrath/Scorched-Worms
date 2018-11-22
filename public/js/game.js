@@ -167,6 +167,8 @@ class GameScene extends Phaser.Scene{
 
 function createTank(self, playerInfo) {
   console.log("Adding player!")
+  let tankContainer = new Player(self, 'tank', 'turret', playerInfo);
+  /*
   let tank = self.add.sprite(0, 0, 'tank');
   let turret = self.add.sprite(0, -7, 'turret');
   turret.setOrigin(0, 0.5);
@@ -181,6 +183,7 @@ function createTank(self, playerInfo) {
   tankContainer.turretRotation = 0;
 
   self.physics.add.collider(tankContainer, platforms);
+  */
   return tankContainer;
 }
 
