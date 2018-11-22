@@ -158,9 +158,8 @@ class GameScene extends Phaser.Scene{
         this.emitter.on = true;
       } else {
         this.emitter.on = false;
-      }
+
     }
-  }
 
 }
 
