@@ -20,8 +20,6 @@ function startGameServer(server) {
     } else {
       createPlayer(players, socket.id,"Player "+ playerTurnIndex);
     }
-
-    console.log("players ",players);
     // when a player disconnects, remove them from our players object
     socket.on("disconnect", () => {
       console.log("user disconnected");
@@ -92,14 +90,15 @@ function startGameServer(server) {
 
         if (clientsReady == playerOrder.length && clientsReady > 1) {
           // send the players object to the new player
-          io.emit("currentPlayers", players);
-          io.emit("nextPlayerTurn", playerTurnIndex);
-          let nextPlayerSocket = getNextPlayerSocket(0);
-          nextPlayerSocket.emit("startTurn");
-          gameRunning = true;
+          startRound();
         }
       }
     });
+
+    socket.on("forceStart", function(){
+      playerTurnIndex = 0;
+      newRound();
+    })
   });
 }
 
@@ -145,12 +144,23 @@ function resetPlayers(){
 }
 
 function newRound(){
+  console.log("before ",players);
   players = resetPlayers();
+  
+  console.log("after ",players);
   io.emit("clearScene");
-  io.emit("currentPlayers",players);
-  clientsReady = 0;
-  playerTurnIndex = 0;
+  startRound();
   console.log("players ",players);
 }
 
+function startRound(){
+  
+  console.log("before currentPlayers",players)
+  io.emit("currentPlayers", players);
+  io.emit("nextPlayerTurn", playerTurnIndex);
+  let nextPlayerSocket = getNextPlayerSocket(0);
+  nextPlayerSocket.emit("startTurn");
+  gameRunning = true;
+  clientsReady = 0;
+}
 module.exports = { startGameServer };

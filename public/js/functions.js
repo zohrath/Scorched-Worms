@@ -7,21 +7,8 @@ function explodeBullet(bullet, object) {
 }
 
 function createTank(self, playerInfo) {
-    console.log("Adding player!");
-    let tank = self.add.sprite(0, 0, "tank");
-    let turret = self.add.sprite(0, -7, "turret");
-    turret.setOrigin(0, 0.5);
-    let tankContainer = self.add.container(playerInfo.x, playerInfo.y, [tank]);
-    tankContainer.add(turret);
-    //tankContainer.add(tank); TODO?
-    tankContainer.setSize(64, 40);
-
-    self.physics.world.enable(tankContainer);
-    tankContainer.body.setBounce(0.3).setCollideWorldBounds(true);
-    tankContainer.body.setMaxVelocity(300).setDragX(300);
-    tankContainer.turretRotation = 0;
-    self.physics.add.collider(tankContainer, self.terrain);
-    return tankContainer;
+  let tankContainer = new Player(self, 'tank', 'turret', playerInfo);
+  return tankContainer;
 }
 
 function createEmitter(self) {
@@ -59,6 +46,7 @@ function addOtherPlayer(self, playerInfo) {
 }
 
 function movePlayer(self, time, delta) {
+
   if (self.cursors.left.isDown) {
     self.playerContainer.body.setAccelerationX(-500);
   } else if (self.cursors.right.isDown) {
@@ -86,7 +74,7 @@ function movePlayer(self, time, delta) {
       self.nextTic = time + 500;
       shotInfo = {
         power: power,
-        angle: self.turretInContainer.rotation
+        angle: self.playerContainer.getWeaponAngle()
       };
       socket.emit("bulletFired", shotInfo);
       socket.emit("finishedTurn"); // TODO: after bullet died, or smth else
@@ -112,7 +100,7 @@ function movePlayer(self, time, delta) {
     }
 
     if (
-      self.turretInContainer.rotation !==
+      self.playerContainer.getWeaponAngle() !==
       self.playerContainer.oldPosition.turretRotation
     ) {
       socket.emit("toOtherClients", {

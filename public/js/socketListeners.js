@@ -13,10 +13,10 @@ function createSocketListners(self) {
 function createCurrentPlayersListener(self){
 socket.on("currentPlayers", function(players) {
     Object.values(players).forEach(value => {
+      console.log(value)
       if (value.playerId === socket.id) {
         addPlayer(self, value);
         self.ready = true;
-        self.turretInContainer = self.playerContainer.list[1]; // Is this the position of the turret always?
       } else {
         addOtherPlayer(self, value);
       }
