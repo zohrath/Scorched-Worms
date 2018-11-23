@@ -158,14 +158,14 @@ class GameScene extends Phaser.Scene{
         this.emitter.on = true;
       } else {
         this.emitter.on = false;
-
-    }
-
+      }
+    }  
+  }
 }
 
 
 function createTank(self, playerInfo) {
-  console.log("Adding player!")
+  console.log("Adding player!");
   let tankContainer = new Player(self, 'tank', 'turret', playerInfo);
   /*
   let tank = self.add.sprite(0, 0, 'tank');
