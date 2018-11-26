@@ -13,7 +13,6 @@ function createSocketListners(self) {
 function createCurrentPlayersListener(self){
 socket.on("currentPlayers", function(players) {
     Object.values(players).forEach(value => {
-      console.log(value)
       if (value.playerId === socket.id) {
         addPlayer(self, value);
         self.ready = true;

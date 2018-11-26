@@ -77,6 +77,7 @@ class GameScene extends Phaser.Scene {
 
   update(time, delta) {
 
+
     if (keyX.isDown) {
       console.log(this);
       console.log(
@@ -87,12 +88,12 @@ class GameScene extends Phaser.Scene {
       );
     }
     
+    if (keyD.isDown){
+      console.log("force start")
+      socket.emit("forceStart");
+      this.ready
+    }
     if (!this.ready) {
-      if (keyD.isDown){
-        console.log("force start")
-        socket.emit("forceStart");
-        this.ready
-      }
       if (keyR.isDown) {
         socket.emit("clientReady");
         this.ready = true;

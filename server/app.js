@@ -80,11 +80,9 @@ function startGameServer(server) {
 
     socket.on("clientReady", function() {
       if (typeof players[socket.id] !== "undefined") {
-        console.log("readey req");
 
         if (!players[socket.id].ready) {
           clientsReady++;
-          console.log(clientsReady);
           players[socket.id].ready = true;
         }
 
@@ -95,6 +93,7 @@ function startGameServer(server) {
       }
     });
 
+    //// FOR DEVELOPMENT
     socket.on("forceStart", function(){
       playerTurnIndex = 0;
       newRound();
@@ -144,18 +143,12 @@ function resetPlayers(){
 }
 
 function newRound(){
-  console.log("before ",players);
   players = resetPlayers();
-  
-  console.log("after ",players);
   io.emit("clearScene");
   startRound();
-  console.log("players ",players);
 }
 
 function startRound(){
-  
-  console.log("before currentPlayers",players)
   io.emit("currentPlayers", players);
   io.emit("nextPlayerTurn", playerTurnIndex);
   let nextPlayerSocket = getNextPlayerSocket(0);
