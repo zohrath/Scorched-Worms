@@ -1,5 +1,5 @@
 {
-  "name": "phaser_tut2",
+  "name": "scorched-worms",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -8,8 +8,8 @@
     "start-prod": "NODE_ENV=production node server.js",
     "basetest": "NODE_ENV=development jest test_area/base.test.js"
   },
-  "author": "Scott Westover",
-  "license": "ISC",
+  "author": "Lords of War",
+  "license": "",
   "dependencies": {
     "express": "^4.16.4",
     "phaser": "^3.15.1",

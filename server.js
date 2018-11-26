@@ -11,6 +11,6 @@ expressApp.get("/", (req, res) => {
 
 gameServer.startGameServer(server);
 
-server.listen(8081, () => {
+server.listen(process.env.PORT || 8081, () => {
   console.log(`Listening on ${server.address().port}`);
 });
