@@ -17,7 +17,7 @@ var userName;
 var clients = {};
 
 function startGameServer(server) {
-  let playerOrder = [];
+  var playerOrder = [];
 
   io = socketio.listen(server);
 
@@ -199,15 +199,32 @@ function createPlayer(playersObject, id, alias, playerOrder) {
   return playersObject[id];
 }
 
+function createPlayer2(id, alias) {
+  let newPlayer = {
+    alias: alias,
+    rotation: 0,
+    x: Math.floor(Math.random() * 700) + 50,
+    y: HEIGHT/4,
+    playerId: id,
+    playerTurn: false, //TODO randomize for 1 player to be true
+    ready: false,
+    hp: 10
+  };
+  return newPlayer;
+}
+
 // TODO: Refer to player usernames somehow, for testing?
 function resetPlayers(playerOrder) {
   let newPlayers = {};
-  playerOrder = []; //create new?
+  playerOrder.length = 0; //create new?
 
   Object.values(io.sockets.sockets).forEach((socket, i) => {
     let newAlias = "Player " + i; //(socket.id in players) ? players[socket.id].alias : "Player " + i;
-    createPlayer(newPlayers, socket.id, newAlias, playerOrder);
+    let newPlayer = createPlayer2(socket.id, newAlias);
+    newPlayers[socket.id] = newPlayer;
+    playerOrder.push(socket.id);
   });
+  console.log("newPlayerOrder", playerOrder);
   return newPlayers; //return or set players
 }
 
@@ -215,7 +232,7 @@ function newRound(playerOrder) {
   currentMap = terrain.createPlatformLayer();
   playerTurnIndex = 0;
   players = resetPlayers();
-  io.emit("updatePlatformLayer",currentMap);
+  io.emit("updatePlatformLayer", currentMap);
   io.emit("clearScene");
   startRound(playerOrder);
 }
