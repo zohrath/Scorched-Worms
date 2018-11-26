@@ -57,7 +57,7 @@ function movePlayer(self, time, delta) {
   if (self.cursors.up.isDown && self.playerContainer.body.touching.down) {
     self.playerContainer.body.velocity.y = -100;
   } else if (self.cursors.down.isDown) {
-    self.turretInContainer.rotation--;
+    //self.turretInContainer.rotation--;
   }
   // The if statement below this is never true. Something is wrong with keyX.
   if (keyX.isdown && self.playerContainer.body.touching.down) {
