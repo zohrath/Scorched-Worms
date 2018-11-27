@@ -99,12 +99,8 @@ function startGameServer(server) {
 function nextPlayerAlias() {
   let playerSocketID;
   do {
-    console.log("before ",playerTurnIndex);
     playerTurnIndex = getNextPlayerTurnIndex();
-    console.log("after ",playerTurnIndex);
     playerSocketID = playerOrder[playerTurnIndex];
-    console.log("after socketID",playerSocketID);
-    console.log("if ",playerSocketID == "DEAD")
   } while (playerSocketID == "DEAD");
   return players[playerSocketID].alias;
 }
