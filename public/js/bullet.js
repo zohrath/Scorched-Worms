@@ -39,14 +39,15 @@ var Bullet = new Phaser.Class({
       this.setVisible(false);
     }*/
     if (this.x < 0 || this.x > game.canvas.width){
-      this.setActive(false);
-      this.setVisible(false);
+      this.hide();
     }
   },
 
   hide: function(){
     this.setActive(false);
     this.setVisible(false);
-    this.destroy();
+    this.destroy(); 
+    console.log("hide!!!", allowedToEmit);
+    socketEmit("finishedTurn");
   }
 });

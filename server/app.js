@@ -18,7 +18,7 @@ function startGameServer(server) {
     if (gameRunning) {
       socket.emit("currentPlayers", players);
     } else {
-      createPlayer(players, socket.id,"Player "+ playerTurnIndex);
+      createPlayer(players, socket.id, "Player " + playerOrder.length);
     }
     // when a player disconnects, remove them from our players object
     socket.on("disconnect", () => {
@@ -42,11 +42,12 @@ function startGameServer(server) {
         socket.broadcast.emit("playerMoved", players[socket.id]);
       }
     });
+
     socket.on("playerHit", function(socketId) {
       io.emit("removePlayer", socketId);
       removeFromPlayerOrder(socketId);
       players[socketId].active = false;
-      if(playerOrder.length <= 1){
+      if (countAlive() <= 1) {
         newRound();
       }
     });
@@ -71,12 +72,11 @@ function startGameServer(server) {
     });
 
     socket.on("finishedTurn", function() {
-      newTurn();
+      newTurn(2000);
     });
 
     socket.on("clientReady", function() {
       if (typeof players[socket.id] !== "undefined") {
-
         if (!players[socket.id].ready) {
           clientsReady++;
           players[socket.id].ready = true;
@@ -90,31 +90,29 @@ function startGameServer(server) {
     });
 
     //// FOR DEVELOPMENT
-    socket.on("forceStart", function(){
-      playerTurnIndex = 0;
+    socket.on("forceStart", function() {
       newRound();
-    })
+    });
   });
 }
 
-function getNextPlayerAlias(){
-  return players[getNextPlayerSocketID(0)].alias;
-}
-
-function getNextPlayerSocket(offset = 1) {
-  let nextPlayerSocketID = getNextPlayerSocketID(offset)
-  return io.sockets.sockets[nextPlayerSocketID];
-}
-
-function getNextPlayerSocketID(offset=1) {
-  let nextPlayerIndex = getNextPlayerTurnIndex(offset);
-  return playerOrder[nextPlayerIndex]
+function nextPlayerAlias() {
+  let playerSocketID;
+  do {
+    console.log("before ",playerTurnIndex);
+    playerTurnIndex = getNextPlayerTurnIndex();
+    console.log("after ",playerTurnIndex);
+    playerSocketID = playerOrder[playerTurnIndex];
+    console.log("after socketID",playerSocketID);
+    console.log("if ",playerSocketID == "DEAD")
+  } while (playerSocketID == "DEAD");
+  return players[playerSocketID].alias;
 }
 
 function removeFromPlayerOrder(targetID) {
   playerOrder.forEach(function(id, i) {
     if (targetID == id) {
-      playerOrder.splice(i, 1); //remove from index i and 1 element
+      playerOrder[i] = "DEAD"; //remove from index i and 1 element
     }
   });
 }
@@ -137,31 +135,44 @@ function createPlayer(playersObject, id, alias) {
   playerOrder.push(id);
 }
 
-
-function resetPlayers(){
+function resetPlayers() {
   let newPlayers = {};
   playerOrder = []; //create new?
-  Object.values(io.sockets.sockets).forEach(function (socket, i){
-    createPlayer(newPlayers, socket.id, "Player "+i);
+  Object.values(io.sockets.sockets).forEach(function(socket, i) {
+    createPlayer(newPlayers, socket.id, "Player " + i);
   });
   return newPlayers; //return or set players
 }
 
-function newRound(){
+function newRound() {
+  playerTurnIndex = 0;
   players = resetPlayers();
   io.emit("clearScene");
   startRound();
 }
 
-function newTurn(offset=1){
-  playerTurnIndex = getNextPlayerTurnIndex(offset);
-  io.emit("nextPlayerTurn", getNextPlayerAlias());
+function newTurn(timeout = 0) {
+  setTimeout(function() {
+    io.emit("nextPlayerTurn", nextPlayerAlias());
+  }, timeout); //delay to sync allowedToEmit and bullet destroy
 }
 
-function startRound(){
+function startRound() {
   io.emit("currentPlayers", players);
-  newTurn(0);
+  newTurn();
   gameRunning = true;
   clientsReady = 0;
 }
+
+function countAlive(){
+  let aliveCount = 0;
+  playerOrder.forEach(function(id) {
+    if(id !== "DEAD"){
+      aliveCount++;
+    }
+  });
+  return aliveCount;
+}
+
+
 module.exports = { startGameServer };

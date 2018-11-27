@@ -1,13 +1,11 @@
 function explodeBullet(bullet, object) {
   if (object.hasOwnProperty("playerId")) {
-    bullet.hide();
     socketEmit("playerHit", object.playerId);
   }
   bullet.hide();
 }
 
-function createTank(self, playerInfo) {
-  color = "#fff" //white
+function createTank(self, playerInfo, color) {
   let tankContainer = new Player(self, 'tank', 'turret', playerInfo, color);
   return tankContainer;
 }
@@ -83,7 +81,6 @@ function movePlayer(self, time, delta) {
       self.isMyTurn = false;
       self.spaceDown = false;
       socketEmit("bulletFired", shotInfo);
-      socketEmit("finishedTurn"); // TODO: after bullet died, or smth else
       power = 0;
     }
   }
