@@ -9,6 +9,7 @@ class MainMenu extends Phaser.Scene{
     }    
 
     preload () {
+        if (skipMenu) {this.scene.start("GameScene");}  
         this.load.image("button", "assets/buttonstolen.png");
         this.load.image("menubackground", "assets/menustolen.jpg");
         console.log("Preload in mainmenu");
