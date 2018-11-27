@@ -84,8 +84,10 @@ function createStartTurn(self){
 }
 
 function createNextPlayerTurn(self){
-   socket.on("nextPlayerTurn", function(playerNumber){
-     self.turnText.setText("Turn: Player"+playerNumber);
+   socket.on("nextPlayerTurn", function(alias){
+     let color = self.alias == alias ? "#00ff00" : "#ff0000"
+     self.turnText.setText("Turn: "+alias);
+     self.turnText.setColor(color);
    });
 }
 

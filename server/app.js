@@ -75,7 +75,7 @@ function startGameServer(server) {
       playerTurnIndex = getNextPlayerTurnIndex();
       let nextPlayerSocket = getNextPlayerSocket(0);
       nextPlayerSocket.emit("startTurn");
-      io.emit("nextPlayerTurn", playerTurnIndex);
+      io.emit("nextPlayerTurn", players[nextPlayerSocket.id].alias);
     });
 
     socket.on("clientReady", function() {
@@ -149,9 +149,9 @@ function newRound(){
 }
 
 function startRound(){
-  io.emit("currentPlayers", players);
-  io.emit("nextPlayerTurn", playerTurnIndex);
   let nextPlayerSocket = getNextPlayerSocket(0);
+  io.emit("currentPlayers", players);
+  io.emit("nextPlayerTurn", players[nextPlayerSocket.id].alias);
   nextPlayerSocket.emit("startTurn");
   gameRunning = true;
   clientsReady = 0;
