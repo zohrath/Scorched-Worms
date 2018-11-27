@@ -85,16 +85,17 @@ function createStartTurn(self) {
 
 function createNextPlayerTurn(self) {
   socket.on("nextPlayerTurn", function(alias) {
-    if (alias == self.playerContainer.alias) {
+    if (alias == self.alias) {
       allowedToEmit = true;
       self.isMyTurn= true;
       self.playerContainer.isMyTurn = true;
+      self.turnText.setColor("#00ff00");
     } else {
+      self.turnText.setColor("#ff0000");
       allowedToEmit = false;
     }
     self.turnText.setText("Turn: " + alias);
   });
-}
 
 function createClearScene(self) {
   socket.on("clearScene", function() {

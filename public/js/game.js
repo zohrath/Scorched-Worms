@@ -8,6 +8,8 @@ let keyD;
 let keyR;
 let keyX;
 let allowedToEmit = false;
+let skipMenu = true;
+
 
 class GameScene extends Phaser.Scene {
 
