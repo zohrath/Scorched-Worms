@@ -47,7 +47,6 @@ var Bullet = new Phaser.Class({
     this.setActive(false);
     this.setVisible(false);
     this.destroy(); 
-    console.log("hide!!!", allowedToEmit);
     socketEmit("finishedTurn");
   }
 });

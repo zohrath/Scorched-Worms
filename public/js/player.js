@@ -4,7 +4,6 @@ class Player extends Phaser.GameObjects.Container{
         let weaponSprite = self.add.sprite(0, -7, weapon);
         weaponSprite.setOrigin(0, 0.5);
         let playerText = self.add.text(0, 0, playerInfo.alias, { fontSize: "18px Arial", fill: color, align: "center" });
-        console.log(playerInfo.alias, playerText);
         playerText.setOrigin(0.5, 2);
         super(self, playerInfo.x, playerInfo.y, []);
         self.physics.world.enable(this);
