@@ -7,7 +7,8 @@ function explodeBullet(bullet, object) {
 }
 
 function createTank(self, playerInfo) {
-  let tankContainer = new Player(self, 'tank', 'turret', playerInfo);
+  color = "#fff" //white
+  let tankContainer = new Player(self, 'tank', 'turret', playerInfo, color);
   return tankContainer;
 }
 
