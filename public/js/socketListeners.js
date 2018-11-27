@@ -96,6 +96,7 @@ function createNextPlayerTurn(self) {
     }
     self.turnText.setText("Turn: " + alias);
   });
+}
 
 function createClearScene(self) {
   socket.on("clearScene", function() {
