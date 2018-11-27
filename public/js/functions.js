@@ -1,7 +1,7 @@
 function explodeBullet(bullet, object) {
   if (object.hasOwnProperty("playerId")) {
     bullet.hide();
-    socket.emit("playerHit", object.playerId);
+    socketEmit("playerHit", object.playerId);
   }
   bullet.hide();
 }
@@ -76,37 +76,18 @@ function movePlayer(self, time, delta) {
         power: power,
         angle: self.playerContainer.getWeaponAngle()
       };
-      socket.emit("bulletFired", shotInfo);
-      socket.emit("finishedTurn"); // TODO: after bullet died, or smth else
       self.isMyTurn = false;
       self.spaceDown = false;
+      socketEmit("bulletFired", shotInfo);
+      socketEmit("finishedTurn"); // TODO: after bullet died, or smth else
       power = 0;
     }
   }
 
-  // emit player movement
-  if (self.playerContainer.oldPosition) {
-    if (
-      self.playerContainer.x !== self.playerContainer.oldPosition.x ||
-      self.playerContainer.y !== self.playerContainer.oldPosition.y ||
-      self.playerContainer.rotation !==
-        self.playerContainer.oldPosition.rotation
-    ) {
-      socket.emit("playerMovement", {
-        x: self.playerContainer.x,
-        y: self.playerContainer.y,
-        rotation: self.playerContainer.rotation
-      });
-    }
+}
 
-    if (
-      self.playerContainer.getWeaponAngle() !==
-      self.playerContainer.oldPosition.turretRotation
-    ) {
-      socket.emit("toOtherClients", {
-        event: "moveTurret",
-        turretRotation: self.playerContainer.oldPosition.turretRotation
-      });
-    }
+function socketEmit(emitName,data,force=false){
+  if (allowedToEmit || force){
+    socket.emit(emitName,data);
   }
 }

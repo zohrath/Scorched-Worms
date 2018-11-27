@@ -46,7 +46,6 @@ function startGameServer(server) {
       io.emit("removePlayer", socketId);
       removeFromPlayerOrder(socketId);
       players[socketId].active = false;
-      //io.emit("nextPlayerTurn", playerTurnIndex); //TODO: correct?
       if(playerOrder.length <= 1){
         newRound();
       }
@@ -72,10 +71,7 @@ function startGameServer(server) {
     });
 
     socket.on("finishedTurn", function() {
-      playerTurnIndex = getNextPlayerTurnIndex();
-      let nextPlayerSocket = getNextPlayerSocket(0);
-      nextPlayerSocket.emit("startTurn");
-      io.emit("nextPlayerTurn", playerTurnIndex);
+      newTurn();
     });
 
     socket.on("clientReady", function() {
@@ -101,9 +97,18 @@ function startGameServer(server) {
   });
 }
 
+function getNextPlayerAlias(){
+  return players[getNextPlayerSocketID(0)].alias;
+}
+
 function getNextPlayerSocket(offset = 1) {
+  let nextPlayerSocketID = getNextPlayerSocketID(offset)
+  return io.sockets.sockets[nextPlayerSocketID];
+}
+
+function getNextPlayerSocketID(offset=1) {
   let nextPlayerIndex = getNextPlayerTurnIndex(offset);
-  return io.sockets.sockets[playerOrder[nextPlayerIndex]];
+  return playerOrder[nextPlayerIndex]
 }
 
 function removeFromPlayerOrder(targetID) {
@@ -148,11 +153,14 @@ function newRound(){
   startRound();
 }
 
+function newTurn(offset=1){
+  playerTurnIndex = getNextPlayerTurnIndex(offset);
+  io.emit("nextPlayerTurn", getNextPlayerAlias());
+}
+
 function startRound(){
   io.emit("currentPlayers", players);
-  io.emit("nextPlayerTurn", playerTurnIndex);
-  let nextPlayerSocket = getNextPlayerSocket(0);
-  nextPlayerSocket.emit("startTurn");
+  newTurn(0);
   gameRunning = true;
   clientsReady = 0;
 }

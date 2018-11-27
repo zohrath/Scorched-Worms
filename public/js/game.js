@@ -7,7 +7,7 @@ let socket;
 let keyD;
 let keyR;
 let keyX;
-
+let allowedToEmit = false;
 
 class GameScene extends Phaser.Scene {
 
@@ -79,13 +79,13 @@ class GameScene extends Phaser.Scene {
 
 
     if (keyX.isDown) {
-      console.log(this);
-      console.log(
-        typeof this.playerContainer,
-        this.isMyTurn,
-        this.ready,
-        this
-      );
+
+      console.log(  "type of playerCotainer ",typeof this.playerContainer,);
+      console.log(  "isMyTurn: ",this.isMyTurn,);
+      console.log(  "ready: ",this.ready,);
+      console.log(  "this: ",this);
+      console.log("allowedToEmit: ", allowedToEmit);
+
     }
     
     if (keyD.isDown){
@@ -100,32 +100,62 @@ class GameScene extends Phaser.Scene {
       }
       return;
     }
+
     if (
       typeof this.playerContainer !== "undefined" &&
-      this.playerContainer.active &&
-      this.isMyTurn
+      this.playerContainer.active
     ) {
-      this.playerContainer.setWeaponAngle(mouseAngle);
-      movePlayer(this, time, delta);
-      // save old position data
-      this.playerContainer.oldPosition = {
-        x: this.playerContainer.x,
-        y: this.playerContainer.y,
-        rotation: this.playerContainer.rotation,
-        turretRotation: this.playerContainer.getWeaponAngle()
-      };
-      if (this.playerContainer.body.velocity.x > 0) {
-        this.emitter.startFollow(this.playerContainer, -30, 8);
-        this.playerContainer.list[0].flipX = false;
-        this.emitter.on = true;
-      } else if (this.playerContainer.body.velocity.x < 0) {
-        this.emitter.startFollow(this.playerContainer, 30, 8);
-        this.playerContainer.list[0].flipX = true;
-        this.emitter.on = true;
-      } else {
-        this.emitter.on = false;
+      if(this.isMyTurn){
+        
+        this.playerContainer.setWeaponAngle(mouseAngle);
+        movePlayer(this, time, delta);
+        // save old position data
+        this.playerContainer.oldPosition = {
+          x: this.playerContainer.x,
+          y: this.playerContainer.y,
+          rotation: this.playerContainer.rotation,
+          turretRotation: this.playerContainer.getWeaponAngle()
+        };
+        if (this.playerContainer.body.velocity.x > 0) {
+          this.emitter.startFollow(this.playerContainer, -30, 8);
+          this.playerContainer.list[0].flipX = false;
+          this.emitter.on = true;
+        } else if (this.playerContainer.body.velocity.x < 0) {
+          this.emitter.startFollow(this.playerContainer, 30, 8);
+          this.playerContainer.list[0].flipX = true;
+          this.emitter.on = true;
+        } else {
+          this.emitter.on = false;
+        }
+      }
+      // emit player movement
+      if (this.playerContainer.oldPosition) {
+
+        if (
+          this.playerContainer.x !== this.playerContainer.oldPosition.x ||
+          this.playerContainer.y !== this.playerContainer.oldPosition.y ||
+          this.playerContainer.rotation !==
+            this.playerContainer.oldPosition.rotation
+        ) {
+          socketEmit("playerMovement", {
+            x: this.playerContainer.x,
+            y: this.playerContainer.y,
+            rotation: this.playerContainer.rotation
+          },true);
+        }
+    
+        if (
+          this.playerContainer.getWeaponAngle() !==
+          this.playerContainer.oldPosition.turretRotation
+        ) {
+          socketEmit("toOtherClients", {
+            event: "moveTurret",
+            turretRotation: self.playerContainer.oldPosition.turretRotation
+          });
+        }
       }
   }
+
 }
 }
 

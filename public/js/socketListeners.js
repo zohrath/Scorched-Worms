@@ -1,17 +1,17 @@
 function createSocketListners(self) {
-    createCurrentPlayersListener(self);
-    createNewPlayerListener(self);
-    createPlayerMovedListener(self);
-    createRemovePlayerListener(self);
-    createFireBulletListener(self);
-    createMoveTurretListener(self);
-    createStartTurn(self);
-    createNextPlayerTurn(self);
-    createClearScene(self);
+  createCurrentPlayersListener(self);
+  createNewPlayerListener(self);
+  createPlayerMovedListener(self);
+  createRemovePlayerListener(self);
+  createFireBulletListener(self);
+  createMoveTurretListener(self);
+  createStartTurn(self);
+  createNextPlayerTurn(self);
+  createClearScene(self);
 }
 
-function createCurrentPlayersListener(self){
-socket.on("currentPlayers", function(players) {
+function createCurrentPlayersListener(self) {
+  socket.on("currentPlayers", function(players) {
     Object.values(players).forEach(value => {
       if (value.playerId === socket.id) {
         addPlayer(self, value);
@@ -23,12 +23,12 @@ socket.on("currentPlayers", function(players) {
   });
 }
 
-function createNewPlayerListener(self){
+function createNewPlayerListener(self) {
   socket.on("newPlayer", function(playerInfo) {
     addOtherPlayer(self, playerInfo);
   });
 }
-function createPlayerMovedListener(self){
+function createPlayerMovedListener(self) {
   socket.on("playerMoved", playerInfo => {
     self.otherPlayers.getChildren().forEach(otherPlayer => {
       if (playerInfo.playerId === otherPlayer.playerId) {
@@ -38,25 +38,24 @@ function createPlayerMovedListener(self){
     });
   });
 }
-function createRemovePlayerListener(self){
-      socket.on("removePlayer", function(playerId) {
-          if (socket.id == playerId) {
-              self.playerContainer.setActive(false);
-              self.playerContainer.destroy();
-              if(self.isMyTurn){
-                socket.emit("finishedTurn");
-                self.isMyTurn = false;
-              }
-            }
-            self.otherPlayers.getChildren().forEach(function(otherPlayer) {
-                if (playerId === otherPlayer.playerId) {
-                    otherPlayer.destroy();
-                }
-            });
-        });
+function createRemovePlayerListener(self) {
+  socket.on("removePlayer", function(playerId) {
+    if (socket.id == playerId) {
+      self.playerContainer.setActive(false);
+      self.playerContainer.destroy();
+      if (self.isMyTurn) {
+        self.isMyTurn = false;
+      }
     }
+    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
+      if (playerId === otherPlayer.playerId) {
+        otherPlayer.destroy();
+      }
+    });
+  });
+}
 
-function createFireBulletListener(self){
+function createFireBulletListener(self) {
   socket.on("fireBullet", function(bulletInfo) {
     fireBullet(
       self,
@@ -67,34 +66,42 @@ function createFireBulletListener(self){
     );
   });
 }
-function createMoveTurretListener(self){
+function createMoveTurretListener(self) {
   socket.on("moveTurret", function(turretInfo) {
     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
       if (turretInfo.playerId === otherPlayer.playerId) {
-        rotateTurret(otherPlayer,turretInfo.turretRotation);
+        rotateTurret(otherPlayer, turretInfo.turretRotation);
       }
     });
   });
 }
 
-function createStartTurn(self){
-  socket.on("startTurn", function(){
+function createStartTurn(self) {
+  socket.on("startTurn", function() {
+
     self.isMyTurn = true;
   });
 }
 
-function createNextPlayerTurn(self){
-   socket.on("nextPlayerTurn", function(playerNumber){
-     self.turnText.setText("Turn: Player"+playerNumber);
-   });
+function createNextPlayerTurn(self) {
+  socket.on("nextPlayerTurn", function(alias) {
+    if (alias == self.playerContainer.alias) {
+      allowedToEmit = true;
+      self.isMyTurn= true;
+      self.playerContainer.isMyTurn = true;
+    } else {
+      allowedToEmit = false;
+    }
+    self.turnText.setText("Turn: " + alias);
+  });
 }
 
-function createClearScene(self){
-  socket.on('clearScene', function(){
-    self.otherPlayers.getChildren().forEach(function(player){
+function createClearScene(self) {
+  socket.on("clearScene", function() {
+    self.otherPlayers.getChildren().forEach(function(player) {
       player.destroy();
     });
-    if (self.playerContainer){
+    if (self.playerContainer) {
       self.playerContainer.destroy();
     }
   });
