@@ -47,7 +47,13 @@ function startGameServer(server) {
       io.emit("removePlayer", socketId);
       removeFromPlayerOrder(socketId);
       players[socketId].active = false;
-      if (countAlive() <= 1) {
+      let alivePlayers = getAlivePlayers();
+      if (alivePlayers.length <= 1) {
+        if (alivePlayers.length == 1) {
+          io.emit("playerWon", players[alivePlayers[0]].alias);
+        } else if (alivePlayers.length < 1) {
+          io.emit("playerWon");
+        }
         newRound();
       }
     });
@@ -160,15 +166,14 @@ function startRound() {
   clientsReady = 0;
 }
 
-function countAlive(){
-  let aliveCount = 0;
+function getAlivePlayers() {
+  let aliveArray = [];
   playerOrder.forEach(function(id) {
-    if(id !== "DEAD"){
-      aliveCount++;
+    if (id !== "DEAD") {
+      aliveArray.push(id);
     }
   });
-  return aliveCount;
+  return aliveArray;
 }
-
 
 module.exports = { startGameServer };

@@ -31,6 +31,7 @@ function addPlayer(self, playerInfo) {
   self.alias = playerInfo.alias
   let color = "#00ff00";
   self.playerContainer = createTank(self, playerInfo, color);
+  self.player.add(self.playerContainer);
 }
 
 function fireBullet(self, x, y, angle, power) {

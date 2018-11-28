@@ -8,6 +8,7 @@ function createSocketListners(self) {
   createStartTurn(self);
   createNextPlayerTurn(self);
   createClearScene(self);
+  createPlayerWon(self);
 }
 
 function createCurrentPlayersListener(self) {
@@ -28,6 +29,7 @@ function createNewPlayerListener(self) {
     addOtherPlayer(self, playerInfo);
   });
 }
+
 function createPlayerMovedListener(self) {
   socket.on("playerMoved", playerInfo => {
     self.otherPlayers.getChildren().forEach(otherPlayer => {
@@ -107,4 +109,19 @@ function createClearScene(self) {
       self.playerContainer.destroy();
     }
   });
+}
+
+function createPlayerWon(self) {
+  socket.on("playerWon",function(player){
+    let displayText;
+    if(player){
+      displayText = player + " won!";
+    } else {
+      displayText = "Draw!";
+    }
+    centerText = createCenterText(self,displayText);
+      setTimeout(function(){
+        centerText.destroy();
+      }, 3000)
+  })
 }

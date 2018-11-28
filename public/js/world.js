@@ -35,4 +35,17 @@ function createTurnText(self) {
       fill: "#999"
     });
   }
+
+function createCenterText(self,text){
+  self.winText = self.add.text((game.canvas.width) * .5, ( game.canvas.height) * .5, text, {
+    align: "center",
+    fontSize: "64px",
+    fill: "#999",
+    boundsAlignH: "center", // bounds center align horizontally
+    boundsAlignV: "middle" 
+  }
+  )
+  self.winText.setOrigin(0.5,0.5);
+  return self.winText;
+}
   
