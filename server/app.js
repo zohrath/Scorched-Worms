@@ -76,11 +76,13 @@ function startGameServer(server) {
 
     socket.on("isPlayerHit", explosionInfo => {
       tilesToRemove = terrain.tilesHit(explosionInfo,16);
-
+      let damgeTaken = 0;
       io.emit("removeTiles", tilesToRemove);
       Object.values(players).forEach(currentPlayer => {
         let playerID = currentPlayer.playerId;
-        currentPlayer.hp -= calculateDmg(explosionInfo, currentPlayer);
+        let currDmg = calculateDmg(explosionInfo, currentPlayer);
+        currentPlayer.hp -= currDmg;
+        damgeTaken += currDmg; 
         if (currentPlayer.hp <= 0) {
           io.emit("removePlayer", playerID);
           removeFromPlayerOrder(playerID, playerOrder);
@@ -97,6 +99,8 @@ function startGameServer(server) {
           io.emit("playerWon");
         }
         newRound(playerOrder);
+      }else if (damgeTaken > 0){
+        io.emit("updateHP", players)
       }
     });
 
@@ -231,7 +235,7 @@ function resetPlayers(playerOrder) {
 function newRound(playerOrder) {
   currentMap = terrain.createPlatformLayer();
   playerTurnIndex = 0;
-  players = resetPlayers();
+  players = resetPlayers(playerOrder);
   io.emit("updatePlatformLayer", currentMap);
   io.emit("clearScene");
   startRound(playerOrder);
@@ -255,16 +259,17 @@ function startRound(playerOrder) {
 
 function calculateDmg(explosion, player) {
   let radius = explosion.radius + 32;
-  let distance = Math.hypot(explosion.x, explosion.y, player.x, player.y);
-
+  let distance = Math.hypot(explosion.x - player.x, explosion.y - player.y);
+  let dmg = 0;
   if (Math.hypot(32, 20) >= distance) {
     // 20?
-    return explosion.dmg;
+    dmg =  explosion.dmg;
   } else if (distance <= radius) {
-    return (explosion.dmg * (1 - distance / radius)).toFixed();
-  } else {
-    return 0;
+    dmg = (explosion.dmg * (1 - distance / radius)).toFixed();
   }
+  
+  console.log("DMG", dmg, " D: ", distance, " R: ", radius);
+  return dmg;
 }
 
 function getAlivePlayers(playerOrder) {

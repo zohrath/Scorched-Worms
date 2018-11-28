@@ -1,15 +1,15 @@
 class Player extends Phaser.GameObjects.Container {
   constructor(scene, character, turretSprite, playerInfo, color) {
     let characterSprite = scene.add.sprite(0, 0, character);
-    let weaponSprite = new Weapon(scene, turretSprite, "bullet", 48, 10);
-    let playerText = scene.add.text(0, 0, playerInfo.alias, {
+    let weaponSprite = new Weapon(scene, turretSprite, "bullet", 100, 10);
+    let playerText = scene.add.text(0, 0, playerInfo.alias + "\n HP: " + playerInfo.hp, {
       fontSize: "18px Arial",
       fill: color,
       align: "center"
     });
 
     weaponSprite.setOrigin(0, 0.5);
-    playerText.setOrigin(0.5, 2);
+    playerText.setOrigin(0.5, 1.5);
     super(scene, playerInfo.x, playerInfo.y, []);
 
     this.playerId = playerInfo.playerId;

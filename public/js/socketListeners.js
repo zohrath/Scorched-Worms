@@ -12,6 +12,7 @@ function createSocketListners(scene) {
   createSyncGamestate(scene);
   createRemoveTiles(scene);
   createUpdatePlatformLayer(scene);
+  createUpdateHP(scene);
 }
 
 function createCurrentPlayersListener(scene) {
@@ -180,5 +181,19 @@ function createUpdatePlatformLayer(scene) {
     platformLayer.physic = scene.matter.world.convertTilemapLayer(
       platformLayer.graphic
     );
+  });
+}
+
+function createUpdateHP(scene){
+  socket.on("updateHP", (players) => {
+    Object.values(players).forEach(playerInfo => {
+      let playerToUpdate = scene.otherPlayers[playerInfo.playerId];
+      if (playerInfo.playerId === socket.id) {
+        playerToUpdate = scene.playerContainer;
+      }
+      console.log(playerInfo);
+      console.log(playerToUpdate);
+      playerToUpdate.list[2].setText(playerInfo.alias + "\n HP: " + playerInfo.hp);
+    });
   });
 }
