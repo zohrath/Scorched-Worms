@@ -5,14 +5,14 @@ function explodeBullet(bullet, object) {
   bullet.hide();
 }
 
-function createTank(self, playerInfo, color) {
-  let tankContainer = new Player(self, 'tank', 'turret', playerInfo, color);
+function createTank(scene, playerInfo, color) {
+  let tankContainer = new Player(scene, 'tank', 'turret', playerInfo, color);
   return tankContainer;
 }
 
-function createEmitter(self) {
-  self.particles = self.add.particles("smoke");
-  self.emitter = self.particles.createEmitter({
+function createEmitter(scene) {
+  scene.particles = scene.add.particles("smoke");
+  scene.emitter = scene.particles.createEmitter({
     on: false,
     active: true,
     speed: 100,
@@ -25,62 +25,55 @@ function rotateTurret(tank, newAngle) {
   tank.list[1].setRotation(newAngle);
 }
 
-function addPlayer(self, playerInfo) {
-  createEmitter(self);
-  self.isMyTurn = playerInfo.playerTurn;
-  self.alias = playerInfo.alias
+function addPlayer(scene, playerInfo) {
+  createEmitter(scene);
+  scene.isMyTurn = playerInfo.playerTurn;
+  scene.alias = playerInfo.alias
   let color = "#00ff00";
-  self.playerContainer = createTank(self, playerInfo, color);
-  self.player.add(self.playerContainer);
+  scene.playerContainer = createTank(scene, playerInfo, color);
+  scene.player.add(scene.playerContainer);
 }
 
-function fireBullet(self, x, y, angle, power) {
-  let bullet = self.bullets.get();
-  if (bullet) {
-    bullet.fire(x, y, angle, power);
-  }
-}
-
-function addOtherPlayer(self, playerInfo) {
+function addOtherPlayer(scene, playerInfo) {
   let color = "#ff0000";
-  otherPlayer = createTank(self, playerInfo, color);
+  otherPlayer = createTank(scene, playerInfo, color);
   otherPlayer.playerId = playerInfo.playerId;
-  self.otherPlayers.add(otherPlayer);
+  scene.otherPlayers.add(otherPlayer);
 }
 
-function movePlayer(self, time, delta) {
+function movePlayer(scene, time, delta) {
 
-  if (self.cursors.left.isDown) {
-    self.playerContainer.body.setAccelerationX(-500);
-  } else if (self.cursors.right.isDown) {
-    self.playerContainer.body.setAccelerationX(500);
+  if (scene.cursors.left.isDown) {
+    scene.playerContainer.body.setAccelerationX(-500);
+  } else if (scene.cursors.right.isDown) {
+    scene.playerContainer.body.setAccelerationX(500);
   } else {
-    self.playerContainer.body.setAccelerationX(0);
+    scene.playerContainer.body.setAccelerationX(0);
   }
-  if (self.cursors.up.isDown && self.playerContainer.body.touching.down) {
-    self.playerContainer.body.velocity.y = -100;
-  } else if (self.cursors.down.isDown) {
-    self.turretInContainer.rotation--;
+  if (scene.cursors.up.isDown && scene.playerContainer.body.touching.down) {
+    scene.playerContainer.body.velocity.y = -100;
+  } else if (scene.cursors.down.isDown) {
+    scene.turretInContainer.rotation--;
   }
   // The if statement below this is never true. Something is wrong with keyX.
-  if (keyX.isdown && self.playerContainer.body.touching.down) {
-    self.playerContainer.body.velocity.y = -100;
+  if (keyX.isdown && scene.playerContainer.body.touching.down) {
+    scene.playerContainer.body.velocity.y = -100;
   }
 
   // SPACE
-  if (self.cursors.space.isDown) {
-    self.spaceDown = true;
+  if (scene.cursors.space.isDown) {
+    scene.spaceDown = true;
     power = (power + Math.floor(delta / 2)) % 1000;
-    self.powerText.setText("Power: " + power);
-  } else if (self.cursors.space.isUp) {
-    if (self.spaceDown && time > self.nextTic) {
-      self.nextTic = time + 500;
+    scene.powerText.setText("Power: " + power);
+  } else if (scene.cursors.space.isUp) {
+    if (scene.spaceDown && time > scene.nextTic) {
+      scene.nextTic = time + 500;
       shotInfo = {
         power: power,
-        angle: self.playerContainer.getWeaponAngle()
+        angle: scene.playerContainer.getWeaponAngle()
       };
-      self.isMyTurn = false;
-      self.spaceDown = false;
+      scene.isMyTurn = false;
+      scene.spaceDown = false;
       socketEmit("bulletFired", shotInfo);
       power = 0;
     }

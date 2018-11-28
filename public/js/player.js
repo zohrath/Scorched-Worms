@@ -1,13 +1,14 @@
 class Player extends Phaser.GameObjects.Container{
-    constructor(self, character, weapon, playerInfo, color) {
-        let characterSprite = self.add.sprite(0, 0, character);
-        let weaponSprite = self.add.sprite(0, -7, weapon);
+    constructor(scene, character, weapon, playerInfo, color) {
+        let characterSprite = scene.add.sprite(0, 0, character);
+        let weaponSprite = new Weapon(scene, "turret", "bullet", 1, 1); //scene.add.sprite(0, -7, weapon);
+        console.log(weaponSprite);
         weaponSprite.setOrigin(0, 0.5);
-        let playerText = self.add.text(0, 0, playerInfo.alias, { fontSize: "18px Arial", fill: color, align: "center" });
+        let playerText = scene.add.text(0, 0, playerInfo.alias, { fontSize: "18px Arial", fill: color, align: "center" });
         playerText.setOrigin(0.5, 2);
-        super(self, playerInfo.x, playerInfo.y, []);
-        self.physics.world.enable(this);
-        self.physics.add.collider(this, self.terrain);
+        super(scene, playerInfo.x, playerInfo.y, []);
+        scene.physics.world.enable(this);
+        scene.physics.add.collider(this, scene.terrain);
 
         
         this.playerId = playerInfo.playerId;
@@ -15,12 +16,17 @@ class Player extends Phaser.GameObjects.Container{
         this.add(characterSprite);
         this.add(weaponSprite);
         this.add(playerText);
-        self.physics.world.enable(this);
+        scene.physics.world.enable(this);
         this.body.setBounce(0.3).setCollideWorldBounds(true);
         this.body.setMaxVelocity(300).setDragX(300);
-        self.physics.add.collider(this, self.terrain);
+        scene.physics.add.collider(this, scene.terrain);
         this.alias = playerInfo.alias
-        self.add.existing(this);
+        scene.add.existing(this);
+    }
+
+    fire (scene, angle, power) {
+
+      this.list[1].fire(scene, this.x, this.y, angle, power);  
     }
 
     getWeaponAngle () {

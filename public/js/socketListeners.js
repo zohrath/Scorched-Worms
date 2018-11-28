@@ -1,38 +1,38 @@
-function createSocketListners(self) {
-  createCurrentPlayersListener(self);
-  createNewPlayerListener(self);
-  createPlayerMovedListener(self);
-  createRemovePlayerListener(self);
-  createFireBulletListener(self);
-  createMoveTurretListener(self);
-  createStartTurn(self);
-  createNextPlayerTurn(self);
-  createClearScene(self);
-  createPlayerWon(self);
+function createSocketListners(scene) {
+  createCurrentPlayersListener(scene);
+  createNewPlayerListener(scene);
+  createPlayerMovedListener(scene);
+  createRemovePlayerListener(scene);
+  createFireBulletListener(scene);
+  createMoveTurretListener(scene);
+  createStartTurn(scene);
+  createNextPlayerTurn(scene);
+  createClearScene(scene);
+  createPlayerWon(scene);
 }
 
-function createCurrentPlayersListener(self) {
+function createCurrentPlayersListener(scene) {
   socket.on("currentPlayers", function(players) {
     Object.values(players).forEach(value => {
       if (value.playerId === socket.id) {
-        addPlayer(self, value);
-        self.ready = true;
+        addPlayer(scene, value);
+        scene.ready = true;
       } else {
-        addOtherPlayer(self, value);
+        addOtherPlayer(scene, value);
       }
     });
   });
 }
 
-function createNewPlayerListener(self) {
+function createNewPlayerListener(scene) {
   socket.on("newPlayer", function(playerInfo) {
-    addOtherPlayer(self, playerInfo);
+    addOtherPlayer(scene, playerInfo);
   });
 }
 
-function createPlayerMovedListener(self) {
+function createPlayerMovedListener(scene) {
   socket.on("playerMoved", playerInfo => {
-    self.otherPlayers.getChildren().forEach(otherPlayer => {
+    scene.otherPlayers.getChildren().forEach(otherPlayer => {
       if (playerInfo.playerId === otherPlayer.playerId) {
         otherPlayer.setRotation(playerInfo.rotation);
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
@@ -40,16 +40,16 @@ function createPlayerMovedListener(self) {
     });
   });
 }
-function createRemovePlayerListener(self) {
+function createRemovePlayerListener(scene) {
   socket.on("removePlayer", function(playerId) {
     if (socket.id == playerId) {
-      self.playerContainer.setActive(false);
-      self.playerContainer.destroy();
-      if (self.isMyTurn) {
-        self.isMyTurn = false;
+      scene.playerContainer.setActive(false);
+      scene.playerContainer.destroy();
+      if (scene.isMyTurn) {
+        scene.isMyTurn = false;
       }
     }
-    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
+    scene.otherPlayers.getChildren().forEach(function(otherPlayer) {
       if (playerId === otherPlayer.playerId) {
         otherPlayer.destroy();
       }
@@ -57,20 +57,19 @@ function createRemovePlayerListener(self) {
   });
 }
 
-function createFireBulletListener(self) {
+function createFireBulletListener(scene) {
   socket.on("fireBullet", function(bulletInfo) {
-    fireBullet(
-      self,
-      bulletInfo.x,
-      bulletInfo.y,
+    let bullet = scene.bullets.get();
+    scene.playerContainer.fire(
+      scene,
       bulletInfo.angle,
       bulletInfo.power
     );
   });
 }
-function createMoveTurretListener(self) {
+function createMoveTurretListener(scene) {
   socket.on("moveTurret", function(turretInfo) {
-    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
+    scene.otherPlayers.getChildren().forEach(function(otherPlayer) {
       if (turretInfo.playerId === otherPlayer.playerId) {
         rotateTurret(otherPlayer, turretInfo.turretRotation);
       }
@@ -78,40 +77,40 @@ function createMoveTurretListener(self) {
   });
 }
 
-function createStartTurn(self) {
+function createStartTurn(scene) {
   socket.on("startTurn", function() {
 
-    self.isMyTurn = true;
+    scene.isMyTurn = true;
   });
 }
 
-function createNextPlayerTurn(self) {
+function createNextPlayerTurn(scene) {
   socket.on("nextPlayerTurn", function(alias) {
-    if (alias == self.alias) {
+    if (alias == scene.alias) {
       allowedToEmit = true;
-      self.isMyTurn= true;
-      self.playerContainer.isMyTurn = true;
-      self.turnText.setColor("#00ff00");
+      scene.isMyTurn= true;
+      scene.playerContainer.isMyTurn = true;
+      scene.turnText.setColor("#00ff00");
     } else {
-      self.turnText.setColor("#ff0000");
+      scene.turnText.setColor("#ff0000");
       allowedToEmit = false;
     }
-    self.turnText.setText("Turn: " + alias);
+    scene.turnText.setText("Turn: " + alias);
   });
 }
 
-function createClearScene(self) {
+function createClearScene(scene) {
   socket.on("clearScene", function() {
-    self.otherPlayers.getChildren().forEach(function(player) {
+    scene.otherPlayers.getChildren().forEach(function(player) {
       player.destroy();
     });
-    if (self.playerContainer) {
-      self.playerContainer.destroy();
+    if (scene.playerContainer) {
+      scene.playerContainer.destroy();
     }
   });
 }
 
-function createPlayerWon(self) {
+function createPlayerWon(scene) {
   socket.on("playerWon",function(player){
     let displayText;
     if(player){
@@ -119,7 +118,7 @@ function createPlayerWon(self) {
     } else {
       displayText = "Draw!";
     }
-    centerText = createCenterText(self,displayText);
+    centerText = createCenterText(scene,displayText);
       setTimeout(function(){
         centerText.destroy();
       }, 3000)

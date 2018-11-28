@@ -28,7 +28,7 @@ class GameScene extends Phaser.Scene {
 
   create() {
     this.nextTic = 0;
-    let self = this;
+    let scene = this;
     this.isMyTurn = false;
     this.ready = false;
     createWorld(this);
@@ -40,28 +40,28 @@ class GameScene extends Phaser.Scene {
     socket = io();
     this.otherPlayers = this.physics.add.group();
     this.player = this.physics.add.group();
-    createSocketListners(self);
+    createSocketListners(scene);
     //COLLIDERS
     this.physics.add.collider(
       this.bullets,
       this.terrain,
       explodeBullet,
       null,
-      self
+      scene
     );
     this.physics.add.collider(
       this.bullets,
       this.otherPlayers,
       explodeBullet,
       null,
-      self
+      scene
     );
     this.physics.add.collider(
       this.bullets,
       this.player,
       explodeBullet,
       null,
-      self
+      scene
     );
 
     this.input.on(

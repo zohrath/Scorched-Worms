@@ -50,9 +50,9 @@ class MainMenu extends Phaser.Scene{
 }
 
 
-/* function startGame (self) {
+/* function startGame (scene) {
     console.log("Starting game scene!");
-    self.scene.start('GameScene');
+    scene.scene.start('GameScene');
 }
 
 function exitGame () {
