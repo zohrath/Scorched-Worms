@@ -7,7 +7,8 @@ function explodeBullet(bullet, object) {
 }
 
 function createTank(self, playerInfo) {
-  let tankContainer = new Player(self, 'tank', 'turret', playerInfo);
+  color = "#fff" //white
+  let tankContainer = new Player(self, 'tank', 'turret', playerInfo, color);
   return tankContainer;
 }
 
@@ -29,7 +30,9 @@ function rotateTurret(tank, newAngle) {
 function addPlayer(self, playerInfo) {
   createEmitter(self);
   self.isMyTurn = playerInfo.playerTurn;
-  self.playerContainer = createTank(self, playerInfo);
+  self.alias = playerInfo.alias
+  let color = "#00ff00";
+  self.playerContainer = createTank(self, playerInfo, color);
 }
 
 function fireBullet(self, x, y, angle, power) {
@@ -40,7 +43,8 @@ function fireBullet(self, x, y, angle, power) {
 }
 
 function addOtherPlayer(self, playerInfo) {
-  otherPlayer = createTank(self, playerInfo);
+  let color = "#ff0000";
+  otherPlayer = createTank(self, playerInfo, color);
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers.add(otherPlayer);
 }

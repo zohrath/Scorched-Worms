@@ -7,6 +7,7 @@ let socket;
 let keyD;
 let keyR;
 let keyX;
+let skipMenu = true;
 
 
 class GameScene extends Phaser.Scene {
