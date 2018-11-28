@@ -90,7 +90,7 @@ class GameScene extends Phaser.Scene {
     }
     
     if (keyD.isDown){
-      console.log("force start")
+      console.log("force start");
       socket.emit("forceStart");
       this.ready
     }
