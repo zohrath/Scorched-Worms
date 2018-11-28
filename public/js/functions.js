@@ -3,6 +3,8 @@ function explodeBullet(bullet, object) {
     bullet.hide();
     socket.emit("playerHit", object.playerId);
   }
+
+  bullet.bulletParticles.destroy();
   bullet.hide();
 }
 
@@ -10,6 +12,17 @@ function createTank(self, playerInfo) {
   color = "#fff" //white
   let tankContainer = new Player(self, 'tank', 'turret', playerInfo, color);
   return tankContainer;
+}
+
+function createBulletEmitter(scene, self) {
+  self.bulletParticles = scene.add.particles("green");
+  self.bulletEmitter = self.bulletParticles.createEmitter({
+    on: false,
+    active: true,
+    speed: 50,
+    scale: { start: 0.3, end: 0},
+    blendMode: "ADD"
+  }); 
 }
 
 function createEmitter(self) {

@@ -2,6 +2,11 @@ var Bullet = new Phaser.Class({
   Extends: Phaser.GameObjects.Image,
 
   initialize: function Bullet(scene) {
+    this.bulletParticles = null;
+    createBulletEmitter(scene, this);
+    this.bulletEmitter.startFollow(this);
+    this.bulletEmitter.on = true;
+    console.log(this.bulletEmitter);
     Phaser.GameObjects.Sprite.call(this, scene, 0, 0, 'bullet');
     this.dx = 0;
     this.dy = 0;
@@ -39,8 +44,7 @@ var Bullet = new Phaser.Class({
       this.setVisible(false);
     }*/
     if (this.x < 0 || this.x > game.canvas.width){
-      this.setActive(false);
-      this.setVisible(false);
+      this.hide;
     }
   },
 

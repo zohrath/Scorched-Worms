@@ -8,6 +8,7 @@ let keyD;
 let keyR;
 let keyX;
 let skipMenu = true;
+let edgeSize = 4;
 
 
 class GameScene extends Phaser.Scene {
@@ -18,6 +19,7 @@ class GameScene extends Phaser.Scene {
     }
 
   preload() {
+    this.load.image("green", "assets/green.png");
     this.load.image("tank_right", "assets/tank_right.png");
     this.load.image("tank_left", "assets/tank_left.png");
     this.load.image("tank", "assets/tank_right.png");
@@ -26,6 +28,7 @@ class GameScene extends Phaser.Scene {
     this.load.image("turret", "assets/turret.png");
     this.load.image("smoke", "assets/smoke-puff.png");
     this.load.image("bullet", "assets/bullet.png");
+    this.load.image('land', 'assets/land.png');
   }
 
   create() {
