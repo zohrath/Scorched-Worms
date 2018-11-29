@@ -64,7 +64,8 @@ function startGameServer(server) {
         x: player.x,
         y: player.y,
         power: inputInfo.power,
-        angle: inputInfo.angle
+        angle: inputInfo.angle,
+        alias: player.alias
       };
 
       io.emit("fireBullet", bulletInfo);
@@ -141,7 +142,8 @@ function resetPlayers() {
   let newPlayers = {};
   playerOrder = []; //create new?
   Object.values(io.sockets.sockets).forEach(function(socket, i) {
-    createPlayer(newPlayers, socket.id, "Player " + i);
+    let newAlias = "Player "  + i;//(socket.id in players) ? players[socket.id].alias : "Player " + i;
+    createPlayer(newPlayers, socket.id, newAlias);
   });
   return newPlayers; //return or set players
 }
