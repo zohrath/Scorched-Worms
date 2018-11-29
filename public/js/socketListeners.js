@@ -59,8 +59,17 @@ function createRemovePlayerListener(scene) {
 
 function createFireBulletListener(scene) {
   socket.on("fireBullet", function(bulletInfo) {
-    let bullet = scene.bullets.get();
-    scene.playerContainer.fire(
+    let playerToFire = scene.playerContainer;
+
+    if(bulletInfo.alias !== scene.alias){
+      scene.otherPlayers.getChildren().forEach(function(otherPlayer) {
+        if(bulletInfo.alias === otherPlayer.alias){
+          playerToFire = otherPlayer;
+        }
+      });
+    }
+    
+    playerToFire.fire(
       scene,
       bulletInfo.angle,
       bulletInfo.power
@@ -106,6 +115,9 @@ function createClearScene(scene) {
     });
     if (scene.playerContainer) {
       scene.playerContainer.destroy();
+    }
+    if(scene.particles){
+      scene.particles.destroy();
     }
   });
 }
