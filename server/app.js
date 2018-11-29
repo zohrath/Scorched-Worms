@@ -43,7 +43,8 @@ function startGameServer(server) {
       }
     });
 
-    socket.on("playerHit", function(socketId) {
+    socket.on("playerHit", function(playerInfo) {
+      let socketId = playerInfo.playerId;
       io.emit("removePlayer", socketId);
       removeFromPlayerOrder(socketId);
       players[socketId].active = false;

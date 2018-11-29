@@ -39,4 +39,15 @@ class Player extends Phaser.GameObjects.Container{
     flipCharacterX (bool) {
         this.list[0].flipX = bool;
     }
+
+    getPlayerInfo(){
+        let basicInfo = {
+            x: this.x,
+            y: this.y,
+            alias: this.alias,
+            playerId: this.playerId
+
+        }
+        return basicInfo;
+    }
 }

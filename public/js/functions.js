@@ -1,7 +1,8 @@
 function explodeBullet(bullet, object) {
   if (object.hasOwnProperty("playerId")) {
-
-    socketEmit("playerHit", object.playerId);
+    console.log(object);
+    let playerInfo = object.getPlayerInfo();
+    socketEmit("playerHit", playerInfo);
   }
   bullet.hide();
 }
@@ -86,4 +87,18 @@ function socketEmit(emitName,data,force=false){
   if (allowedToEmit || force){
     socket.emit(emitName,data);
   }
+}
+
+
+function damagePlayer(explosion, player){
+  //send expl player
+  // with player hit
+  let playerInfo = player.getPlayerInfo();
+  if(playerInfo.playerId in scene.otherPlayers){
+    socketEmit("playerHit",{explosion: explosion,
+  playerInfo: playerInfo});
+  }
+  //else if
+
+  //emit explode bullet
 }

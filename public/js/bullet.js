@@ -1,10 +1,12 @@
 var Bullet = new Phaser.Class({
   Extends: Phaser.GameObjects.Image,
 
-  initialize: function Bullet(scene, aoe, sprite, dmg) {
+  initialize: function Bullet(scene, radius, sprite, dmg) {
     Phaser.GameObjects.Sprite.call(this, scene, 0, 0, 'bullet');
     this.dx = 0;
     this.dy = 0;
+    this.radius = radius;
+    this.dmg = dmg;
     
   },
 
@@ -29,10 +31,14 @@ var Bullet = new Phaser.Class({
     socketEmit("finishedTurn");
   },
 
-  setValues: function(spriteName,aoe,dmg,x,y) {
-    this.setPosition(x, y);
-    this.texture.key = spriteName;
-    this.aoe = aoe;
-    this.dmg = dmg;
+  explode: function(){
+    console.log("EXPLODE!!!!")
   }
+
+  // setValues: function(spriteName,aoe,dmg,x,y) {
+  //   this.setPosition(x, y);
+  //   this.texture.key = spriteName;
+  //   this.aoe = aoe;
+  //   this.dmg = dmg;
+  // }
 });
