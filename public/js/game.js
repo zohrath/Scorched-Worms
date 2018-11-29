@@ -59,6 +59,7 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    console.log(this);
     this.nextTic = 0;
     let self = this;
     this.isMyTurn = false;
