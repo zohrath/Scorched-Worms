@@ -13,15 +13,15 @@ function playerHit(player,explosion){
 }
 
 function createTank(scene, playerInfo, color) {
-  let tankContainer = new Player(scene, 'tank', 'turret', playerInfo, color);
-  return tankContainer;
+  let tank = new Player(scene, 'tank', 'turret', playerInfo, color);
+  return tank;
 }
 
 
 function createBulletEmitter(scene, bullet) {
   bullet.bulletParticles = scene.add.particles("green");
   bullet.bulletEmitter = bullet.bulletParticles.createEmitter({
-    on: false,
+    on: true,
     active: true,
     speed: 50,
     scale: { start: 0.3, end: 0},
@@ -32,7 +32,7 @@ function createBulletEmitter(scene, bullet) {
 function createEmitter(scene) {
   scene.particles = scene.add.particles("smoke");
   scene.emitter = scene.particles.createEmitter({
-    on: false,
+    on: true,
     active: true,
     speed: 100,
     scale: { start: 0.15, end: 0 },
@@ -52,15 +52,6 @@ function addPlayer(scene, playerInfo) {
   scene.playerContainer = createTank(scene, playerInfo, color);
 }
 
-// TODO RM
-function fireBullet(scene, x, y, angle, power) {
-  //let bullet = scene.bullets.get();
-  let bullet = new Bullet(scene);
-  if (bullet) {
-    bullet.fire(x, y, angle, power);
-  }
-}
-
 function addOtherPlayer(scene, playerInfo) {
   let color = "#ff0000";
   otherPlayer = createTank(scene, playerInfo, color);
@@ -70,11 +61,13 @@ function addOtherPlayer(scene, playerInfo) {
 }
 
 function movePlayer(scene, time, delta) {
-  if (scene.playerContainer.body.velocity.x > 7) {
-    scene.playerContainer.setVelocityX(7);
+  scene.playerContainer.setTurretPosition();
+  scene.playerContainer.setPlayerTextPosition();
+  if (scene.playerContainer.tank.body.velocity.x > 7) {
+    scene.playerContainer.tank.body.setVelocityX(7);
   }
-  else if(scene.playerContainer.body.velocity.x < -7){
-    scene.playerContainer.setVelocityX(-7);
+  else if(scene.playerContainer.tank.body.velocity.x < -7){
+    scene.playerContainer.tank.setVelocityX(-7);
   }
   if (scene.cursors.left.isDown) {
     scene.playerContainer.thrustBack(0.5);

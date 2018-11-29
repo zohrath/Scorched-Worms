@@ -117,7 +117,7 @@ function createClearScene(scene) {
       }
     });
     if (scene.playerContainer) {
-      scene.playerContainer.destroy();
+      scene.playerContainer.destroyPlayer();
     }
     if (scene.particles) {
       scene.particles.destroy();

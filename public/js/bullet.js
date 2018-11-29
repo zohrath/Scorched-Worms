@@ -1,7 +1,7 @@
 var Bullet = new Phaser.Class({
   Extends: Phaser.GameObjects.Image,
 
-  initialize: function Bullet(scene, radius, sprite, dmg, explosion) {
+  initialize: function Bullet(scene, radius, sprite, dmg) {
     this.bulletParticles = null;
     createBulletEmitter(scene, this);
     this.bulletEmitter.startFollow(this);
@@ -10,11 +10,10 @@ var Bullet = new Phaser.Class({
 
     this.radius = radius;
     this.dmg = dmg;
-    this.explosion = explosion;
     this.allowedToExplode = true;
 
-    scene.matter.add.gameObject(this);
     scene.add.existing(this);
+    scene.matter.add.gameObject(this);
     scene.matterCollision.addOnCollideStart({
       objectA: this,
       callback: eventData => {
@@ -36,14 +35,18 @@ var Bullet = new Phaser.Class({
   },
 
   fire: function(x, y, angle, speed) {
+    console.log("x,y", x, " , ", y);
     this.setActive(true);
     this.setVisible(true);
+    this.bulletEmitter.on = true;
+    this.bulletEmitter.active = true;
     //  Bullets fire from the middle of the screen to the given x/y
-    this.setPosition(x, y - 40);
-    this.setOrigin(0.5, 0.5);
+    this.setPosition(x, y - 60);
+    //this.setOrigin(0.5, 0.5);
     this.body.angle = angle;
     this.setMass(1);
     this.thrust(speed / 5000);
+    console.log("firing mah laza", this);
   },
 
   hide: function() {
