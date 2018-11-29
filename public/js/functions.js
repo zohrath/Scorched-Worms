@@ -1,5 +1,6 @@
 function explodeBullet(bullet, object) {
   if (object.hasOwnProperty("playerId")) {
+
     socketEmit("playerHit", object.playerId);
   }
   bullet.hide();
@@ -31,7 +32,7 @@ function addPlayer(scene, playerInfo) {
   scene.alias = playerInfo.alias
   let color = "#00ff00";
   scene.playerContainer = createTank(scene, playerInfo, color);
-  scene.player.add(scene.playerContainer);
+
 }
 
 function addOtherPlayer(scene, playerInfo) {
