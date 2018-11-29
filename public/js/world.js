@@ -22,7 +22,7 @@ function createTerrain(self) {
   //self.terrain = self.matter.add.staticGroup();
   //self.terrain.create(512, 753, "ground");
   //console.log(self.terrain);
-  self.terrain = self.matter.add.image(512,753, "ground", null, { isStatic: true });
+  self.terrain = self.matter.add.image(512, 753, "ground", null, { isStatic: true });
 }
 function createPowerText(self) {
   self.powerText = self.add.text(16, 16, "Power: 0", {
