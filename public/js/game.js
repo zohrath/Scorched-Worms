@@ -15,7 +15,18 @@ class GameScene extends Phaser.Scene {
 
   constructor ()
     {
-        super({ key: 'GameScene' });
+        super({ key: 'GameScene',
+                physics: {
+                  arcade: {
+                    debug: true,
+                    gravity: { y: 200 }
+                  },
+                  matter: {
+                    debug: true,
+                    gravity: { y: 0.9 }
+                  }
+                } 
+              });
     }
 
   preload() {
@@ -32,6 +43,7 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    console.log(this);
     this.nextTic = 0;
     let self = this;
     this.isMyTurn = false;
@@ -138,14 +150,7 @@ let config = {
   parent: "ScorchedWorms",
   width: 1024,
   height: 768,
-  physics: {
-    default: "arcade",
-    arcade: {
-      debug: true,
-      gravity: { y: 300 }
-    }
-  },
   scene: [MainMenu, GameScene]
 };
 
-let game = new Phaser.Game(config);
+var game = new Phaser.Game(config);

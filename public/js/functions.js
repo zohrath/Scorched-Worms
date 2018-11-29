@@ -3,7 +3,6 @@ function explodeBullet(bullet, object) {
     bullet.hide();
     socket.emit("playerHit", object.playerId);
   }
-
   bullet.bulletParticles.destroy();
   bullet.hide();
 }
@@ -22,7 +21,7 @@ function createBulletEmitter(scene, self) {
     speed: 50,
     scale: { start: 0.3, end: 0},
     blendMode: "ADD"
-  }); 
+  });
 }
 
 function createEmitter(self) {
@@ -65,11 +64,11 @@ function addOtherPlayer(self, playerInfo) {
 function movePlayer(self, time, delta) {
 
   if (self.cursors.left.isDown) {
-    self.playerContainer.body.setAccelerationX(-500);
+    self.playerContainer.setVelocity(-10,0);
   } else if (self.cursors.right.isDown) {
-    self.playerContainer.body.setAccelerationX(500);
+    self.playerContainer.setVelocity(10,0);
   } else {
-    self.playerContainer.body.setAccelerationX(0);
+    self.playerContainer.setVelocityX(0);
   }
   if (self.cursors.up.isDown && self.playerContainer.body.touching.down) {
     self.playerContainer.body.velocity.y = -100;
