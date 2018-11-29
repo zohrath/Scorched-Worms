@@ -2,16 +2,13 @@ var Bullet = new Phaser.Class({
   Extends: Phaser.GameObjects.Image,
 
   initialize: function Bullet(scene, aoe, sprite, dmg) {
-    Phaser.GameObjects.Image.call(this, scene, 0, 0, 'bullet');
+    Phaser.GameObjects.Sprite.call(this, scene, 0, 0, 'bullet');
     this.dx = 0;
     this.dy = 0;
-    this.setActive(false);
-    this.setVisible(false);
+    
   },
 
   fire: function(x, y, angle, speed) {
-    this.setActive(true);
-    this.setVisible(true);
     this.setPosition(x, y);
 
     this.body.world.scene.physics.velocityFromRotation(
@@ -28,9 +25,7 @@ var Bullet = new Phaser.Class({
   },
 
   hide: function(){
-    this.setActive(false);
-    this.setVisible(false);
-    this.destroy(); 
+    this.destroy();
     socketEmit("finishedTurn");
   },
 
