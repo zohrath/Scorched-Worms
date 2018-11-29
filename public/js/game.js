@@ -47,7 +47,7 @@ class GameScene extends Phaser.Scene {
       this.terrain,
       explodeBullet,
       null,
-      scene
+      scene,
     );
     this.physics.add.collider(
       this.bullets,
@@ -56,13 +56,13 @@ class GameScene extends Phaser.Scene {
       null,
       scene
     );
-    this.physics.add.collider(
-      this.bullets,
-      this.player,
-      explodeBullet,
-      null,
-      scene
-    );
+    // this.physics.add.collider(
+    //   this.bullets,
+    //   this.player,
+    //   explodeBullet,
+    //   null,
+    //   scene
+    // );
 
     this.input.on(
       "pointermove",
