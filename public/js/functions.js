@@ -62,19 +62,24 @@ function addOtherPlayer(self, playerInfo) {
 }
 
 function movePlayer(self, time, delta) {
-
+  if (self.playerContainer.body.velocity.x > 7) {
+    self.playerContainer.setVelocityX(7);
+  }
+  else if(self.playerContainer.body.velocity.x < -7){
+    self.playerContainer.setVelocityX(-7);
+  }
   if (self.cursors.left.isDown) {
-    self.playerContainer.setVelocity(-10,0);
+    self.playerContainer.thrustBack(0.15);
   } else if (self.cursors.right.isDown) {
-    self.playerContainer.setVelocity(10,0);
+    self.playerContainer.thrust(0.15);
   } else {
     //self.playerContainer.setVelocity(0,0);
   }
-  if (self.cursors.up.isDown) {// && self.playerContainer.body.touching.down) {
-    self.playerContainer.setVelocity(0,-3);
+  /*if (self.cursors.up.isDown && self.playerContainer.body.velocity.y > 0) {
+    self.playerContainer.thrustRight(-0.02);
   } else if (self.cursors.down.isDown) {
     //self.turretInContainer.rotation--;
-  }
+  }*/
   // The if statement below this is never true. Something is wrong with keyX.
   if (keyX.isdown && self.playerContainer.body.touching.down) {
     self.playerContainer.body.velocity.y = -100;

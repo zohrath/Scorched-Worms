@@ -12,12 +12,13 @@ class Player extends Phaser.GameObjects.Container{
         //his.add(weaponSprite);
         this.add(playerText);
          //.setCollideWorldBounds(true);
-        //this.body.setMaxVelocity(300).setDragX(300);
+        
         //self.physics.add.collider(this, self.terrain);
         self.matter.add.gameObject(this);
         self.add.existing(this);
         this.setBounce(0.5);
-        //this.setMass(1000);
+        //this.body.setMaxVelocity(300);//.setDragX(300);
+        this.setMass(100);
         console.log("Tank created");
         console.log(this.body);
     }

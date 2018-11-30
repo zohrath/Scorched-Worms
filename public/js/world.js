@@ -5,6 +5,7 @@ function createWorld(self) {
   createPowerText(self);
   createTurnText(self);
   self.physics.world.setBoundsCollision(true, true, false, true);
+  self.matter.world.setBounds(left = true, right = true);
 }
 
 function createBackground(self) {
