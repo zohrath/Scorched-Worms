@@ -68,10 +68,10 @@ function movePlayer(self, time, delta) {
   } else if (self.cursors.right.isDown) {
     self.playerContainer.setVelocity(10,0);
   } else {
-    self.playerContainer.setVelocityX(0);
+    //self.playerContainer.setVelocity(0,0);
   }
-  if (self.cursors.up.isDown && self.playerContainer.body.touching.down) {
-    self.playerContainer.body.velocity.y = -100;
+  if (self.cursors.up.isDown) {// && self.playerContainer.body.touching.down) {
+    self.playerContainer.setVelocity(0,-3);
   } else if (self.cursors.down.isDown) {
     //self.turretInContainer.rotation--;
   }

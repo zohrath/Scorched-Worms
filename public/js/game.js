@@ -130,11 +130,11 @@ class GameScene extends Phaser.Scene {
         rotation: this.playerContainer.rotation,
         turretRotation: this.playerContainer.getWeaponAngle()
       };
-      if (this.playerContainer.body.velocity.x > 0) {
+      if (this.playerContainer.body.velocity.x > 1) {
         this.emitter.startFollow(this.playerContainer, -30, 8);
         this.playerContainer.list[0].flipX = false;
         this.emitter.on = true;
-      } else if (this.playerContainer.body.velocity.x < 0) {
+      } else if (this.playerContainer.body.velocity.x < -1) {
         this.emitter.startFollow(this.playerContainer, 30, 8);
         this.playerContainer.list[0].flipX = true;
         this.emitter.on = true;

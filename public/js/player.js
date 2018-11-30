@@ -16,7 +16,8 @@ class Player extends Phaser.GameObjects.Container{
         //self.physics.add.collider(this, self.terrain);
         self.matter.add.gameObject(this);
         self.add.existing(this);
-        this.setBounce(0.3);
+        this.setBounce(0.5);
+        //this.setMass(1000);
         console.log("Tank created");
         console.log(this.body);
     }
