@@ -23,8 +23,6 @@ class Player {
     this.oldPosition = {turretRotation: 0};
     // scene.add.existing(this);
     scene.add.existing(this.turret);
-    // scene.add.existing(this.tank);
-    console.log(this);
     //super(scene, playerInfo.x, playerInfo.y, 'sheet', 'tank_right_resized.png', {shape: scene.shapes.tank_right});
   };
 
