@@ -7,6 +7,7 @@ var Bullet = new Phaser.Class({
     this.dy = 0;
     this.radius = radius;
     this.dmg = dmg;
+    console.log(this);
     
   },
 
@@ -31,8 +32,11 @@ var Bullet = new Phaser.Class({
     socketEmit("finishedTurn");
   },
 
-  explode: function(){
-    console.log("EXPLODE!!!!")
+  explode: function(scene){
+    let explosion = new Explosion(scene,this.radius,this.dmg,this.x,this.y,"bullet");
+    scene.physics.add.overlap(scene.otherPlayers,explosion,playerHit);
+    setTimeout(function(){
+      explosion.destroy()},2000);
   }
 
   // setValues: function(spriteName,aoe,dmg,x,y) {

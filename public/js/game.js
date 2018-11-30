@@ -40,6 +40,7 @@ class GameScene extends Phaser.Scene {
     socket = io();
     this.otherPlayers = this.physics.add.group();
     this.player = this.physics.add.group();
+    this.explosions = this.physics.add.group();
     createSocketListners(scene);
     //COLLIDERS
     this.physics.add.collider(

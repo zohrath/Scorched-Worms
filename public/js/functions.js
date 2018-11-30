@@ -1,10 +1,15 @@
 function explodeBullet(bullet, object) {
-  if (object.hasOwnProperty("playerId")) {
-    console.log(object);
-    let playerInfo = object.getPlayerInfo();
-    socketEmit("playerHit", playerInfo);
-  }
+  bullet.explode(this);
   bullet.hide();
+}
+
+function playerHit(player,explosion){
+  let playerInfo = player.getPlayerInfo();
+  let explosionInfo = explosion.getBasicInfo();
+  socketEmit("playerHit", {
+    playerInfo: playerInfo,
+    explosionInfo: explosionInfo
+  });
 }
 
 function createTank(scene, playerInfo, color) {
@@ -93,10 +98,11 @@ function socketEmit(emitName,data,force=false){
 function damagePlayer(explosion, player){
   //send expl player
   // with player hit
+  let explosionInfo = explosion.getBasicInfo();
   let playerInfo = player.getPlayerInfo();
   if(playerInfo.playerId in scene.otherPlayers){
-    socketEmit("playerHit",{explosion: explosion,
-  playerInfo: playerInfo});
+    socketEmit("playerHit",{explosion: explosionInfo,
+  player: playerInfo});
   }
   //else if
 

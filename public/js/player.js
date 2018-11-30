@@ -1,53 +1,55 @@
-class Player extends Phaser.GameObjects.Container{
-    constructor(scene, character, weapon, playerInfo, color) {
-        let characterSprite = scene.add.sprite(0, 0, character);
-        let weaponSprite = new Weapon(scene, "turret", "bullet", 1, 1);
-        let playerText = scene.add.text(0, 0, playerInfo.alias, { fontSize: "18px Arial", fill: color, align: "center" });
-       
-        weaponSprite.setOrigin(0, 0.5);
-        playerText.setOrigin(0.5, 2);
-        super(scene, playerInfo.x, playerInfo.y, []);
-        
-        this.playerId = playerInfo.playerId;
-        this.setSize(64, 40);
-        this.add(characterSprite);
-        this.add(weaponSprite);
-        this.add(playerText);
+class Player extends Phaser.GameObjects.Container {
+  constructor(scene, character, weapon, playerInfo, color) {
+    let characterSprite = scene.add.sprite(0, 0, character);
+    let weaponSprite = new Weapon(scene, "turret", "bullet", 10, 10);
+    let playerText = scene.add.text(0, 0, playerInfo.alias, {
+      fontSize: "18px Arial",
+      fill: color,
+      align: "center"
+    });
 
-        
-        scene.physics.world.enable(this);
-        this.body.setBounce(0.3).setCollideWorldBounds(true);
-        this.body.setMaxVelocity(300).setDragX(300);
+    weaponSprite.setOrigin(0, 0.5);
+    playerText.setOrigin(0.5, 2);
+    super(scene, playerInfo.x, playerInfo.y, []);
 
-        scene.physics.add.collider(this, scene.terrain);
-        this.alias = playerInfo.alias;
-        scene.add.existing(this);
-    }
+    this.playerId = playerInfo.playerId;
+    this.setSize(64, 40);
+    this.add(characterSprite);
+    this.add(weaponSprite);
+    this.add(playerText);
 
-    fire (scene, angle, power) {
-      this.list[1].fire(scene, this.x, this.y, angle, power);
-    }
+    scene.physics.world.enable(this);
+    this.body.setBounce(0.3).setCollideWorldBounds(true);
+    this.body.setMaxVelocity(300).setDragX(300);
 
-    getWeaponAngle () {
-        return this.list[1].rotation;
-    }
+    scene.physics.add.collider(this, scene.terrain);
+    this.alias = playerInfo.alias;
+    scene.add.existing(this);
+  }
 
-    setWeaponAngle (angle) {
-        this.list[1].rotation = angle;
-    }
+  fire(scene, angle, power) {
+    this.list[1].fire(scene, this.x, this.y, angle, power);
+  }
 
-    flipCharacterX (bool) {
-        this.list[0].flipX = bool;
-    }
+  getWeaponAngle() {
+    return this.list[1].rotation;
+  }
 
-    getPlayerInfo(){
-        let basicInfo = {
-            x: this.x,
-            y: this.y,
-            alias: this.alias,
-            playerId: this.playerId
+  setWeaponAngle(angle) {
+    this.list[1].rotation = angle;
+  }
 
-        }
-        return basicInfo;
-    }
+  flipCharacterX(bool) {
+    this.list[0].flipX = bool;
+  }
+
+  getPlayerInfo() {
+    let basicInfo = {
+      x: this.x,
+      y: this.y,
+      alias: this.alias,
+      playerId: this.playerId
+    };
+    return basicInfo;
+  }
 }

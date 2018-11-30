@@ -43,21 +43,26 @@ function startGameServer(server) {
       }
     });
 
-    socket.on("playerHit", function(playerInfo) {
+    socket.on("playerHit", function(data) {
+      let playerInfo = data.playerInfo;
+      let explosionInfo = data.explosionInfo;
       let socketId = playerInfo.playerId;
+      let dmgTaken = calculateDmg(explosionInfo,playerInfo);
       io.emit("removePlayer", socketId);
       removeFromPlayerOrder(socketId);
       players[socketId].active = false;
-      let alivePlayers = getAlivePlayers();
-      if (alivePlayers.length <= 1) {
-        if (alivePlayers.length == 1) {
-          io.emit("playerWon", players[alivePlayers[0]].alias);
-        } else if (alivePlayers.length < 1) {
-          io.emit("playerWon");
-        }
-        newRound();
-      }
+      console.log(dmgTaken);
+      // let alivePlayers = getAlivePlayers();
+      // if (alivePlayers.length <= 1) {
+      //   if (alivePlayers.length == 1) {
+      //     io.emit("playerWon", players[alivePlayers[0]].alias);
+      //   } else if (alivePlayers.length < 1) {
+      //     io.emit("playerWon");
+      //   }
+      //   newRound();
+      // }
     });
+
     socket.on("bulletFired", function(inputInfo) {
       player = players[socket.id];
 
@@ -133,7 +138,8 @@ function createPlayer(playersObject, id, alias) {
     y: HEIGHT - 50,
     playerId: id,
     playerTurn: false, //TODO randomize for 1 player to be true
-    ready: false
+    ready: false,
+    hp: 100
   };
   // add id to playerOrder
   playerOrder.push(id);
@@ -167,6 +173,24 @@ function startRound() {
   newTurn();
   gameRunning = true;
   clientsReady = 0;
+}
+
+function calculateDmg(explosion,player){
+  let dmg = explosion.dmg;
+  let radius = explosion.radius+32; // as player x,y is as most 32px away
+  distance = getDistance(explosion.x,explosion.y,player.x,player.y);
+  if(Math.hypot(32,20) >= distance){
+    return dmg;
+  }
+  playerDmg = dmg*(distance/radius);
+  console.log(playerDmg);
+  return playerDmg;
+  
+
+}
+
+function getDistance(x1,y1,x2,y2){
+  return Math.hypot(x1-x2,y1-y2);
 }
 
 function getAlivePlayers() {
