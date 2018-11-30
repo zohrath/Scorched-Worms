@@ -61,8 +61,6 @@ function addOtherPlayer(scene, playerInfo) {
 }
 
 function movePlayer(scene, time, delta) {
-  scene.playerContainer.setTurretPosition();
-  scene.playerContainer.setPlayerTextPosition();
   if (scene.playerContainer.tank.body.velocity.x > 7) {
     scene.playerContainer.tank.body.setVelocityX(7);
   }
@@ -135,4 +133,11 @@ function updatePlayerPosition(scene,playerInfo){
     otherPlayer.setRotation(playerInfo.rotation);
     otherPlayer.setPosition(playerInfo.x, playerInfo.y);
   }
+}
+
+function updateAllPlayers(scene){
+  Object.values(scene.otherPlayers).forEach(player => {
+    player.update();
+  });
+  scene.playerContainer.update();
 }

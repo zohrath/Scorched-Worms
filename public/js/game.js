@@ -140,12 +140,13 @@ class GameScene extends Phaser.Scene {
       }
       
       let prevPos = this.playerContainer.getPrevPos(); 
-      let currPos = this.playerContainer.getCurrentPos(); 
+      let currPos = this.playerContainer.getCurrentPos();
       if (prevPos) {
         if (
           Math.round(currPos.x) !== Math.round(prevPos.x) ||
           Math.round(currPos.y) !== Math.round(prevPos.y)
-        ) {
+          ) {
+          updateAllPlayers(this);
           socketEmit(
             "playerMovement",
             {

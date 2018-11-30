@@ -27,43 +27,7 @@ class Player {
     console.log(this);
     //super(scene, playerInfo.x, playerInfo.y, 'sheet', 'tank_right_resized.png', {shape: scene.shapes.tank_right});
   };
-// TODO: create args outside of weapon for turret and bullet (moar?)
-// class Player extends Phaser.GameObjects.Sprite {
-//   constructor(scene, character, weapon, playerInfo, color) {
-//     let shapes = scene.cache.json.get('shapes');
-//     let tank = scene.matter.add.sprite(playerInfo.x, playerInfo.y, 'sheet', 'tank_right_resized.png', {shape: shapes.tank_right});
-//     let turret = new Weapon(scene, "turret", "bullet", 100, 10, tank.x+2, tank.y+15);
-//     let playerText = scene.add.text(playerInfo.x, playerInfo.y, playerInfo.alias + "\n HP: " + playerInfo.hp, {
-//       fontSize: "18px Arial",
-//       fill: color,
-//       align: "center"
-//     });
-    
-//     tank.setBounce(0.0001);
-//     tank.setMass(100);
-//     tank.body.friction = 0;
-//     tank.body.frictionStatic = 0;
-//     tank.body.frictionAir = 0.3;
 
-//     super(scene, playerInfo.x, playerInfo.y, [tank, turret, playerText]);
-//     this.setInteractive({shape: shapes.tank_right})
-//     turret.setOrigin(0, 0.5);
-//     playerText.setOrigin(0.5, 1.5);
-    
-//     this.setSize(8, 8);
-//     // this.add(tank);
-//     // this.add(turret);
-//     // this.add(playerText);
-    
-//     this.playerId = playerInfo.playerId;
-//     this.alias = playerInfo.alias;
-//     this.tank = this.list[0];
-//     this.turret = this.list[1];
-//     this.playerText = this.list[2];
-//     scene.add.existing(this);
-//     scene.matter.add.gameObject(this);
-//     console.log(this);
-//   }
 
   setFlipX(value) {
     this.tank.setFlipX(value);
@@ -88,8 +52,9 @@ class Player {
   }
 
   fire(scene, angle, power) {
-    console.log("in player fire scene:", scene, "x,y", this.x, this.y, " angle, power:", angle, power);
-    this.turret.fire(scene, this.x, this.y, angle, power);
+    let pos = this.getCurrentPos()
+    console.log("in player fire scene:", scene, "x,y", pos.x, pos.y, " angle, power:", angle, power);
+    this.turret.fire(scene, pos.x, pos.y, angle, power);
   }
 
   getWeaponAngle() {
@@ -121,7 +86,11 @@ class Player {
     this.tank.destroy();
     this.turret.destroy();
     this.playerText.destroy();
-    this.destroy();
+  }
+
+  update(){
+    this.setTurretPosition();
+    this.setPlayerTextPosition();
   }
 
   getCurrentPos(){
