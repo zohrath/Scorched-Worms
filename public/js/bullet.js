@@ -8,6 +8,8 @@ var Bullet = new Phaser.Class({
     this.bulletEmitter.on = true;
     console.log(this.bulletEmitter);
     Phaser.GameObjects.Sprite.call(this, scene, 0, 0, 'bullet');
+    scene.matter.add.gameObject(this);
+    scene.add.existing(this);
     this.dx = 0;
     this.dy = 0;
     this.lifespan = 10000;
@@ -15,21 +17,26 @@ var Bullet = new Phaser.Class({
   },
 
   fire: function(x, y, angle, speed) {
+    
     this.setActive(true);
     this.setVisible(true);
     //  Bullets fire from the middle of the screen to the given x/y
     this.setPosition(x, y);
-
+    this.setOrigin(0.5, 0.5);
+    this.body.angle = angle;
+    this.thrust(speed/5000);
+    this.setMass(1);
+    console.log(this);
     //  we don't need to rotate the bullets as they are round
     //  this.setRotation(angle);
 
     // this.dx = Math.cos(angle);
     // this.dy = Math.sin(angle);
-    this.body.world.scene.physics.velocityFromRotation(
+    /*this.body.world.scene.physics.velocityFromRotation(
       angle,
       speed,
       this.body.velocity
-    );
+    );*/
     // this.body.setAccelerationX(Math.cos(angle)*1000);
     // this.body.setAccelerationY(Math.sin(angle)*1000);
     // this.body.setMaxVelocity(50,50);

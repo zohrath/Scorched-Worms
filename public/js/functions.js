@@ -48,7 +48,8 @@ function addPlayer(self, playerInfo) {
 }
 
 function fireBullet(self, x, y, angle, power) {
-  let bullet = self.bullets.get();
+  //let bullet = self.bullets.get();
+  let bullet = new Bullet(self);
   if (bullet) {
     bullet.fire(x, y, angle, power);
   }
