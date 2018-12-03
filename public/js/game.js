@@ -24,11 +24,13 @@ class GameScene extends Phaser.Scene {
     this.load.image("tank_left", "assets/tank_left.png");
     this.load.image("tank", "assets/tank_right.png");
     this.load.image("background", "assets/background_vulcano.png");
-    this.load.image("ground", "assets/ground.png");
+    //this.load.image("ground", "assets/ground.png");
     this.load.image("turret", "assets/turret.png");
     this.load.image("smoke", "assets/smoke-puff.png");
     this.load.image("bullet", "assets/bullet.png");
     this.load.image('land', 'assets/land.png');
+    this.load.atlas('sheet', 'assets/ground.png', 'assets/groundhillsprite.json');
+    this.load.json('shapes', 'assets/groundhill.json');
   }
 
   create() {
@@ -43,11 +45,11 @@ class GameScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     socket = io();
-    this.otherPlayers = this.physics.add.group();
+    //this.otherPlayers = this.physics.add.group();
 
     createSocketListners(self);
     //COLLIDERS
-    this.physics.add.collider(
+    /* this.physics.add.collider(
       this.bullets,
       this.terrain,
       explodeBullet,
@@ -60,7 +62,7 @@ class GameScene extends Phaser.Scene {
       explodeBullet,
       null,
       self
-    );
+    ); */
 
     this.input.on(
       "pointermove",
@@ -139,10 +141,10 @@ let config = {
   width: 1024,
   height: 768,
   physics: {
-    default: "arcade",
-    arcade: {
+    default: "matter",
+    matter: {
       debug: true,
-      gravity: { y: 300 }
+      gravity: { y: 0.300 }
     }
   },
   scene: [MainMenu, GameScene]
