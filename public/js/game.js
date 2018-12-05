@@ -18,11 +18,11 @@ class GameScene extends Phaser.Scene {
         super({ key: 'GameScene',
                 physics: {
                   arcade: {
-                    debug: true,
+                    debug: false,
                     gravity: { y: 200 }
                   },
                   matter: {
-                    debug: true,
+                    debug: false,
                     gravity: { y: 0.9 }
                   }
                 },
@@ -41,6 +41,9 @@ class GameScene extends Phaser.Scene {
     this.load.image("smoke", "assets/smoke-puff.png");
     this.load.image("bullet", "assets/bullet.png");
     this.load.image('land', 'assets/land.png');
+
+    this.load.tilemapTiledJSON('map', 'assets/scorchedworms.json');
+    this.load.image('swImg', 'assets/scorchedworms.png');
     	
     //this.load.plugin('matterCollision', 'js/phaser-matter-collision-plugin.min.js');
     /*this.load.plugin(
@@ -58,6 +61,7 @@ class GameScene extends Phaser.Scene {
     let self = this;
     this.isMyTurn = false;
     this.ready = false;
+
     createWorld(this);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
