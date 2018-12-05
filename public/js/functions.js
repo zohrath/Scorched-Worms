@@ -59,7 +59,8 @@ function addOtherPlayer(self, playerInfo) {
   let color = "#ff0000";
   otherPlayer = createTank(self, playerInfo, color);
   otherPlayer.playerId = playerInfo.playerId;
-  self.otherPlayers.add(otherPlayer);
+  //self.otherPlayers.add(otherPlayer);
+  self.otherPlayers[playerInfo.playerId] = otherPlayer;
 }
 
 function movePlayer(self, time, delta) {

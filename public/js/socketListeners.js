@@ -30,7 +30,7 @@ function createNewPlayerListener(self){
 }
 function createPlayerMovedListener(self){
   socket.on("playerMoved", playerInfo => {
-    self.otherPlayers.getChildren().forEach(otherPlayer => {
+    Object.values(self.otherPlayers).forEach(otherPlayer => {
       if (playerInfo.playerId === otherPlayer.playerId) {
         otherPlayer.setRotation(playerInfo.rotation);
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
@@ -48,10 +48,10 @@ function createRemovePlayerListener(self){
                 self.isMyTurn = false;
               }
             }
-            self.otherPlayers.getChildren().forEach(function(otherPlayer) {
-                if (playerId === otherPlayer.playerId) {
-                    otherPlayer.destroy();
-                }
+            Object.values(self.otherPlayers).forEach(player => {
+              if (player){
+                player.destroy();
+              }
             });
         });
     }
@@ -69,7 +69,7 @@ function createFireBulletListener(self){
 }
 function createMoveTurretListener(self){
   socket.on("moveTurret", function(turretInfo) {
-    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
+    Object.values(self.otherPlayers).forEach(otherPlayer => {
       if (turretInfo.playerId === otherPlayer.playerId) {
         rotateTurret(otherPlayer,turretInfo.turretRotation);
       }
@@ -93,9 +93,15 @@ function createNextPlayerTurn(self){
 
 function createClearScene(self){
   socket.on('clearScene', function(){
-    self.otherPlayers.getChildren().forEach(function(player){
+    /*self.otherPlayers.getChildren().forEach(function(player){
       player.destroy();
+    });*/
+    Object.values(self.otherPlayers).forEach(player => {
+      if (player){
+        player.destroy();
+      }
     });
+    //self.otherPlayers.clear();
     if (self.playerContainer){
       self.playerContainer.destroy();
     }

@@ -9,7 +9,7 @@ var Bullet = new Phaser.Class({
     Phaser.GameObjects.Sprite.call(this, scene, 0, 0, 'bullet');
     scene.matter.add.gameObject(this);
     scene.add.existing(this);
-    console.log(scene);
+    console.log(this);
     scene.matterCollision.addOnCollideStart({
       objectA: this,
       objectB: scene.terrain,
@@ -19,9 +19,19 @@ var Bullet = new Phaser.Class({
       },
       context: this
     });
+    var players = Object.values(scene.otherPlayers);
+
+    scene.matterCollision.addOnCollideStart({
+      objectA: this,
+      objectB: players,
+      callback: function() {
+        console.log("hit other player");
+      },
+      context: this
+    });
     this.dx = 0;
     this.dy = 0;
-    this.lifespan = 10000;
+    //this.lifespan = 10000;
     // this.setCollideWorldBounds(true);
   },
 
@@ -35,7 +45,6 @@ var Bullet = new Phaser.Class({
     this.body.angle = angle;
     this.setMass(1);
     this.thrust(speed/10000);
-    console.log(this);
     //  we don't need to rotate the bullets as they are round
     //  this.setRotation(angle);
 

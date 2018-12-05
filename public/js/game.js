@@ -65,8 +65,8 @@ class GameScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     socket = io();
-    this.otherPlayers = this.physics.add.group();
-
+    //this.otherPlayers = this.physics.add.group();
+    this.otherPlayers = {};
     createSocketListners(self);
     //COLLIDERS
     this.physics.add.collider(
@@ -78,7 +78,7 @@ class GameScene extends Phaser.Scene {
     );
     this.physics.add.collider(
       //this.bullets,
-      this.otherPlayers,
+      //this.otherPlayers,
       explodeBullet,
       null,
       self
