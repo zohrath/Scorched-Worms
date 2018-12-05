@@ -1,6 +1,6 @@
 function createWorld(self) {
   createBackground(self);
-  createBullets(self);
+  //createBullets(self);
   createTerrain(self);
   createPowerText(self);
   createTurnText(self);
@@ -12,12 +12,13 @@ function createBackground(self) {
   self.terrain = self.add.sprite(512, 384, "background");
 }
 
-function createBullets(self) {
+/*function createBullets(self) {
   self.bullets = self.physics.add.group({
     classType: Bullet,
     runChildUpdate: true
   });
-}
+}*/
+
 
 function createTerrain(self) {
   //self.terrain = self.matter.add.staticGroup();

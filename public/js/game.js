@@ -25,7 +25,8 @@ class GameScene extends Phaser.Scene {
                     debug: true,
                     gravity: { y: 0.9 }
                   }
-                } 
+                },
+                  plugin: PhaserMatterCollisionPlugin // The plugin class
               });
     }
 
@@ -40,6 +41,15 @@ class GameScene extends Phaser.Scene {
     this.load.image("smoke", "assets/smoke-puff.png");
     this.load.image("bullet", "assets/bullet.png");
     this.load.image('land', 'assets/land.png');
+    	
+    //this.load.plugin('matterCollision', 'js/phaser-matter-collision-plugin.min.js');
+    /*this.load.plugin(
+      {
+        key: "matterCollision", // Where to store in Scene.Systems, e.g. scene.sys.matterCollision
+        mapping: "matterCollision", // Where to store in the Scene, e.g. scene.matterCollision
+        url: "https://raw.githubusercontent.com/mikewesthad/phaser-matter-collision-plugin/master/dist/phaser-matter-collision-plugin.min.js"
+      }
+    );*/
   }
 
   create() {
@@ -60,14 +70,14 @@ class GameScene extends Phaser.Scene {
     createSocketListners(self);
     //COLLIDERS
     this.physics.add.collider(
-      this.bullets,
+      //his.bullets,
       this.terrain,
       explodeBullet,
       null,
       self
     );
     this.physics.add.collider(
-      this.bullets,
+      //this.bullets,
       this.otherPlayers,
       explodeBullet,
       null,
@@ -150,7 +160,16 @@ let config = {
   parent: "ScorchedWorms",
   width: 1024,
   height: 768,
-  scene: [MainMenu, GameScene]
+  scene: [MainMenu, GameScene],
+  plugins: {
+    scene: [
+      {
+        plugin: PhaserMatterCollisionPlugin, // The plugin class
+        key: "GameScene", // Where to store in Scene.Systems, e.g. scene.sys.matterCollision
+        mapping: "matterCollision" // Where to store in the Scene, e.g. scene.matterCollision
+      }
+    ]
+  }
 };
 
 var game = new Phaser.Game(config);

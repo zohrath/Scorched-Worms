@@ -11,8 +11,7 @@ class Player extends Phaser.GameObjects.Container{
         //this.add(characterSprite);
         //his.add(weaponSprite);
         this.add(playerText);
-         //.setCollideWorldBounds(true);
-        
+        //.setCollideWorldBounds(true);
         //self.physics.add.collider(this, self.terrain);
         self.matter.add.gameObject(this);
         self.add.existing(this);

@@ -6,10 +6,19 @@ var Bullet = new Phaser.Class({
     createBulletEmitter(scene, this);
     this.bulletEmitter.startFollow(this);
     this.bulletEmitter.on = true;
-    console.log(this.bulletEmitter);
     Phaser.GameObjects.Sprite.call(this, scene, 0, 0, 'bullet');
     scene.matter.add.gameObject(this);
     scene.add.existing(this);
+    console.log(scene);
+    scene.matterCollision.addOnCollideStart({
+      objectA: this,
+      objectB: scene.terrain,
+      callback: function() {
+        this.bulletParticles.destroy();
+        this.destroy();
+      },
+      context: this
+    });
     this.dx = 0;
     this.dy = 0;
     this.lifespan = 10000;
@@ -24,8 +33,8 @@ var Bullet = new Phaser.Class({
     this.setPosition(x, y);
     this.setOrigin(0.5, 0.5);
     this.body.angle = angle;
-    this.thrust(speed/5000);
     this.setMass(1);
+    this.thrust(speed/10000);
     console.log(this);
     //  we don't need to rotate the bullets as they are round
     //  this.setRotation(angle);
@@ -50,9 +59,9 @@ var Bullet = new Phaser.Class({
       this.setActive(false);
       this.setVisible(false);
     }*/
-    if (this.x < 0 || this.x > game.canvas.width){
+    /*if (this.x < 0 || this.x > game.canvas.width){
       this.hide;
-    }
+    }*/
   },
 
   hide: function(){
