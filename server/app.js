@@ -135,7 +135,7 @@ function createPlayer(playersObject, id, alias) {
     alias: alias,
     rotation: 0,
     x: Math.floor(Math.random() * 700) + 50,
-    y: HEIGHT - 50,
+    y: HEIGHT - 200,
     playerId: id,
     playerTurn: false, //TODO randomize for 1 player to be true
     ready: false,
