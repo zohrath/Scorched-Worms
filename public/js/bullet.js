@@ -45,16 +45,18 @@ var Bullet = new Phaser.Class({
     this.body.angle = angle;
     this.setMass(1);
     this.thrust(speed/10000);
+
     //  we don't need to rotate the bullets as they are round
     //  this.setRotation(angle);
-
     // this.dx = Math.cos(angle);
     // this.dy = Math.sin(angle);
+
     /*this.body.world.scene.physics.velocityFromRotation(
       angle,
       speed,
       this.body.velocity
     );*/
+    
     // this.body.setAccelerationX(Math.cos(angle)*1000);
     // this.body.setAccelerationY(Math.sin(angle)*1000);
     // this.body.setMaxVelocity(50,50);
@@ -74,8 +76,21 @@ var Bullet = new Phaser.Class({
   },
 
   hide: function(){
-    this.setActive(false);
-    this.setVisible(false);
     this.destroy();
+    socketEmit("finishedTurn");
+  },
+
+  explode: function(scene){
+    let explosion = new Explosion(scene,this.radius,this.dmg,this.x,this.y,"bullet");
+    scene.physics.add.overlap(scene.otherPlayers,explosion,playerHit);
+    setTimeout(function(){
+      explosion.destroy()},2000);
   }
+
+  // setValues: function(spriteName,aoe,dmg,x,y) {
+  //   this.setPosition(x, y);
+  //   this.texture.key = spriteName;
+  //   this.aoe = aoe;
+  //   this.dmg = dmg;
+  // }
 });

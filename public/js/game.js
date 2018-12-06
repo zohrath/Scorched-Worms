@@ -7,9 +7,9 @@ let socket;
 let keyD;
 let keyR;
 let keyX;
+let allowedToEmit = false;
 let skipMenu = true;
 let edgeSize = 4;
-
 
 class GameScene extends Phaser.Scene {
 
@@ -58,7 +58,7 @@ class GameScene extends Phaser.Scene {
   create() {
     console.log(this);
     this.nextTic = 0;
-    let self = this;
+    let scene = this;
     this.isMyTurn = false;
     this.ready = false;
 
@@ -71,26 +71,37 @@ class GameScene extends Phaser.Scene {
     socket = io();
     //this.otherPlayers = this.physics.add.group();
     this.otherPlayers = {};
-    createSocketListners(self);
+    // TODO change group -> {}?
+    // this.player = this.physics.add.group();
+    // this.explosions = this.physics.add.group();
+    
+    createSocketListners(scene);
     //COLLIDERS
     this.physics.add.collider(
       //his.bullets,
       this.terrain,
       explodeBullet,
       null,
-      self
+      scene,
     );
     this.physics.add.collider(
       //this.bullets,
       //this.otherPlayers,
       explodeBullet,
       null,
-      self
+      scene
     );
+    // this.physics.add.collider(
+    //   this.bullets,
+    //   this.player,
+    //   explodeBullet,
+    //   null,
+    //   scene
+    // );
 
     this.input.on(
       "pointermove",
-      function (pointer) {
+      function(pointer) {
         let cursor = pointer;
         if (typeof this.playerContainer == "object") {
           mouseAngle = Phaser.Math.Angle.Between(
@@ -106,22 +117,18 @@ class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-
-
     if (keyX.isDown) {
-      console.log(this);
-      console.log(
-        typeof this.playerContainer,
-        this.isMyTurn,
-        this.ready,
-        this
-      );
+      console.log("type of playerCotainer ", typeof this.playerContainer);
+      console.log("isMyTurn: ", this.isMyTurn);
+      console.log("ready: ", this.ready);
+      console.log("this: ", this);
+      console.log("allowedToEmit: ", allowedToEmit);
     }
-    
-    if (keyD.isDown){
-      console.log("force start")
+
+    if (keyD.isDown) {
+      console.log("force start");
       socket.emit("forceStart");
-      this.ready
+      this.ready;
     }
     if (!this.ready) {
       if (keyR.isDown) {
@@ -130,13 +137,44 @@ class GameScene extends Phaser.Scene {
       }
       return;
     }
+
     if (
       typeof this.playerContainer !== "undefined" &&
-      this.playerContainer.active &&
-      this.isMyTurn
+      this.playerContainer.active
     ) {
-      this.playerContainer.setWeaponAngle(mouseAngle);
-      movePlayer(this, time, delta);
+      if (this.isMyTurn) {
+        this.playerContainer.setWeaponAngle(mouseAngle);
+        movePlayer(this, time, delta);
+      }
+
+      if (this.playerContainer.oldPosition) {
+        if (
+          this.playerContainer.x !== this.playerContainer.oldPosition.x ||
+          this.playerContainer.y !== this.playerContainer.oldPosition.y ||
+          this.playerContainer.rotation !==
+            this.playerContainer.oldPosition.rotation
+        ) {
+          socketEmit(
+            "playerMovement",
+            {
+              x: this.playerContainer.x,
+              y: this.playerContainer.y,
+              rotation: this.playerContainer.rotation
+            },
+            true
+          );
+        }
+
+        if (
+          this.playerContainer.getWeaponAngle() !==
+          this.playerContainer.oldPosition.turretRotation
+        ) {
+          socketEmit("toOtherClients", {
+            event: "moveTurret",
+            turretRotation: this.playerContainer.oldPosition.turretRotation
+          });
+        }
+      }
       // save old position data
       this.playerContainer.oldPosition = {
         x: this.playerContainer.x,
@@ -155,8 +193,9 @@ class GameScene extends Phaser.Scene {
       } else {
         this.emitter.on = false;
       }
+    }
+    // emit player movement
   }
-}
 }
 
 let config = {
