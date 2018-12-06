@@ -49,12 +49,13 @@ function createRemovePlayerListener(scene){
             socket.emit("finishedTurn");
             scene.isMyTurn = false;
           }
-        }
+      }else{
         Object.values(scene.otherPlayers).forEach(player => {
-          if (player){
+          if (player != "undefined" && player.id == playerId){
             player.destroy();
           }
         });
+      }
     });
   }
 
@@ -63,7 +64,7 @@ function createFireBulletListener(scene) {
     let playerToFire = scene.playerContainer;
 
     if(bulletInfo.alias !== scene.alias){
-      scene.otherPlayers.getChildren().forEach(function(otherPlayer) {
+      Object.values(scene.otherPlayers).forEach(function(otherPlayer) {
         if(bulletInfo.alias === otherPlayer.alias){
           playerToFire = otherPlayer;
         }
