@@ -9,28 +9,22 @@ var Bullet = new Phaser.Class({
     Phaser.GameObjects.Sprite.call(this, scene, 0, 0, 'bullet');
     scene.matter.add.gameObject(this);
     scene.add.existing(this);
-    console.log(this);
-    scene.matterCollision.addOnCollideStart({
-      objectA: this,
-      objectB: scene.terrain,
-      callback: function() {
-        this.bulletParticles.destroy();
-        this.destroy();
-      },
-      context: this
-    });
-    var players = Object.values(scene.otherPlayers);
 
     scene.matterCollision.addOnCollideStart({
       objectA: this,
-      objectB: players,
-      callback: function() {
-        console.log("hit other player");
-      },
-      context: this
+      callback: eventData => {
+        const { bodyB, gameObjectB } = eventData;
+        
+        //|| gameObjectB instanceof Phaser.GameObjects.Container
+        if (gameObjectB !== undefined && (gameObjectB instanceof Phaser.Tilemaps.Tile || gameObjectB instanceof Player )) {
+          // Now you know that gameObjectB is a Tile, so you can check the index, properties, etc.
+          this.explode(scene);
+          this.hide();
+          console.log(gameObjectB);
+        }
+      }
     });
-    this.dx = 0;
-    this.dy = 0;
+    
     //this.lifespan = 10000;
     // this.setCollideWorldBounds(true);
   },
@@ -40,7 +34,7 @@ var Bullet = new Phaser.Class({
     this.setActive(true);
     this.setVisible(true);
     //  Bullets fire from the middle of the screen to the given x/y
-    this.setPosition(x, y);
+    this.setPosition(x, y-40);
     this.setOrigin(0.5, 0.5);
     this.body.angle = angle;
     this.setMass(1);
@@ -69,13 +63,13 @@ var Bullet = new Phaser.Class({
   },
 
   hide: function(){
+    this.bulletParticles.destroy();
     this.destroy();
     socketEmit("finishedTurn");
   },
 
   explode: function(scene){
     let explosion = new Explosion(scene,this.radius,this.dmg,this.x,this.y,"bullet");
-    scene.physics.add.overlap(scene.otherPlayers,explosion,playerHit);
     setTimeout(function(){
       explosion.destroy()},2000);
   }

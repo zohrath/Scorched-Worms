@@ -1,19 +1,32 @@
 class Explosion extends Phaser.GameObjects.Sprite {
   constructor(scene, radius, dmg, x, y, image) {
     super(scene,x, y, image);
+    scene.matter.add.gameObject(this, {isStatic: true});
     this.radius = radius;
     this.dmg = dmg;
     this.x = x;
     this.y = y;
     this.setOrigin(0.5,0.5);
     this.image = image;
-    scene.physics.world.enable(this);
-    this.body.setCircle(4);
+    this.setCircle(4);
     this.setScale(radius);
-    this.body.setAllowGravity(false);
     scene.add.existing(this);
-  }
 
+    scene.matterCollision.addOnCollideStart({
+      objectA: this,
+      callback: eventData => {
+        const { bodyB, gameObjectB } = eventData;
+        
+        //|| gameObjectB instanceof Phaser.GameObjects.Container
+        if (gameObjectB !== undefined && gameObjectB instanceof Player ) {
+          // Now you know that gameObjectB is a Tile, so you can check the index, properties, etc.
+          console.log("PLAYER HIT", gameObjectB)
+          playerHit(gameObjectB, this);
+        }
+      }
+    });
+  }
+  
   getBasicInfo() {
     let info = {
       radius: this.radius,
@@ -23,5 +36,4 @@ class Explosion extends Phaser.GameObjects.Sprite {
     };
     return info;
   }
-
 }
