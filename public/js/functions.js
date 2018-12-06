@@ -18,9 +18,9 @@ function createTank(scene, playerInfo, color) {
 }
 
 
-function createBulletEmitter(scene) {
-  scene.bulletParticles = scene.add.particles("green");
-  scene.bulletEmitter = scene.bulletParticles.createEmitter({
+function createBulletEmitter(scene, bullet) {
+  bullet.bulletParticles = scene.add.particles("green");
+  bullet.bulletEmitter = bullet.bulletParticles.createEmitter({
     on: false,
     active: true,
     speed: 50,
@@ -105,10 +105,9 @@ function movePlayer(scene, time, delta) {
         power: power,
         angle: scene.playerContainer.getWeaponAngle()
       };
-      socket.emit("bulletFired", shotInfo);
-      socket.emit("finishedTurn"); // TODO: after bullet died, or smth else
       scene.isMyTurn = false;
       scene.spaceDown = false;
+      socketEmit("bulletFired", shotInfo);
       power = 0;
     }
   }
