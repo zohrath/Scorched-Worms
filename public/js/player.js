@@ -18,11 +18,12 @@ class Player extends Phaser.GameObjects.Container {
     this.add(weaponSprite);
     this.add(playerText);
 
-    scene.physics.world.enable(this);
-    this.body.setBounce(0.3).setCollideWorldBounds(true);
-    this.body.setMaxVelocity(300).setDragX(300);
+    scene.matter.add.gameObject(this);
 
-    scene.physics.add.collider(this, scene.terrain);
+    //
+    this.setBounce(0.05);
+    this.setMass(100);
+
     this.alias = playerInfo.alias;
     scene.add.existing(this);
   }
