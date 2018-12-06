@@ -40,7 +40,6 @@ class GameScene extends Phaser.Scene {
     this.load.image("turret", "assets/turret.png");
     this.load.image("smoke", "assets/smoke-puff.png");
     this.load.image("bullet", "assets/bullet.png");
-    this.load.image('land', 'assets/land.png');
 
     this.load.tilemapTiledJSON('map', 'assets/scorchedworms.json');
     this.load.image('swImg', 'assets/scorchedworms.png');
@@ -58,7 +57,7 @@ class GameScene extends Phaser.Scene {
   create() {
     console.log(this);
     this.nextTic = 0;
-    let scene = this;
+    let self = this;
     this.isMyTurn = false;
     this.ready = false;
 
@@ -75,29 +74,7 @@ class GameScene extends Phaser.Scene {
     // this.player = this.physics.add.group();
     // this.explosions = this.physics.add.group();
     
-    createSocketListners(scene);
-    //COLLIDERS
-    this.physics.add.collider(
-      //his.bullets,
-      this.terrain,
-      explodeBullet,
-      null,
-      scene,
-    );
-    this.physics.add.collider(
-      //this.bullets,
-      //this.otherPlayers,
-      explodeBullet,
-      null,
-      scene
-    );
-    // this.physics.add.collider(
-    //   this.bullets,
-    //   this.player,
-    //   explodeBullet,
-    //   null,
-    //   scene
-    // );
+    createSocketListners(this);
 
     this.input.on(
       "pointermove",
