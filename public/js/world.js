@@ -1,6 +1,6 @@
 function createWorld(scene) {
   // createBackground(scene);
-  //createBullets(scene);
+  createBullets(scene);
   createTerrain(scene);
   createPowerText(scene);
   createTurnText(scene);
@@ -8,17 +8,14 @@ function createWorld(scene) {
   scene.matter.world.setBounds(left = true, right = true);
 }
 
-function createBackground(scene) {
-  scene.terrain = scene.add.sprite(512, 384, "background");
-}
+// function createBackground(scene) {
+//   scene.terrain = scene.add.sprite(512, 384, "background");
+// }
 
-/*
+
 function createBullets(scene) {
-  scene.bullets = scene.physics.add.group({
-    classType: Bullet,
-    runChildUpdate: true
-  });
-}*/
+  scene.bullets = []; // defa update <-
+  }
 
 
 function createTerrain(scene) {
