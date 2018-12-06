@@ -63,13 +63,6 @@ var Bullet = new Phaser.Class({
   },
 
   update: function(time, delta) {
-    /*this.lifespan -= delta;
-    // this.x += this.dx * (this.speed * delta);
-    // this.y += this.dy * (this.speed * delta);
-    if (this.lifespan <= 0) {
-      this.setActive(false);
-      this.setVisible(false);
-    }*/
     /*if (this.x < 0 || this.x > game.canvas.width){
       this.hide;
     }*/

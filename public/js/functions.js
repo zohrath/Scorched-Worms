@@ -1,21 +1,26 @@
 function explodeBullet(bullet, object) {
-  if (object.hasOwnProperty("playerId")) {
-    bullet.hide();
-    socket.emit("playerHit", object.playerId);
-  }
-  bullet.bulletParticles.destroy();
+  bullet.explode(this);
   bullet.hide();
 }
 
-function createTank(self, playerInfo) {
-  color = "#fff" //white
-  let tankContainer = new Player(self, 'tank', 'turret', playerInfo, color);
+function playerHit(player,explosion){
+  let playerInfo = player.getPlayerInfo();
+  let explosionInfo = explosion.getBasicInfo();
+  socketEmit("playerHit", {
+    playerInfo: playerInfo,
+    explosionInfo: explosionInfo
+  });
+}
+
+function createTank(scene, playerInfo, color) {
+  let tankContainer = new Player(scene, 'tank', 'turret', playerInfo, color);
   return tankContainer;
 }
 
-function createBulletEmitter(scene, self) {
-  self.bulletParticles = scene.add.particles("green");
-  self.bulletEmitter = self.bulletParticles.createEmitter({
+
+function createBulletEmitter(scene) {
+  scene.bulletParticles = scene.add.particles("green");
+  scene.bulletEmitter = scene.bulletParticles.createEmitter({
     on: false,
     active: true,
     speed: 50,
@@ -24,9 +29,9 @@ function createBulletEmitter(scene, self) {
   });
 }
 
-function createEmitter(self) {
-  self.particles = self.add.particles("smoke");
-  self.emitter = self.particles.createEmitter({
+function createEmitter(scene) {
+  scene.particles = scene.add.particles("smoke");
+  scene.emitter = scene.particles.createEmitter({
     on: false,
     active: true,
     speed: 100,
@@ -39,97 +44,119 @@ function rotateTurret(tank, newAngle) {
   tank.list[1].setRotation(newAngle);
 }
 
-function addPlayer(self, playerInfo) {
-  createEmitter(self);
-  self.isMyTurn = playerInfo.playerTurn;
-  self.alias = playerInfo.alias
+function addPlayer(scene, playerInfo) {
+  createEmitter(scene);
+  scene.isMyTurn = playerInfo.playerTurn;
+  scene.alias = playerInfo.alias
   let color = "#00ff00";
-  self.playerContainer = createTank(self, playerInfo, color);
+  scene.playerContainer = createTank(scene, playerInfo, color);
 }
 
-function fireBullet(self, x, y, angle, power) {
-  //let bullet = self.bullets.get();
-  let bullet = new Bullet(self);
+// TODO RM
+function fireBullet(scene, x, y, angle, power) {
+  //let bullet = scene.bullets.get();
+  let bullet = new Bullet(scene);
   if (bullet) {
     bullet.fire(x, y, angle, power);
   }
 }
 
-function addOtherPlayer(self, playerInfo) {
+function addOtherPlayer(scene, playerInfo) {
   let color = "#ff0000";
-  otherPlayer = createTank(self, playerInfo, color);
+  otherPlayer = createTank(scene, playerInfo, color);
   otherPlayer.playerId = playerInfo.playerId;
-  //self.otherPlayers.add(otherPlayer);
-  self.otherPlayers[playerInfo.playerId] = otherPlayer;
+  //scene.otherPlayers.add(otherPlayer);
+  scene.otherPlayers[playerInfo.playerId] = otherPlayer;
 }
 
-function movePlayer(self, time, delta) {
-  if (self.playerContainer.body.velocity.x > 7) {
-    self.playerContainer.setVelocityX(7);
+function movePlayer(scene, time, delta) {
+  if (scene.playerContainer.body.velocity.x > 7) {
+    scene.playerContainer.setVelocityX(7);
   }
-  else if(self.playerContainer.body.velocity.x < -7){
-    self.playerContainer.setVelocityX(-7);
+  else if(scene.playerContainer.body.velocity.x < -7){
+    scene.playerContainer.setVelocityX(-7);
   }
-  if (self.cursors.left.isDown) {
-    self.playerContainer.thrustBack(0.15);
-  } else if (self.cursors.right.isDown) {
-    self.playerContainer.thrust(0.15);
+  if (scene.cursors.left.isDown) {
+    scene.playerContainer.thrustBack(0.15);
+  } else if (scene.cursors.right.isDown) {
+    scene.playerContainer.thrust(0.15);
   } else {
-    //self.playerContainer.setVelocity(0,0);
+    //scene.playerContainer.setVelocity(0,0);
   }
-  /*if (self.cursors.up.isDown && self.playerContainer.body.velocity.y > 0) {
-    self.playerContainer.thrustRight(-0.02);
-  } else if (self.cursors.down.isDown) {
-    //self.turretInContainer.rotation--;
+  /*if (scene.cursors.up.isDown && scene.playerContainer.body.velocity.y > 0) {
+    scene.playerContainer.thrustRight(-0.02);
+  } else if (scene.cursors.down.isDown) {
+    //scene.turretInContainer.rotation--;
   }*/
   // The if statement below this is never true. Something is wrong with keyX.
-  if (keyX.isdown && self.playerContainer.body.touching.down) {
-    self.playerContainer.body.velocity.y = -100;
+  if (keyX.isdown && scene.playerContainer.body.touching.down) {
+    scene.playerContainer.body.velocity.y = -100;
   }
 
   // SPACE
-  if (self.cursors.space.isDown) {
-    self.spaceDown = true;
+  if (scene.cursors.space.isDown) {
+    scene.spaceDown = true;
     power = (power + Math.floor(delta / 2)) % 1000;
-    self.powerText.setText("Power: " + power);
-  } else if (self.cursors.space.isUp) {
-    if (self.spaceDown && time > self.nextTic) {
-      self.nextTic = time + 500;
+    scene.powerText.setText("Power: " + power);
+  } else if (scene.cursors.space.isUp) {
+    if (scene.spaceDown && time > scene.nextTic) {
+      scene.nextTic = time + 500;
       shotInfo = {
         power: power,
-        angle: self.playerContainer.getWeaponAngle()
+        angle: scene.playerContainer.getWeaponAngle()
       };
       socket.emit("bulletFired", shotInfo);
       socket.emit("finishedTurn"); // TODO: after bullet died, or smth else
-      self.isMyTurn = false;
-      self.spaceDown = false;
+      scene.isMyTurn = false;
+      scene.spaceDown = false;
       power = 0;
     }
   }
 
   // emit player movement
-  if (self.playerContainer.oldPosition) {
+  if (scene.playerContainer.oldPosition) {
     if (
-      self.playerContainer.x !== self.playerContainer.oldPosition.x ||
-      self.playerContainer.y !== self.playerContainer.oldPosition.y ||
-      self.playerContainer.rotation !==
-        self.playerContainer.oldPosition.rotation
+      scene.playerContainer.x !== scene.playerContainer.oldPosition.x ||
+      scene.playerContainer.y !== scene.playerContainer.oldPosition.y ||
+      scene.playerContainer.rotation !==
+        scene.playerContainer.oldPosition.rotation
     ) {
       socket.emit("playerMovement", {
-        x: self.playerContainer.x,
-        y: self.playerContainer.y,
-        rotation: self.playerContainer.rotation
+        x: scene.playerContainer.x,
+        y: scene.playerContainer.y,
+        rotation: scene.playerContainer.rotation
       });
     }
 
     if (
-      self.playerContainer.getWeaponAngle() !==
-      self.playerContainer.oldPosition.turretRotation
+      scene.playerContainer.getWeaponAngle() !==
+      scene.playerContainer.oldPosition.turretRotation
     ) {
       socket.emit("toOtherClients", {
         event: "moveTurret",
-        turretRotation: self.playerContainer.oldPosition.turretRotation
+        turretRotation: scene.playerContainer.oldPosition.turretRotation
       });
     }
   }
+}
+
+function socketEmit(emitName,data,force=false){
+  if (allowedToEmit || force){
+    socket.emit(emitName,data);
+  }
+}
+
+
+function damagePlayer(explosion, player){
+  //send expl player
+  // with player hit
+  let explosionInfo = explosion.getBasicInfo();
+  let playerInfo = player.getPlayerInfo();
+  if(playerInfo.playerId in scene.otherPlayers){
+    socketEmit("playerHit",{explosion: explosionInfo,
+  player: playerInfo});
+  }
+  //else if
+
+  //emit explode bullet
 }
