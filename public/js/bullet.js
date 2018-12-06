@@ -31,8 +31,6 @@ var Bullet = new Phaser.Class({
     });
     this.dx = 0;
     this.dy = 0;
-    //this.lifespan = 10000;
-    // this.setCollideWorldBounds(true);
   },
 
   fire: function(x, y, angle, speed) {
@@ -68,9 +66,9 @@ var Bullet = new Phaser.Class({
       this.setActive(false);
       this.setVisible(false);
     }*/
-    /*if (this.x < 0 || this.x > game.canvas.width){
+    if (this.x < 0 || this.x > game.canvas.width){
       this.hide;
-    }*/
+    }
   },
 
   hide: function(){

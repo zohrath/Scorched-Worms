@@ -44,15 +44,6 @@ class GameScene extends Phaser.Scene {
 
     this.load.tilemapTiledJSON('map', 'assets/scorchedworms.json');
     this.load.image('swImg', 'assets/scorchedworms.png');
-    	
-    //this.load.plugin('matterCollision', 'js/phaser-matter-collision-plugin.min.js');
-    /*this.load.plugin(
-      {
-        key: "matterCollision", // Where to store in Scene.Systems, e.g. scene.sys.matterCollision
-        mapping: "matterCollision", // Where to store in the Scene, e.g. scene.matterCollision
-        url: "https://raw.githubusercontent.com/mikewesthad/phaser-matter-collision-plugin/master/dist/phaser-matter-collision-plugin.min.js"
-      }
-    );*/
   }
 
   create() {
@@ -69,25 +60,9 @@ class GameScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     socket = io();
-    //this.otherPlayers = this.physics.add.group();
     this.otherPlayers = {};
     createSocketListners(self);
-    //COLLIDERS
-    this.physics.add.collider(
-      //his.bullets,
-      this.terrain,
-      explodeBullet,
-      null,
-      self
-    );
-    this.physics.add.collider(
-      //this.bullets,
-      //this.otherPlayers,
-      explodeBullet,
-      null,
-      self
-    );
-
+    
     this.input.on(
       "pointermove",
       function (pointer) {

@@ -1,23 +1,14 @@
 function createWorld(self) {
   // createBackground(self);
-  //createBullets(self);
   createTerrain(self);
   createPowerText(self);
   createTurnText(self);
-  // self.physics.world.setBoundsCollision(true, true, false, true);
   self.matter.world.setBounds(left = true, right = true);
 }
 
 function createBackground(self) {
   self.terrain = self.add.sprite(512, 384, "background");
 }
-
-/*function createBullets(self) {
-  self.bullets = self.physics.add.group({
-    classType: Bullet,
-    runChildUpdate: true
-  });
-}*/
 
 
 function createTerrain(self) {

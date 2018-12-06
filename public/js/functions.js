@@ -75,7 +75,6 @@ function movePlayer(self, time, delta) {
   } else if (self.cursors.right.isDown) {
     self.playerContainer.thrust(0.15);
   } else {
-    //self.playerContainer.setVelocity(0,0);
   }
   /*if (self.cursors.up.isDown && self.playerContainer.body.velocity.y > 0) {
     self.playerContainer.thrustRight(-0.02);
