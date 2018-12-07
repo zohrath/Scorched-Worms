@@ -1,31 +1,59 @@
-class Player extends Phaser.GameObjects.Container{
-    constructor(self, character, weapon, playerInfo, color) {
-        let characterSprite = self.add.image(0, 0, character);
-        let weaponSprite = self.add.image(0, -7, weapon);
-        weaponSprite.setOrigin(0, 0.5);
-        let playerText = self.add.text(0, 0, playerInfo.alias, { fontSize: "18px Arial", fill: color, align: "center" });
-        playerText.setOrigin(0.5, 2);
-        super(self, playerInfo.x, playerInfo.y, [characterSprite, weaponSprite]);
-        this.playerId = playerInfo.playerId;
-        this.setSize(64,40);
-        this.add(playerText);
-        self.matter.add.gameObject(this);
-        self.add.existing(this);
-        this.setBounce(0.5);
-        this.setMass(200);
-        console.log("Tank created");
-        console.log(this.body);
-    }
+class Player extends Phaser.GameObjects.Container {
+  constructor(scene, character, weapon, playerInfo, color) {
+    let characterSprite = scene.add.sprite(0, 0, character);
+    let weaponSprite = new Weapon(scene, "turret", "bullet", 10, 10);
+    let playerText = scene.add.text(0, 0, playerInfo.alias, {
+      fontSize: "18px Arial",
+      fill: color,
+      align: "center"
+    });
 
-    getWeaponAngle () {
-        return this.list[1].rotation;
-    }
+    weaponSprite.setOrigin(0, 0.5);
+    playerText.setOrigin(0.5, 2);
+    super(scene, playerInfo.x, playerInfo.y, []);
 
-    setWeaponAngle (angle) {
-        this.list[1].rotation = angle;
-    }
+    this.playerId = playerInfo.playerId;
+    this.setSize(64, 40);
+    this.add(characterSprite);
+    this.add(weaponSprite);
+    this.add(playerText);
 
-    flipCharacterX (bool) {
-        this.list[0].flipX = bool;
-    }
+    scene.matter.add.gameObject(this);
+
+    //
+    this.setBounce(0.0001);
+    this.setMass(100);
+    this.body.friction = 0.0001;
+    this.body.frictionAir = 0.3;
+    console.log(this);
+
+    this.alias = playerInfo.alias;
+    scene.add.existing(this);
+  }
+
+  fire(scene, angle, power) {
+    this.list[1].fire(scene, this.x, this.y, angle, power);
+  }
+
+  getWeaponAngle() {
+    return this.list[1].rotation;
+  }
+
+  setWeaponAngle(angle) {
+    this.list[1].rotation = angle;
+  }
+
+  flipCharacterX(bool) {
+    this.list[0].flipX = bool;
+  }
+
+  getPlayerInfo() {
+    let basicInfo = {
+      x: this.x,
+      y: this.y,
+      alias: this.alias,
+      playerId: this.playerId
+    };
+    return basicInfo;
+  }
 }

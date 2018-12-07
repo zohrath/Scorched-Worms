@@ -1,36 +1,38 @@
-function createSocketListners(self) {
-    createCurrentPlayersListener(self);
-    createNewPlayerListener(self);
-    createPlayerMovedListener(self);
-    createRemovePlayerListener(self);
-    createFireBulletListener(self);
-    createMoveTurretListener(self);
-    createStartTurn(self);
-    createNextPlayerTurn(self);
-    createClearScene(self);
+function createSocketListners(scene) {
+  createCurrentPlayersListener(scene);
+  createNewPlayerListener(scene);
+  createPlayerMovedListener(scene);
+  createRemovePlayerListener(scene);
+  createFireBulletListener(scene);
+  createMoveTurretListener(scene);
+  createStartTurn(scene);
+  createNextPlayerTurn(scene);
+  createClearScene(scene);
+  createPlayerWon(scene);
 }
 
-function createCurrentPlayersListener(self){
-socket.on("currentPlayers", function(players) {
+function createCurrentPlayersListener(scene) {
+  socket.on("currentPlayers", function(players) {
     Object.values(players).forEach(value => {
       if (value.playerId === socket.id) {
-        addPlayer(self, value);
-        self.ready = true;
+        addPlayer(scene, value);
+        scene.ready = true;
       } else {
-        addOtherPlayer(self, value);
+        addOtherPlayer(scene, value);
       }
     });
   });
 }
 
-function createNewPlayerListener(self){
+function createNewPlayerListener(scene) {
   socket.on("newPlayer", function(playerInfo) {
-    addOtherPlayer(self, playerInfo);
+    addOtherPlayer(scene, playerInfo);
   });
 }
-function createPlayerMovedListener(self){
+
+function createPlayerMovedListener(scene) {
   socket.on("playerMoved", playerInfo => {
-    Object.values(self.otherPlayers).forEach(otherPlayer => {
+    Object.values(scene.otherPlayers).forEach(otherPlayer => {
       if (playerInfo.playerId === otherPlayer.playerId) {
         otherPlayer.setRotation(playerInfo.rotation);
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
@@ -38,72 +40,106 @@ function createPlayerMovedListener(self){
     });
   });
 }
-function createRemovePlayerListener(self){
-      socket.on("removePlayer", function(playerId) {
-          if (socket.id == playerId) {
-              self.playerContainer.setActive(false);
-              self.playerContainer.destroy();
-              if(self.isMyTurn){
-                socket.emit("finishedTurn");
-                self.isMyTurn = false;
-              }
-            }
-            Object.values(self.otherPlayers).forEach(player => {
-              if (player){
-                player.destroy();
-              }
-            });
+function createRemovePlayerListener(scene){
+  socket.on("removePlayer", function(playerId) {
+      if (socket.id == playerId) {
+          scene.playerContainer.setActive(false);
+          scene.playerContainer.destroy();
+          if(scene.isMyTurn){
+            socket.emit("finishedTurn");
+            scene.isMyTurn = false;
+          }
+      }else{
+        Object.values(scene.otherPlayers).forEach(player => {
+          if (player != "undefined" && player.id == playerId){
+            player.destroy();
+          }
         });
-    }
+      }
+    });
+  }
 
-function createFireBulletListener(self){
+function createFireBulletListener(scene) {
   socket.on("fireBullet", function(bulletInfo) {
-    fireBullet(
-      self,
-      bulletInfo.x,
-      bulletInfo.y,
+    let playerToFire = scene.playerContainer;
+
+    if(bulletInfo.alias !== scene.alias){
+      Object.values(scene.otherPlayers).forEach(function(otherPlayer) {
+        if(bulletInfo.alias === otherPlayer.alias){
+          playerToFire = otherPlayer;
+        }
+      });
+    }
+    
+    playerToFire.fire(
+      scene,
       bulletInfo.angle,
       bulletInfo.power
     );
   });
 }
-function createMoveTurretListener(self){
+function createMoveTurretListener(scene) {
   socket.on("moveTurret", function(turretInfo) {
-    Object.values(self.otherPlayers).forEach(otherPlayer => {
+    Object.values(scene.otherPlayers).forEach(otherPlayer => {
       if (turretInfo.playerId === otherPlayer.playerId) {
-        rotateTurret(otherPlayer,turretInfo.turretRotation);
+        rotateTurret(otherPlayer, turretInfo.turretRotation);
       }
     });
   });
 }
 
-function createStartTurn(self){
-  socket.on("startTurn", function(){
-    self.isMyTurn = true;
+function createStartTurn(scene) {
+  socket.on("startTurn", function() {
+
+    scene.isMyTurn = true;
   });
 }
 
-function createNextPlayerTurn(self){
-   socket.on("nextPlayerTurn", function(alias){
-     let color = self.alias == alias ? "#00ff00" : "#ff0000"
-     self.turnText.setText("Turn: "+alias);
-     self.turnText.setColor(color);
-   });
+function createNextPlayerTurn(scene) {
+  socket.on("nextPlayerTurn", function(alias) {
+    if (alias == scene.alias) {
+      allowedToEmit = true;
+      scene.isMyTurn= true;
+      scene.playerContainer.isMyTurn = true;
+      scene.turnText.setColor("#00ff00");
+    } else {
+      scene.turnText.setColor("#ff0000");
+      allowedToEmit = false;
+    }
+    scene.turnText.setText("Turn: " + alias);
+  });
 }
 
-function createClearScene(self){
+function createClearScene(scene){
   socket.on('clearScene', function(){
-    /*self.otherPlayers.getChildren().forEach(function(player){
+    /*scene.otherPlayers.getChildren().forEach(function(player){
       player.destroy();
     });*/
-    Object.values(self.otherPlayers).forEach(player => {
+    Object.values(scene.otherPlayers).forEach(player => {
       if (player){
         player.destroy();
       }
     });
-    //self.otherPlayers.clear();
-    if (self.playerContainer){
-      self.playerContainer.destroy();
+    if (scene.playerContainer) {
+      scene.playerContainer.destroy();
+    }
+    if(scene.particles){
+      scene.particles.destroy();
     }
   });
+}
+
+function createPlayerWon(scene) {
+  socket.on("playerWon",function(player){
+    let displayText;
+    if(player){
+      displayText = player + " won!";
+    } else {
+      displayText = "Draw!";
+    }
+    centerText = createCenterText(scene,displayText);
+      setTimeout(function(){
+        centerText.destroy();
+      }, 3000)
+  })
 }
