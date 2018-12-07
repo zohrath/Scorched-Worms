@@ -14,16 +14,18 @@ function createWorld(scene) {
 
 
 function createBullets(scene) {
+  if(scene.hasOwnProperty("bullets")){
+    scene.bullets.array.forEach(bullet => {
+      if(bullet){
+        bullet.destroyBullet();
+      }
+    });
+  }
   scene.bullets = []; // defa update <-
   }
 
 
-function createTerrain(scene) {
-  //scene.terrain = scene.matter.add.staticGroup();
-  //scene.terrain.create(512, 753, "ground");
-  //console.log(scene.terrain);
-  //scene.terrain = scene.matter.add.image(512, 753, "ground", null, { isStatic: true });
-  
+function createTerrain(scene) { 
   scene.terrain = scene.make.tilemap({ key: 'map' });
   var tileset = scene.terrain.addTilesetImage('scorchedworms', 'swImg');
   var backgroundlayer = scene.terrain.createStaticLayer('bluesky', tileset, 0, 0).setScale(1);
@@ -31,7 +33,7 @@ function createTerrain(scene) {
 
   platformlayer.setCollisionByProperty({ collides: true });
   scene.matter.world.convertTilemapLayer(platformlayer);
-  // scene.matter.world.createDebugGraphic();
+  //scene.matter.world.createDebugGraphic();
 
 }
 function createPowerText(scene) {

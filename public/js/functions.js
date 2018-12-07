@@ -1,6 +1,6 @@
 function explodeBullet(bullet, object) {
   bullet.explode(this);
-  bullet.hide();
+  //bullet.hide();
 }
 
 function playerHit(player,explosion){

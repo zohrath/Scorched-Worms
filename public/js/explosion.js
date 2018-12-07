@@ -4,13 +4,14 @@ class Explosion extends Phaser.GameObjects.Sprite {
     scene.matter.add.gameObject(this, {isStatic: true});
     this.radius = radius;
     this.dmg = dmg;
-    this.x = x;
-    this.y = y;
-    this.setOrigin(0.5,0.5);
+
     this.image = image;
     this.setCircle(4);
     this.setScale(radius);
     scene.add.existing(this);
+
+    this.setActive(true);
+    this.setVisible(false);
 
     scene.matterCollision.addOnCollideStart({
       objectA: this,
@@ -27,6 +28,15 @@ class Explosion extends Phaser.GameObjects.Sprite {
     });
   }
   
+  explode(x, y){
+    this.x = x;
+    this.y = y;
+    this.setOrigin(0.5,0.5);
+    
+    this.setVisible(true);
+    this.setActive(true);
+  }
+
   getBasicInfo() {
     let info = {
       radius: this.radius,

@@ -9,12 +9,16 @@ class Weapon extends Phaser.GameObjects.Sprite{
       }
     
     fire(scene, x, y, angle, power) {
-        let bullet = new Bullet(scene, this.radius, 'bullet', this.dmg);//scene.bullets.get();
+        let explosion = new Explosion(scene, this.radius, this.dmg,this.x,this.y, "bullet");
+        let bullet = new Bullet(scene, this.radius, 'bullet', this.dmg, explosion);//scene.bullets.get();
         if (bullet) {
             //scene.bullets = []
             //bullet.setValues(this.bulletSpritename,this.aoe,this.dmg,200,200);
             scene.bullets.push(bullet);
             bullet.fire(x, y, angle, power);
+        }
+        else{
+            console.log("invalid bullet, oh noes!")
         }
         
       };

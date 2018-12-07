@@ -1,15 +1,20 @@
 var Bullet = new Phaser.Class({
   Extends: Phaser.GameObjects.Image,
 
-  initialize: function Bullet(scene) {
+  initialize: function Bullet(scene, radius, sprite, dmg, explosion) {
     this.bulletParticles = null;
     createBulletEmitter(scene, this);
     this.bulletEmitter.startFollow(this);
     this.bulletEmitter.on = true;
-    Phaser.GameObjects.Sprite.call(this, scene, 0, 0, 'bullet');
+    Phaser.GameObjects.Sprite.call(this, scene, 0, 0, sprite);
+    
+    this.radius = radius;
+    this.dmg = dmg;
+
+    this.explosion = explosion; //TODO send as arg instead of 
+
     scene.matter.add.gameObject(this);
     scene.add.existing(this);
-
     scene.matterCollision.addOnCollideStart({
       objectA: this,
       callback: eventData => {
@@ -19,14 +24,9 @@ var Bullet = new Phaser.Class({
         if (gameObjectB !== undefined && (gameObjectB instanceof Phaser.Tilemaps.Tile || gameObjectB instanceof Player )) {
           // Now you know that gameObjectB is a Tile, so you can check the index, properties, etc.
           this.explode(scene);
-          this.hide();
-          console.log(gameObjectB);
         }
       }
     });
-    
-    //this.lifespan = 10000;
-    // this.setCollideWorldBounds(true);
   },
 
   fire: function(x, y, angle, speed) {
@@ -40,41 +40,28 @@ var Bullet = new Phaser.Class({
     this.setMass(1);
     this.thrust(speed/10000);
 
-    //  we don't need to rotate the bullets as they are round
-    //  this.setRotation(angle);
-    // this.dx = Math.cos(angle);
-    // this.dy = Math.sin(angle);
-
-    /*this.body.world.scene.physics.velocityFromRotation(
-      angle,
-      speed,
-      this.body.velocity
-    );*/
-    
-    // this.body.setAccelerationX(Math.cos(angle)*1000);
-    // this.body.setAccelerationY(Math.sin(angle)*1000);
-    // this.body.setMaxVelocity(50,50);
   },
 
-  update: function(time, delta) {
-    /*if (this.x < 0 || this.x > game.canvas.width){
-      this.hide;
-    }*/
+  destroyBullet: function(){
+    this.bulletParticles.destroy();
+    this.bulletEmitter.destroy();
+    this.explosion.destroy();
+    this.destroy();
   },
+  
 
   hide: function(){
-    this.bulletParticles.destroy();
-    this.destroy();
+    console.log("HIDE BULLET");
+    this.destroyBullet;
     socketEmit("finishedTurn");
   },
-
+  
   explode: function(scene){
-    let explosion = new Explosion(scene,this.radius,this.dmg,this.x,this.y,"bullet");
-    setTimeout(function(){
-      explosion.destroy()},2000);
+    this.explosion.explode(this.x, this.y);
+    this.setVisible(false);
+    this.setActive(false);
+    setTimeout(this.hide, 1500);
   }
-
-  // setValues: function(spriteName,aoe,dmg,x,y) {
   //   this.setPosition(x, y);
   //   this.texture.key = spriteName;
   //   this.aoe = aoe;
