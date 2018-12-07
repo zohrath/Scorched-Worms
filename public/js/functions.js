@@ -77,9 +77,9 @@ function movePlayer(scene, time, delta) {
     scene.playerContainer.setVelocityX(-7);
   }
   if (scene.cursors.left.isDown) {
-    scene.playerContainer.thrustBack(0.15);
+    scene.playerContainer.thrustBack(0.5);
   } else if (scene.cursors.right.isDown) {
-    scene.playerContainer.thrust(0.15);
+    scene.playerContainer.thrust(0.5);
   } else {
     //scene.playerContainer.setVelocity(0,0);
   }

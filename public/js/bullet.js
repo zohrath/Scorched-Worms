@@ -38,7 +38,7 @@ var Bullet = new Phaser.Class({
     this.setOrigin(0.5, 0.5);
     this.body.angle = angle;
     this.setMass(1);
-    this.thrust(speed/10000);
+    this.thrust(speed/5000);
 
   },
 

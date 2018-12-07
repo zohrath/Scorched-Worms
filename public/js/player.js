@@ -21,8 +21,11 @@ class Player extends Phaser.GameObjects.Container {
     scene.matter.add.gameObject(this);
 
     //
-    this.setBounce(0.05);
+    this.setBounce(0.0001);
     this.setMass(100);
+    this.body.friction = 0.0001;
+    this.body.frictionAir = 0.3;
+    console.log(this);
 
     this.alias = playerInfo.alias;
     scene.add.existing(this);
