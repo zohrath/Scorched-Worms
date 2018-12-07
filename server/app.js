@@ -52,15 +52,17 @@ function startGameServer(server) {
       removeFromPlayerOrder(socketId);
       players[socketId].active = false;
       console.log(dmgTaken);
-      // let alivePlayers = getAlivePlayers();
-      // if (alivePlayers.length <= 1) {
-      //   if (alivePlayers.length == 1) {
-      //     io.emit("playerWon", players[alivePlayers[0]].alias);
-      //   } else if (alivePlayers.length < 1) {
-      //     io.emit("playerWon");
-      //   }
-      //   newRound();
-      // }
+
+      let alivePlayers = getAlivePlayers();
+      console.log(alivePlayers);
+      if (alivePlayers.length <= 1) {
+        if (alivePlayers.length == 1) {
+          io.emit("playerWon", players[alivePlayers[0]].alias);
+        } else if (alivePlayers.length < 1) {
+          io.emit("playerWon");
+        }
+        newRound();
+      }
     });
 
     socket.on("bulletFired", function(inputInfo) {
@@ -201,6 +203,10 @@ function getAlivePlayers() {
     }
   });
   return aliveArray;
+}
+
+function resetScene(){
+  io.emit("resetScene");
 }
 
 module.exports = { startGameServer };

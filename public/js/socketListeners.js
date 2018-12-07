@@ -43,16 +43,17 @@ function createPlayerMovedListener(scene) {
 function createRemovePlayerListener(scene){
   socket.on("removePlayer", function(playerId) {
       if (socket.id == playerId) {
-          scene.playerContainer.setActive(false);
+          // scene.playerContainer.setActive(false);
           scene.playerContainer.destroy();
           if(scene.isMyTurn){
             socket.emit("finishedTurn");
             scene.isMyTurn = false;
           }
       }else{
-        Object.values(scene.otherPlayers).forEach(player => {
-          if (player != "undefined" && player.id == playerId){
-            player.destroy();
+        Object.keys(scene.otherPlayers).forEach(currID => {
+          if (currID !== "undefined" && currID === playerId){
+            //scene.otherPlayers[currID].setActive(false);
+            scene.otherPlayers[currID].destroy();
           }
         });
       }
@@ -115,6 +116,11 @@ function createClearScene(scene){
     /*scene.otherPlayers.getChildren().forEach(function(player){
       player.destroy();
     });*/
+    if(scene.scene){
+      console.log("zän", scene.scene);
+      scene.scene.restart();
+    }
+    /*
     Object.values(scene.otherPlayers).forEach(player => {
       if (player){
         player.destroy();
@@ -126,6 +132,7 @@ function createClearScene(scene){
     if(scene.particles){
       scene.particles.destroy();
     }
+    */
   });
 }
 
@@ -142,4 +149,10 @@ function createPlayerWon(scene) {
         centerText.destroy();
       }, 3000)
   })
+}
+
+function createResetScene(scene) {
+  socket.on("resetScene",function(){
+    scene.scene.reset();
+  });
 }
