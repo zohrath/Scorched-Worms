@@ -43,15 +43,17 @@ function startGameServer(server) {
       }
     });
 
-    socket.on("playerHit", function(data) {
-      let playerInfo = data.playerInfo;
-      let explosionInfo = data.explosionInfo;
-      let socketId = playerInfo.playerId;
-      let dmgTaken = calculateDmg(explosionInfo,playerInfo);
-      io.emit("removePlayer", socketId);
-      removeFromPlayerOrder(socketId);
-      players[socketId].active = false;
-      console.log(dmgTaken);
+    socket.on("isPlayerHit", function(explosionInfo) {
+      Object.values(players).forEach(currentPlayer =>{
+        let playerID = currentPlayer.playerId;
+        currentPlayer.hp -= calculateDmg(explosionInfo, currentPlayer);
+        if(currentPlayer.hp <= 0){
+          io.emit("removePlayer", playerID);
+          removeFromPlayerOrder(playerID);
+          players[playerID].active = false;
+        }
+
+      });
 
       let alivePlayers = getAlivePlayers();
       console.log(alivePlayers);
@@ -61,9 +63,10 @@ function startGameServer(server) {
         } else if (alivePlayers.length < 1) {
           io.emit("playerWon");
         }
-        newRound();
+        newRound(2000);
       }
     });
+
 
     socket.on("bulletFired", function(inputInfo) {
       player = players[socket.id];
@@ -141,7 +144,7 @@ function createPlayer(playersObject, id, alias) {
     playerId: id,
     playerTurn: false, //TODO randomize for 1 player to be true
     ready: false,
-    hp: 100
+    hp: 10
   };
   // add id to playerOrder
   playerOrder.push(id);
@@ -180,15 +183,16 @@ function startRound() {
 function calculateDmg(explosion,player){
   let dmg = explosion.dmg;
   let radius = explosion.radius+32; // as player x,y is as most 32px away
+  let playerDmg = 0;
   distance = getDistance(explosion.x,explosion.y,player.x,player.y);
   if(Math.hypot(32,20) >= distance){
-    return dmg;
+    playerDmg = dmg;
+  }else if(distance <= radius ){
+    playerDmg = (dmg*(1 - (distance/radius))).toFixed();
   }
-  playerDmg = dmg*(distance/radius);
   console.log(playerDmg);
   return playerDmg;
   
-
 }
 
 function getDistance(x1,y1,x2,y2){
