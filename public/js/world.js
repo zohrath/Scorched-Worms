@@ -4,6 +4,7 @@ function createWorld(scene) {
   createTerrain(scene);
   createPowerText(scene);
   createTurnText(scene);
+  createWeaponEmitter(scene, 5, 128);
   // scene.physics.world.setBoundsCollision(true, true, false, true);
   scene.matter.world.setBounds(left = true, right = true);
 }
@@ -62,4 +63,15 @@ function createCenterText(scene,text){
   scene.winText.setOrigin(0.5,0.5);
   return scene.winText;
 }
-  
+
+function createWeaponEmitter(scene, radius, imgSize) {
+  let weaponParticles = scene.add.particles("green");
+  scene.weaponEmitter = weaponParticles.createEmitter({
+    on: true,
+    active: true,
+    speed: 50,
+    scale: { start: 0, end: 0.5}, //end to be radius/img.size
+    blendMode: "ADD"
+  });
+  scene.weaponEmitter.size = 128;
+}

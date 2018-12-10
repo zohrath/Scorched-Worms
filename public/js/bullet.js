@@ -5,13 +5,14 @@ var Bullet = new Phaser.Class({
     this.bulletParticles = null;
     createBulletEmitter(scene, this);
     this.bulletEmitter.startFollow(this);
-    this.bulletEmitter.on = true;
+    this.bulletEmitter.on = false;
     Phaser.GameObjects.Sprite.call(this, scene, 0, 0, sprite);
     
     this.radius = radius;
     this.dmg = dmg;
 
     this.explosion = explosion;
+    this.allowedToExplode = true;
 
     scene.matter.add.gameObject(this);
     scene.add.existing(this);
@@ -23,7 +24,9 @@ var Bullet = new Phaser.Class({
         //|| gameObjectB instanceof Phaser.GameObjects.Container
         if (gameObjectB !== undefined && (gameObjectB instanceof Phaser.Tilemaps.Tile || gameObjectB instanceof Player )) {
           // Now you know that gameObjectB is a Tile, so you can check the index, properties, etc.
-          this.explode(scene);
+          if(this.allowedToExplode){
+            this.explode(scene);
+          }
         }
       }
     });
@@ -42,31 +45,31 @@ var Bullet = new Phaser.Class({
 
   },
 
-  destroyBullet: function(){
-    console.log("Destroy BULLET");
-    this.bulletParticles.destroy();
-    this.bulletEmitter.destroy();
-    this.explosion.destroy();
-    this.destroy();
-  },
-
   hide: function(){
-    console.log("HIDE BULLET");
-    this.destroyBullet;
+
+    this.bulletEmitter.on = false;
+    this.destroy();
     socketEmit("finishedTurn");
   },
   
   explode: function(scene){
+    this.allowedToExplode = false;
     //this.explosion.explode(this.x, this.y);
-    this.bulletEmitter.explode(50, this.x, this.y);
-    // this.setVisible(false);
-    // this.setActive(false);
-    this.hide;
+    scene.weaponEmitter.setScale(0.5);//this.radius/scene.weaponEmitter.size);
+    scene.weaponEmitter.explode(200, this.x, this.y);
+    this.isPlayerHit();
+    this.hide();
+
     //setTimeout(this.hide, 1500);
+  },
+
+  isPlayerHit: function(){
+    let explosionInfo = {
+      radius: this.radius,
+      dmg: this.dmg,
+      x: this.x,
+      y: this.y
+     }
+    socketEmit("isPlayerHit", explosionInfo);
   }
-  //   this.setPosition(x, y);
-  //   this.texture.key = spriteName;
-  //   this.aoe = aoe;
-  //   this.dmg = dmg;
-  // }
 });
