@@ -50,18 +50,24 @@ var Bullet = new Phaser.Class({
     this.destroy();
   },
 
-  hide: function(){
+  hide: function(bullet){
     console.log("HIDE BULLET");
-    this.destroyBullet;
-    socketEmit("finishedTurn");
+    console.log(this);
+    //bullet.setVisible(false);
+    //bullet.setActive(false);
+    //bullet.bulletParticles.destroy();
+    //bullet.bulletEmitter.destroy();
+    bullet.explosion.destroy();
+    //bullet.destroy();
+    //this.destroyBullet; 
   },
   
   explode: function(scene){
     //this.explosion.explode(this.x, this.y);
     this.bulletEmitter.explode(50, this.x, this.y);
-    // this.setVisible(false);
-    // this.setActive(false);
-    this.hide;
+    setTimeout(this.hide(this), 1500);
+    //this.hide;
+    socketEmit("finishedTurn");
     //setTimeout(this.hide, 1500);
   }
   //   this.setPosition(x, y);
