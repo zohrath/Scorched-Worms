@@ -116,11 +116,6 @@ function createClearScene(scene){
     /*scene.otherPlayers.getChildren().forEach(function(player){
       player.destroy();
     });*/
-    if(scene.scene){
-      console.log("zän", scene.scene);
-      scene.scene.restart();
-    }
-    /*
     Object.values(scene.otherPlayers).forEach(player => {
       if (player){
         player.destroy();
@@ -132,7 +127,6 @@ function createClearScene(scene){
     if(scene.particles){
       scene.particles.destroy();
     }
-    */
   });
 }
 
@@ -153,6 +147,6 @@ function createPlayerWon(scene) {
 
 function createResetScene(scene) {
   socket.on("resetScene",function(){
-    scene.scene.reset();
+    scene.scene.reset('GameScene');
   });
 }

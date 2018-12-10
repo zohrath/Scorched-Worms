@@ -11,7 +11,7 @@ var Bullet = new Phaser.Class({
     this.radius = radius;
     this.dmg = dmg;
 
-    this.explosion = explosion; //TODO send as arg instead of 
+    this.explosion = explosion;
 
     scene.matter.add.gameObject(this);
     scene.add.existing(this);
@@ -43,12 +43,12 @@ var Bullet = new Phaser.Class({
   },
 
   destroyBullet: function(){
+    console.log("Destroy BULLET");
     this.bulletParticles.destroy();
     this.bulletEmitter.destroy();
     this.explosion.destroy();
     this.destroy();
   },
-  
 
   hide: function(){
     console.log("HIDE BULLET");
@@ -57,10 +57,12 @@ var Bullet = new Phaser.Class({
   },
   
   explode: function(scene){
-    this.explosion.explode(this.x, this.y);
-    this.setVisible(false);
-    this.setActive(false);
-    setTimeout(this.hide, 1500);
+    //this.explosion.explode(this.x, this.y);
+    this.bulletEmitter.explode(50, this.x, this.y);
+    // this.setVisible(false);
+    // this.setActive(false);
+    this.hide;
+    //setTimeout(this.hide, 1500);
   }
   //   this.setPosition(x, y);
   //   this.texture.key = spriteName;
