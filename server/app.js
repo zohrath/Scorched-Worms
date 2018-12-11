@@ -13,22 +13,26 @@ function startGameServer(server) {
   io = socketio.listen(server);
 
   io.sockets.on("connection", function(socket) {
-    console.log("a user connected");
     // create a new player and add it to our players object
     if (gameRunning) {
       socket.emit("currentPlayers", players);
     } else {
       createPlayer(players, socket.id, "Player " + playerOrder.length);
     }
+    console.log("a user connected,", countConnectedPlayers(), "connected and", playerOrder.length, "in game.");
     // when a player disconnects, remove them from our players object
     socket.on("disconnect", () => {
-      console.log("user disconnected");
+      console.log("user disconnected, ", countConnectedPlayers(), "connected");
 
       io.emit("removePlayer", socket.id);
       // remove this player from our players object
-      removeFromPlayerOrder(socket.id);
+      playerIndex = playerOrder.indexOf(socket.id);
+      if (playerIndex >= 0) {
+        playerOrder.splice(playerIndex, 1);
+      }
       socket.disconnect();
       delete players[socket.id];
+      startRoundIfAllReady();
       // emit a message to all players to remove this player
     });
 
@@ -44,15 +48,14 @@ function startGameServer(server) {
     });
 
     socket.on("isPlayerHit", function(explosionInfo) {
-      Object.values(players).forEach(currentPlayer =>{
+      Object.values(players).forEach(currentPlayer => {
         let playerID = currentPlayer.playerId;
         currentPlayer.hp -= calculateDmg(explosionInfo, currentPlayer);
-        if(currentPlayer.hp <= 0){
+        if (currentPlayer.hp <= 0) {
           io.emit("removePlayer", playerID);
           removeFromPlayerOrder(playerID);
           players[playerID].active = false;
         }
-
       });
 
       let alivePlayers = getAlivePlayers();
@@ -66,7 +69,6 @@ function startGameServer(server) {
         newRound(2000);
       }
     });
-
 
     socket.on("bulletFired", function(inputInfo) {
       player = players[socket.id];
@@ -100,10 +102,7 @@ function startGameServer(server) {
           players[socket.id].ready = true;
         }
 
-        if (clientsReady == playerOrder.length && clientsReady > 1) {
-          // send the players object to the new player
-          startRound();
-        }
+        startRoundIfAllReady();
       }
     });
 
@@ -114,6 +113,16 @@ function startGameServer(server) {
   });
 }
 
+function countConnectedPlayers() {
+  return Object.keys(io.sockets.sockets).length;
+}
+
+function startRoundIfAllReady() {
+  if (clientsReady == playerOrder.length && clientsReady > 1) {
+    // send the players object to the new player
+    startRound();
+  }
+}
 function nextPlayerAlias() {
   let playerSocketID;
   do {
@@ -154,7 +163,7 @@ function resetPlayers() {
   let newPlayers = {};
   playerOrder = []; //create new?
   Object.values(io.sockets.sockets).forEach(function(socket, i) {
-    let newAlias = "Player "  + i;//(socket.id in players) ? players[socket.id].alias : "Player " + i;
+    let newAlias = "Player " + i; //(socket.id in players) ? players[socket.id].alias : "Player " + i;
     createPlayer(newPlayers, socket.id, newAlias);
   });
   return newPlayers; //return or set players
@@ -180,23 +189,22 @@ function startRound() {
   clientsReady = 0;
 }
 
-function calculateDmg(explosion,player){
+function calculateDmg(explosion, player) {
   let dmg = explosion.dmg;
-  let radius = explosion.radius+32; // as player x,y is as most 32px away
+  let radius = explosion.radius + 32; // as player x,y is as most 32px away
   let playerDmg = 0;
-  distance = getDistance(explosion.x,explosion.y,player.x,player.y);
-  if(Math.hypot(32,20) >= distance){
+  distance = getDistance(explosion.x, explosion.y, player.x, player.y);
+  if (Math.hypot(32, 20) >= distance) {
     playerDmg = dmg;
-  }else if(distance <= radius ){
-    playerDmg = (dmg*(1 - (distance/radius))).toFixed();
+  } else if (distance <= radius) {
+    playerDmg = (dmg * (1 - distance / radius)).toFixed();
   }
   console.log(playerDmg);
   return playerDmg;
-  
 }
 
-function getDistance(x1,y1,x2,y2){
-  return Math.hypot(x1-x2,y1-y2);
+function getDistance(x1, y1, x2, y2) {
+  return Math.hypot(x1 - x2, y1 - y2);
 }
 
 function getAlivePlayers() {
@@ -209,7 +217,7 @@ function getAlivePlayers() {
   return aliveArray;
 }
 
-function resetScene(){
+function resetScene() {
   io.emit("resetScene");
 }
 
