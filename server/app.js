@@ -4,10 +4,12 @@ let playerOrder = []; // IDs, TODO: randomize
 let playerTurnIndex = 0; //flag for whose turn it is
 let io;
 let clientsReady = 0;
-let gameRunning = false;
+let gameRunning = false
 
 let WIDTH = 800;
 let HEIGHT = 600;
+
+var clients = {};
 
 function startGameServer(server) {
   io = socketio.listen(server);
@@ -19,6 +21,14 @@ function startGameServer(server) {
     } else {
       createPlayer(players, socket.id, "Player " + playerOrder.length);
     }
+
+    var userName;
+    socket.on('username',function(user){
+      userName = user.name;
+      clients[user.name] = socket;
+      io.sockets.emit('new user', user.name + " has joined.");
+    });
+
     console.log("a user connected,", countConnectedPlayers(), "connected and", playerOrder.length, "in game.");
     // when a player disconnects, remove them from our players object
     socket.on("disconnect", () => {
