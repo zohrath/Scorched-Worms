@@ -111,32 +111,6 @@ function movePlayer(scene, time, delta) {
       power = 0;
     }
   }
-
-  // emit player movement
-  if (scene.playerContainer.oldPosition) {
-    if (
-      scene.playerContainer.x !== scene.playerContainer.oldPosition.x ||
-      scene.playerContainer.y !== scene.playerContainer.oldPosition.y ||
-      scene.playerContainer.rotation !==
-        scene.playerContainer.oldPosition.rotation
-    ) {
-      socket.emit("playerMovement", {
-        x: scene.playerContainer.x,
-        y: scene.playerContainer.y,
-        rotation: scene.playerContainer.rotation
-      });
-    }
-
-    if (
-      scene.playerContainer.getWeaponAngle() !==
-      scene.playerContainer.oldPosition.turretRotation
-    ) {
-      socket.emit("toOtherClients", {
-        event: "moveTurret",
-        turretRotation: scene.playerContainer.oldPosition.turretRotation
-      });
-    }
-  }
 }
 
 function socketEmit(emitName,data,force=false){
@@ -158,4 +132,15 @@ function damagePlayer(explosion, player){
   //else if
 
   //emit explode bullet
+}
+
+function updatePlayerPosition(scene,playerInfo){
+
+  currPlayer = scene.otherPlayers[playerInfo.playerId];
+  
+  if(typeof(currPlayer) !== 'undefined'){
+    console.log("updating");
+    otherPlayer.setRotation(playerInfo.rotation);
+    otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+  }
 }

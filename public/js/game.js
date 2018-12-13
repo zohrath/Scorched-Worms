@@ -46,7 +46,6 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    console.log(this);
     this.nextTic = 0;
     let self = this;
     this.isMyTurn = false;
@@ -116,10 +115,8 @@ class GameScene extends Phaser.Scene {
 
       if (this.playerContainer.oldPosition) {
         if (
-          this.playerContainer.x !== this.playerContainer.oldPosition.x ||
-          this.playerContainer.y !== this.playerContainer.oldPosition.y ||
-          this.playerContainer.rotation !==
-            this.playerContainer.oldPosition.rotation
+          Math.round(this.playerContainer.x) !== Math.round(this.playerContainer.oldPosition.x) ||
+          Math.round(this.playerContainer.y) !== Math.round(this.playerContainer.oldPosition.y)
         ) {
           socketEmit(
             "playerMovement",
@@ -133,8 +130,8 @@ class GameScene extends Phaser.Scene {
         }
 
         if (
-          this.playerContainer.getWeaponAngle() !==
-          this.playerContainer.oldPosition.turretRotation
+          Math.round(this.playerContainer.getWeaponAngle()) !==
+          Math.round(this.playerContainer.oldPosition.turretRotation)
         ) {
           socketEmit("toOtherClients", {
             event: "moveTurret",
