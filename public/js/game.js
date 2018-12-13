@@ -1,4 +1,3 @@
-let platforms;
 let cursors;
 let player;
 let power = 0;
@@ -7,9 +6,12 @@ let socket;
 let keyD;
 let keyR;
 let keyX;
+let keyC;
 let allowedToEmit = false;
 let skipMenu = false;
 let edgeSize = 4;
+let platformLayer;
+let tileset;
 
 class GameScene extends Phaser.Scene {
 
@@ -52,13 +54,13 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    console.log(this);
     this.nextTic = 0;
     let self = this;
     this.isMyTurn = false;
     this.ready = false;
 
     createWorld(this);
+    keyC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
     keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
@@ -90,6 +92,9 @@ class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+
+    if (keyC.isDown){
+    }
     if (keyX.isDown) {
       console.log("type of playerCotainer ", typeof this.playerContainer);
       console.log("isMyTurn: ", this.isMyTurn);
@@ -122,10 +127,8 @@ class GameScene extends Phaser.Scene {
 
       if (this.playerContainer.oldPosition) {
         if (
-          this.playerContainer.x !== this.playerContainer.oldPosition.x ||
-          this.playerContainer.y !== this.playerContainer.oldPosition.y ||
-          this.playerContainer.rotation !==
-            this.playerContainer.oldPosition.rotation
+          Math.round(this.playerContainer.x) !== Math.round(this.playerContainer.oldPosition.x) ||
+          Math.round(this.playerContainer.y) !== Math.round(this.playerContainer.oldPosition.y)
         ) {
           socketEmit(
             "playerMovement",
@@ -139,8 +142,8 @@ class GameScene extends Phaser.Scene {
         }
 
         if (
-          this.playerContainer.getWeaponAngle() !==
-          this.playerContainer.oldPosition.turretRotation
+          Math.round(this.playerContainer.getWeaponAngle()) !==
+          Math.round(this.playerContainer.oldPosition.turretRotation)
         ) {
           socketEmit("toOtherClients", {
             event: "moveTurret",

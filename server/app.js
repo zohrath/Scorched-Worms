@@ -4,12 +4,17 @@ let playerOrder = []; // IDs, TODO: randomize
 let playerTurnIndex = 0; //flag for whose turn it is
 let io;
 let clientsReady = 0;
-let gameRunning = false;
+let gameRunning = false
+
+let terrain = require("./terrain.js");
 
 let WIDTH = 800;
 let HEIGHT = 600;
 
+var clients = {};
+
 function startGameServer(server) {
+  
   io = socketio.listen(server);
 
   io.sockets.on("connection", function(socket) {
@@ -19,6 +24,14 @@ function startGameServer(server) {
     } else {
       createPlayer(players, socket.id, "Player " + playerOrder.length);
     }
+
+    var userName;
+    socket.on('username',function(user){
+      userName = user.name;
+      clients[user.name] = socket;
+      io.sockets.emit('new user', user.name + " has joined.");
+    });
+
     console.log("a user connected,", countConnectedPlayers(), "connected and", playerOrder.length, "in game.");
     // when a player disconnects, remove them from our players object
     socket.on("disconnect", () => {
@@ -48,6 +61,8 @@ function startGameServer(server) {
     });
 
     socket.on("isPlayerHit", function(explosionInfo) {
+      tilesToRemove = terrain.tilesHit(explosionInfo);
+      io.emit("removeTiles",tilesToRemove);
       Object.values(players).forEach(currentPlayer => {
         let playerID = currentPlayer.playerId;
         currentPlayer.hp -= calculateDmg(explosionInfo, currentPlayer);
@@ -129,7 +144,12 @@ function nextPlayerAlias() {
     playerTurnIndex = getNextPlayerTurnIndex();
     playerSocketID = playerOrder[playerTurnIndex];
   } while (playerSocketID == "DEAD");
-  return players[playerSocketID].alias;
+  if(players[playerSocketID].alias !== 'undefined'){
+    return players[playerSocketID].alias;
+
+  } else {
+    return
+  }
 }
 
 function removeFromPlayerOrder(targetID) {
@@ -172,11 +192,13 @@ function resetPlayers() {
 function newRound() {
   playerTurnIndex = 0;
   players = resetPlayers();
+  io.emit("updatePlatformLayer");
   io.emit("clearScene");
   startRound();
 }
 
 function newTurn(timeout = 0) {
+  io.emit('syncGamestate',players);
   setTimeout(function() {
     io.emit("nextPlayerTurn", nextPlayerAlias());
   }, timeout); //delay to sync allowedToEmit and bullet destroy
