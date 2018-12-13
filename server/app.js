@@ -177,6 +177,7 @@ function newRound() {
 }
 
 function newTurn(timeout = 0) {
+  io.emit('syncGamestate',players);
   setTimeout(function() {
     io.emit("nextPlayerTurn", nextPlayerAlias());
   }, timeout); //delay to sync allowedToEmit and bullet destroy

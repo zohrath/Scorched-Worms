@@ -9,6 +9,7 @@ function createSocketListners(scene) {
   createNextPlayerTurn(scene);
   createClearScene(scene);
   createPlayerWon(scene);
+  createSyncGamestate(scene);
 }
 
 function createCurrentPlayersListener(scene) {
@@ -32,12 +33,8 @@ function createNewPlayerListener(scene) {
 
 function createPlayerMovedListener(scene) {
   socket.on("playerMoved", playerInfo => {
-    Object.values(scene.otherPlayers).forEach(otherPlayer => {
-      if (playerInfo.playerId === otherPlayer.playerId) {
-        otherPlayer.setRotation(playerInfo.rotation);
-        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-      }
-    });
+    console.log("playerMoved sent", playerInfo.playerId == socket.id);
+    updatePlayerPosition(scene,playerInfo);
   });
 }
 function createRemovePlayerListener(scene){
@@ -149,4 +146,16 @@ function createResetScene(scene) {
   socket.on("resetScene",function(){
     scene.scene.reset('GameScene');
   });
+}
+
+function createSyncGamestate(scene) {
+  socket.on("syncGamestate",function(players){
+    Object.values(players).forEach(playerInfo => {
+      console.log("syncing!!",playerInfo);
+      updatePlayerPosition(scene,playerInfo);
+      // TODO: add hp sync
+      // TODO: add terrain sync
+    });
+  });
+
 }
