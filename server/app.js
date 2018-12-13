@@ -6,10 +6,13 @@ let io;
 let clientsReady = 0;
 let gameRunning = false;
 
+let terrain = require("./terrain.js");
+
 let WIDTH = 800;
 let HEIGHT = 600;
 
 function startGameServer(server) {
+  
   io = socketio.listen(server);
 
   io.sockets.on("connection", function(socket) {
@@ -48,6 +51,8 @@ function startGameServer(server) {
     });
 
     socket.on("isPlayerHit", function(explosionInfo) {
+      tilesToRemove = terrain.tilesHit(explosionInfo);
+      io.emit("removeTiles",tilesToRemove);
       Object.values(players).forEach(currentPlayer => {
         let playerID = currentPlayer.playerId;
         currentPlayer.hp -= calculateDmg(explosionInfo, currentPlayer);
@@ -129,7 +134,12 @@ function nextPlayerAlias() {
     playerTurnIndex = getNextPlayerTurnIndex();
     playerSocketID = playerOrder[playerTurnIndex];
   } while (playerSocketID == "DEAD");
-  return players[playerSocketID].alias;
+  if(players[playerSocketID].alias !== 'undefined'){
+    return players[playerSocketID].alias;
+
+  } else {
+    return
+  }
 }
 
 function removeFromPlayerOrder(targetID) {
@@ -172,6 +182,7 @@ function resetPlayers() {
 function newRound() {
   playerTurnIndex = 0;
   players = resetPlayers();
+  io.emit("updatePlatformLayer");
   io.emit("clearScene");
   startRound();
 }

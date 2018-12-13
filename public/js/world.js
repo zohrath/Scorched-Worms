@@ -26,17 +26,27 @@ function createBullets(scene) {
   }
 
 
+function removeTile(scene,x,y){
+  platformLayer.removeTileAtWorldXY(x,y);
+
+}
+
+function addTile(type,x,y){
+  platformLayer.putTileAtWorldXY(type,x,y);
+}
+
 function createTerrain(scene) { 
   scene.terrain = scene.make.tilemap({ key: 'map' });
-  var tileset = scene.terrain.addTilesetImage('scorchedworms', 'swImg');
+  tileset = scene.terrain.addTilesetImage('scorchedworms', 'swImg');
   var backgroundlayer = scene.terrain.createStaticLayer('bluesky', tileset, 0, 0).setScale(1);
-  var platformlayer = scene.terrain.createStaticLayer('map', tileset, 0, 0).setScale(1);
-
-  platformlayer.setCollisionByProperty({ collides: true });
-  scene.matter.world.convertTilemapLayer(platformlayer);
+  platformLayer = scene.terrain.createDynamicLayer('map', tileset, 0, 0).setScale(1);
+  platformLayer.setCollisionByProperty({ collides: true });
+  scene.matter.world.convertTilemapLayer(platformLayer);
+  // platformLayer.renderDebug();
   //scene.matter.world.createDebugGraphic();
 
 }
+
 function createPowerText(scene) {
   scene.powerText = scene.add.text(16, 16, "Power: 0", {
     fontSize: "32px",
