@@ -1,4 +1,3 @@
-let platforms;
 let cursors;
 let player;
 let power = 0;
@@ -7,9 +6,12 @@ let socket;
 let keyD;
 let keyR;
 let keyX;
+let keyC;
 let allowedToEmit = false;
 let skipMenu = true;
 let edgeSize = 4;
+let platformLayer;
+let tileset;
 
 class GameScene extends Phaser.Scene {
 
@@ -52,6 +54,7 @@ class GameScene extends Phaser.Scene {
     this.ready = false;
 
     createWorld(this);
+    keyC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
     keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
@@ -83,6 +86,9 @@ class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+
+    if (keyC.isDown){
+    }
     if (keyX.isDown) {
       console.log("type of playerCotainer ", typeof this.playerContainer);
       console.log("isMyTurn: ", this.isMyTurn);
