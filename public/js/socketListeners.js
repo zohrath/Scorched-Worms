@@ -151,7 +151,6 @@ function createResetScene(scene) {
 function createSyncGamestate(scene) {
   socket.on("syncGamestate",function(players){
     Object.values(players).forEach(playerInfo => {
-      console.log("syncing!!",playerInfo);
       updatePlayerPosition(scene,playerInfo);
       // TODO: add hp sync
       // TODO: add terrain sync
