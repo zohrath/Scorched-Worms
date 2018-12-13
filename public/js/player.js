@@ -1,4 +1,22 @@
-class Player extends Phaser.GameObjects.Container {
+class Player {
+  constructor(scene, character, weapon, playerInfo, color) {
+    scene.shapes = scene.cache.json.get('shapes');
+    this.tank = scene.matter.add.sprite(playerInfo.x, playerInfo.y, 'sheet', 'tank_right_resized.png', {shape: scene.shapes.tank_right});
+  
+    this.tank.setBounce(0.0001);
+    this.tank.setMass(100);
+    this.tank.body.friction = 0.0001;
+    this.tank.body.frictionAir = 0.3;
+
+    this.turret = scene.add.image(this.tank.x+31, this.tank.y+15, weapon);
+    this.turrent.setOrigin(0, 0.5);
+
+    this.playerId = playerInfo.playerId;
+    this.alias = playerInfo.alias;
+    scene.add.existing(this.tank);
+    //super(scene, playerInfo.x, playerInfo.y, 'sheet', 'tank_right_resized.png', {shape: scene.shapes.tank_right});
+  };
+/*class Player extends Phaser.GameObjects.Container {
   constructor(scene, character, weapon, playerInfo, color) {
     let characterSprite = scene.add.sprite(0, 0, character);
     let weaponSprite = new Weapon(scene, "turret", "bullet", 10, 10);
@@ -29,6 +47,21 @@ class Player extends Phaser.GameObjects.Container {
     this.alias = playerInfo.alias;
     scene.add.existing(this);
   }
+*/  
+
+
+  setTurretPosition() {
+    this.turret.x = this.tank.x+31;
+    this.turret.y = this.tank.y+15;
+  }
+
+  thrust(force) {
+    this.tank.thrust(force);
+  }
+
+  thrustBack(force) {
+    this.tank.thrustBack(force);
+  }
 
   fire(scene, angle, power) {
     this.list[1].fire(scene, this.x, this.y, angle, power);
@@ -54,5 +87,8 @@ class Player extends Phaser.GameObjects.Container {
       playerId: this.playerId
     };
     return basicInfo;
+  }
+  destroy() {
+    this.tank.destroy()
   }
 }

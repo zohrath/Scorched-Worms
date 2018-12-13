@@ -23,7 +23,7 @@ class GameScene extends Phaser.Scene {
                   },
                   matter: {
                     debug: false,
-                    gravity: { y: 3 }
+                    gravity: { y: 3 } 
                   }
                 },
                   plugin: PhaserMatterCollisionPlugin // The plugin class
@@ -32,7 +32,7 @@ class GameScene extends Phaser.Scene {
 
   preload() {
     this.load.image("green", "assets/green.png");
-    this.load.image("tank_right", "assets/tank_right.png");
+    //this.load.image("tank_right", "assets/tank_right.png");
     this.load.image("tank_left", "assets/tank_left.png");
     this.load.image("tank", "assets/tank_right.png");
     this.load.image("background", "assets/background_vulcano.png");
@@ -43,6 +43,11 @@ class GameScene extends Phaser.Scene {
 
     this.load.tilemapTiledJSON('map', 'assets/scorchedworms.json');
     this.load.image('swImg', 'assets/scorchedworms.png');
+
+    // Load sprite sheet generated with TexturePacker
+    this.load.multiatlas('sheet', 'assets/tank_right_resized.json', 'assets');
+    // Load body shapes from JSON file generated using PhysicsEditor
+    this.load.json('shapes', 'assets/tank_test.json');
   }
 
   create() {
@@ -51,6 +56,7 @@ class GameScene extends Phaser.Scene {
     let self = this;
     this.isMyTurn = false;
     this.ready = false;
+
 
     createWorld(this);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -84,6 +90,7 @@ class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+
     if (keyX.isDown) {
       console.log("type of playerCotainer ", typeof this.playerContainer);
       console.log("isMyTurn: ", this.isMyTurn);
@@ -110,7 +117,7 @@ class GameScene extends Phaser.Scene {
       this.playerContainer.active
     ) {
       if (this.isMyTurn) {
-        this.playerContainer.setWeaponAngle(mouseAngle);
+        //this.playerContainer.setWeaponAngle(mouseAngle);
         movePlayer(this, time, delta);
       }
 
@@ -147,7 +154,7 @@ class GameScene extends Phaser.Scene {
         x: this.playerContainer.x,
         y: this.playerContainer.y,
         rotation: this.playerContainer.rotation,
-        turretRotation: this.playerContainer.getWeaponAngle()
+        //turretRotation: this.playerContainer.getWeaponAngle()
       };
       if (this.playerContainer.body.velocity.x > 1) {
         this.emitter.startFollow(this.playerContainer, -30, 8);
