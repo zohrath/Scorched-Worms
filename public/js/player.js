@@ -48,7 +48,9 @@ class Player {
     scene.add.existing(this);
   }
 */  
-
+  setFlipX(value) {
+    this.tank.setFlipX(value);
+  }
 
   setTurretPosition() {
     this.turret.x = this.tank.x+31;

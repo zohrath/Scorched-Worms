@@ -158,11 +158,13 @@ class GameScene extends Phaser.Scene {
       };
       if (this.playerContainer.body.velocity.x > 1) {
         this.emitter.startFollow(this.playerContainer, -30, 8);
-        this.playerContainer.list[0].flipX = false;
+        //this.playerContainer.list[0].flipX = false;
+        this.playerContainer.setFlipX(false);
         this.emitter.on = true;
       } else if (this.playerContainer.body.velocity.x < -1) {
         this.emitter.startFollow(this.playerContainer, 30, 8);
-        this.playerContainer.list[0].flipX = true;
+        //this.playerContainer.list[0].flipX = true;
+        this.playerContainer.setFlipX(true);
         this.emitter.on = true;
       } else {
         this.emitter.on = false;
