@@ -139,7 +139,6 @@ function updatePlayerPosition(scene,playerInfo){
   currPlayer = scene.otherPlayers[playerInfo.playerId];
   
   if(typeof(currPlayer) !== 'undefined'){
-    console.log("updating");
     otherPlayer.setRotation(playerInfo.rotation);
     otherPlayer.setPosition(playerInfo.x, playerInfo.y);
   }
