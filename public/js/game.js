@@ -8,7 +8,7 @@ let keyD;
 let keyR;
 let keyX;
 let allowedToEmit = false;
-let skipMenu = true;
+let skipMenu = false;
 let edgeSize = 4;
 
 class GameScene extends Phaser.Scene {
@@ -29,6 +29,12 @@ class GameScene extends Phaser.Scene {
                   plugin: PhaserMatterCollisionPlugin // The plugin class
               });
     }
+
+  init (data) {
+    console.log ("----------------In GameScene----------------");
+    console.log("init", data);
+    console.log("The alias: ", data.alias);
+  }
 
   preload() {
     this.load.image("green", "assets/green.png");
