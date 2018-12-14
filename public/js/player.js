@@ -7,13 +7,13 @@ class Player {
     this.tank.setMass(100);
     this.tank.body.friction = 0.0001;
     this.tank.body.frictionAir = 0.3;
-
     this.turret = scene.add.image(this.tank.x+31, this.tank.y+15, weapon);
-    this.turrent.setOrigin(0, 0.5);
+    this.turret.setOrigin(0, 0.5);
 
     this.playerId = playerInfo.playerId;
     this.alias = playerInfo.alias;
     scene.add.existing(this.tank);
+    console.log(this);
     //super(scene, playerInfo.x, playerInfo.y, 'sheet', 'tank_right_resized.png', {shape: scene.shapes.tank_right});
   };
 /*class Player extends Phaser.GameObjects.Container {
@@ -53,8 +53,8 @@ class Player {
   }
 
   setTurretPosition() {
-    this.turret.x = this.tank.x+31;
-    this.turret.y = this.tank.y+15;
+    this.turret.x = this.tank.x;
+    this.turret.y = this.tank.y-13;
   }
 
   thrust(force) {
@@ -70,11 +70,14 @@ class Player {
   }
 
   getWeaponAngle() {
-    return this.list[1].rotation;
+    //return this.list[1].rotation;
+    return this.turret.rotation;
   }
 
   setWeaponAngle(angle) {
-    this.list[1].rotation = angle;
+    //this.list[1].rotation = angle;
+    //console.log(angle);
+    this.turret.rotation = angle;
   }
 
   flipCharacterX(bool) {

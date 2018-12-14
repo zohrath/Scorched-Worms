@@ -78,8 +78,8 @@ class GameScene extends Phaser.Scene {
         let cursor = pointer;
         if (typeof this.playerContainer == "object") {
           mouseAngle = Phaser.Math.Angle.Between(
-            this.playerContainer.x,
-            this.playerContainer.y,
+            this.playerContainer.turret.x,
+            this.playerContainer.turret.y,
             cursor.x + this.cameras.main.scrollX,
             cursor.y + this.cameras.main.scrollY
           );
@@ -113,11 +113,11 @@ class GameScene extends Phaser.Scene {
     }
 
     if (
-      typeof this.playerContainer !== "undefined" &&
-      this.playerContainer.active
+      typeof this.playerContainer !== "undefined" //&&
+      //this.playerContainer.active
     ) {
       if (this.isMyTurn) {
-        //this.playerContainer.setWeaponAngle(mouseAngle);
+        this.playerContainer.setWeaponAngle(mouseAngle);
         movePlayer(this, time, delta);
       }
 
@@ -156,12 +156,12 @@ class GameScene extends Phaser.Scene {
         rotation: this.playerContainer.rotation,
         //turretRotation: this.playerContainer.getWeaponAngle()
       };
-      if (this.playerContainer.body.velocity.x > 1) {
+      if (this.playerContainer.tank.body.velocity.x > 1) {
         this.emitter.startFollow(this.playerContainer, -30, 8);
         //this.playerContainer.list[0].flipX = false;
         this.playerContainer.setFlipX(false);
         this.emitter.on = true;
-      } else if (this.playerContainer.body.velocity.x < -1) {
+      } else if (this.playerContainer.tank.body.velocity.x < -1) {
         this.emitter.startFollow(this.playerContainer, 30, 8);
         //this.playerContainer.list[0].flipX = true;
         this.playerContainer.setFlipX(true);
