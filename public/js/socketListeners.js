@@ -11,6 +11,7 @@ function createSocketListners(scene) {
   createPlayerWon(scene);
   createSyncGamestate(scene);
   createRemoveTiles(scene);
+  createUpdatePlatformLayer(scene);
 }
 
 function createCurrentPlayersListener(scene) {
@@ -34,7 +35,6 @@ function createNewPlayerListener(scene) {
 
 function createPlayerMovedListener(scene) {
   socket.on("playerMoved", playerInfo => {
-    console.log("playerMoved sent", playerInfo.playerId == socket.id);
     updatePlayerPosition(scene, playerInfo);
   });
 }
@@ -173,9 +173,16 @@ function createAddTiles(scene) {
 }
 
 function createUpdatePlatformLayer(scene){
-  socket.on("updatePlatformLayer", function(){
-    platformLayer.destroy();
-    // createPlatformLayer(scene)
+  socket.on("updatePlatformLayer", function(maps){
+    let tilesToRemove = maps.old;
+    if(tilesToRemove){
+        destroyMap(scene,tilesToRemove);
+    }
+    let tilesToAdd = maps.new;
+    tilesToAdd.forEach(tile => {
+      addTile(scene,tile.type,tile.x,tile.y)
+    });
+    platformLayer.physic = scene.matter.world.convertTilemapLayer(platformLayer.graphic);
   }
     );
 }
