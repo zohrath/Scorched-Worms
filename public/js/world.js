@@ -27,21 +27,27 @@ function createBullets(scene) {
 
 
 function removeTile(scene,x,y){
-  platformLayer.removeTileAtWorldXY(x,y);
+  let tile = platformLayer.graphic.getTileAtWorldXY(x,y);
+  if(tile){
+    var layer = tile.tilemapLayer;
+    layer.removeTileAt(tile.x, tile.y);
+    tile.physics.matterBody.destroy();
+  }
+  // scene.matter.world.convertTilemapLayer(platformLayer.graphic);
 
 }
 
 function addTile(type,x,y){
-  platformLayer.putTileAtWorldXY(type,x,y);
+  platformLayer.graphic.putTileAtWorldXY(type,x,y);
 }
 
 function createTerrain(scene) { 
   scene.terrain = scene.make.tilemap({ key: 'map' });
   tileset = scene.terrain.addTilesetImage('scorchedworms', 'swImg');
   var backgroundlayer = scene.terrain.createStaticLayer('bluesky', tileset, 0, 0).setScale(1);
-  platformLayer = scene.terrain.createDynamicLayer('map', tileset, 0, 0).setScale(1);
-  platformLayer.setCollisionByProperty({ collides: true });
-  scene.matter.world.convertTilemapLayer(platformLayer);
+  platformLayer.graphic = scene.terrain.createDynamicLayer('map', tileset, 0, 0).setScale(1);
+  platformLayer.graphic.setCollisionByProperty({ collides: true });
+  platformLayer.physic = scene.matter.world.convertTilemapLayer(platformLayer.graphic);
   // platformLayer.renderDebug();
   //scene.matter.world.createDebugGraphic();
 

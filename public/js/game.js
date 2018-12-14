@@ -8,9 +8,9 @@ let keyR;
 let keyX;
 let keyC;
 let allowedToEmit = false;
-let skipMenu = false;
+let skipMenu = true;
 let edgeSize = 4;
-let platformLayer;
+let platformLayer = {}
 let tileset;
 
 class GameScene extends Phaser.Scene {
