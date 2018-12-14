@@ -34,11 +34,11 @@ function removeTile(scene,x,y){
     tile.physics.matterBody.destroy();
   }
   // scene.matter.world.convertTilemapLayer(platformLayer.graphic);
-
 }
 
 function addTile(type,x,y){
-  platformLayer.graphic.putTileAtWorldXY(type,x,y);
+  let tile = platformLayer.graphic.putTileAtWorldXY(type,x,y);
+  scene.matter.world.add(tile);
 }
 
 function createTerrain(scene) { 
