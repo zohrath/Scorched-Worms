@@ -4,7 +4,8 @@ let players = {};
 let playerTurnIndex = 0; //flag for whose turn it is
 let io;
 let clientsReady = 0;
-let gameRunning = false;
+let gameRunning = false
+let currentMap;
 
 let terrain = require("./terrain.js");
 
@@ -206,11 +207,15 @@ function resetPlayers(playerOrder) {
   return newPlayers; //return or set players
 }
 
-function newRound(playerOrder) {
-  // console.log("newRound: " + playerOrder);
+function newRound() {
+  oldMap = currentMap;
+  currentMap = terrain.createPlatformLayer();
   playerTurnIndex = 0;
-  players = resetPlayers(playerOrder);
-  io.emit("updatePlatformLayer");
+  players = resetPlayers();
+  io.emit("updatePlatformLayer",{
+    new: currentMap,
+    old: oldMap}
+    );
   io.emit("clearScene");
   startRound(playerOrder);
 }

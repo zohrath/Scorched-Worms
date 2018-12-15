@@ -1,10 +1,12 @@
 function createWorld(scene) {
   // createBackground(scene);
+
   createBullets(scene);
   createTerrain(scene);
   createPowerText(scene);
   createTurnText(scene);
   createWeaponEmitter(scene, 5, 128);
+  createAnims(scene);
   // scene.physics.world.setBoundsCollision(true, true, false, true);
   scene.matter.world.setBounds(left = true, right = true);
 }
@@ -25,20 +27,33 @@ function createBullets(scene) {
   scene.bullets = []; // defa update <-
   }
 
+function destroyMap(scene,tiles){
+  tiles.forEach(tile => {
+    for(i=tile.y;i<768;i+=16)
+    removeTile(scene,tile.x,i);
+  });
+}
+
 
 function removeTile(scene,x,y){
   let tile = platformLayer.graphic.getTileAtWorldXY(x,y);
   if(tile){
     var layer = tile.tilemapLayer;
-    layer.removeTileAt(tile.x, tile.y);
+    if(typeof(tile.physics.matterBody) !== 'undefined')
     tile.physics.matterBody.destroy();
+    layer.removeTileAt(tile.x, tile.y);
   }
   // scene.matter.world.convertTilemapLayer(platformLayer.graphic);
 }
 
-function addTile(type,x,y){
+function addTile(scene,type,x,y){
   let tile = platformLayer.graphic.putTileAtWorldXY(type,x,y);
-  scene.matter.world.add(tile);
+  if(tile){
+    platformLayer.graphic.fill(13, tile.x, tile.y+1, 1, (768-tile.y/16)); //768 is the height and 16 is tile height;
+    let lastTile = platformLayer.graphic.getTileAtWorldXY(x,768-8); //768 is the height and 8 is half tile height;
+    platformLayer.graphic.setCollisionBetween(tile.index,lastTile.index)
+
+  }
 }
 
 function createTerrain(scene) { 
@@ -90,4 +105,17 @@ function createWeaponEmitter(scene, radius, imgSize) {
     blendMode: "ADD"
   });
   scene.weaponEmitter.size = 128;
+}
+
+function createAnims(scene){
+  scene.anims.create({
+    key: 'explosionKey128',
+    frames: scene.anims.generateFrameNumbers( 'explosionSpriteSheet128', {
+        start: 0,
+        end: 15
+    }),
+    frameRate: 16,
+    repeat: 0,
+    hideOnComplete: true
+  });
 }

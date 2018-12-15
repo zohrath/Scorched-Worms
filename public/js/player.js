@@ -1,7 +1,7 @@
 class Player extends Phaser.GameObjects.Container {
-  constructor(scene, character, weapon, playerInfo, color) {
+  constructor(scene, character, turretSprite, playerInfo, color) {
     let characterSprite = scene.add.sprite(0, 0, character);
-    let weaponSprite = new Weapon(scene, "turret", "bullet", 10, 10);
+    let weaponSprite = new Weapon(scene, turretSprite, "bullet", 48, 10);
     let playerText = scene.add.text(0, 0, playerInfo.alias, {
       fontSize: "18px Arial",
       fill: color,

@@ -12,6 +12,7 @@ let skipMenu = true;
 let edgeSize = 4;
 let platformLayer = {}
 let tileset;
+let allowedToForce = true;
 
 class GameScene extends Phaser.Scene {
 
@@ -51,6 +52,14 @@ class GameScene extends Phaser.Scene {
 
     this.load.tilemapTiledJSON('map', 'assets/scorchedworms.json');
     this.load.image('swImg', 'assets/scorchedworms.png');
+
+    this.load.spritesheet( 'explosionSpriteSheet128', '/assets/explode.png', {
+      frameWidth: 128,
+      frameHeight: 128
+    });
+
+    
+
   }
 
   create() {
@@ -103,10 +112,14 @@ class GameScene extends Phaser.Scene {
       console.log("allowedToEmit: ", allowedToEmit);
     }
 
-    if (keyD.isDown) {
+    if (keyD.isDown && allowedToForce) {
+      allowedToForce = false;
       console.log("force start");
       socket.emit("forceStart");
       this.ready;
+      setTimeout(function(){
+        allowedToForce = true;
+      },1000)
     }
     if (!this.ready) {
       if (keyR.isDown) {
