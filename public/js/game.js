@@ -51,6 +51,14 @@ class GameScene extends Phaser.Scene {
 
     this.load.tilemapTiledJSON('map', 'assets/scorchedworms.json');
     this.load.image('swImg', 'assets/scorchedworms.png');
+
+    this.load.spritesheet( 'explosionSpriteSheet128', '/assets/explode.png', {
+      frameWidth: 128,
+      frameHeight: 128
+    });
+
+    
+
   }
 
   create() {

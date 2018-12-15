@@ -5,6 +5,7 @@ function createWorld(scene) {
   createPowerText(scene);
   createTurnText(scene);
   createWeaponEmitter(scene, 5, 128);
+  createAnims(scene);
   // scene.physics.world.setBoundsCollision(true, true, false, true);
   scene.matter.world.setBounds(left = true, right = true);
 }
@@ -90,4 +91,17 @@ function createWeaponEmitter(scene, radius, imgSize) {
     blendMode: "ADD"
   });
   scene.weaponEmitter.size = 128;
+}
+
+function createAnims(scene){
+  scene.anims.create({
+    key: 'explosionKey128',
+    frames: scene.anims.generateFrameNumbers( 'explosionSpriteSheet128', {
+        start: 0,
+        end: 15
+    }),
+    frameRate: 16,
+    repeat: 0,
+    hideOnComplete: true
+  });
 }

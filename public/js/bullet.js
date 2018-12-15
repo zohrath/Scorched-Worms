@@ -54,13 +54,16 @@ var Bullet = new Phaser.Class({
   
   explode: function(scene){
     this.allowedToExplode = false;
-    //this.explosion.explode(this.x, this.y);
-    scene.weaponEmitter.setScale(0.5);//this.radius/scene.weaponEmitter.size);
-    scene.weaponEmitter.explode(200, this.x, this.y);
+    //scene.weaponEmitter.setScale(0.5);//this.radius/scene.weaponEmitter.size);
+    //scene.weaponEmitter.explode(200, this.x, this.y);
+    
+    let explosionSprite = scene.add.sprite(this.x, this.y, 'explosionSpriteSheet').setScale(2);
+    console.log(explosionSprite);
+    explosionSprite.anims.play('explosionKey128')
+
     this.isPlayerHit();
     this.hide();
 
-    //setTimeout(this.hide, 1500);
   },
 
   isPlayerHit: function(){
