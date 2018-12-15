@@ -1,10 +1,10 @@
 let socketio = require("socket.io");
 let players = {};
- // IDs, TODO: randomize
+// IDs, TODO: randomize
 let playerTurnIndex = 0; //flag for whose turn it is
 let io;
 let clientsReady = 0;
-let gameRunning = false
+let gameRunning = false;
 let currentMap;
 
 let terrain = require("./terrain.js");
@@ -20,16 +20,21 @@ function startGameServer(server) {
   let playerOrder = [];
 
   io = socketio.listen(server);
-  
-  io.sockets.on("connection", (socket) => {
+
+  io.sockets.on("connection", socket => {
     // create a new player and add it to our players object
     if (gameRunning) {
       socket.emit("currentPlayers", players);
     } else {
-      createPlayer(players, socket.id, "Player " + playerOrder.length, playerOrder);
+      createPlayer(
+        players,
+        socket.id,
+        "Player " + playerOrder.length,
+        playerOrder
+      );
     }
 
-    socket.on("username", (user) => {
+    socket.on("username", user => {
       userName = user.name;
       clients[user.name] = socket;
       io.sockets.emit("new user", user.name + " has joined.");
@@ -59,7 +64,7 @@ function startGameServer(server) {
     });
 
     // when a player moves, update the player data
-    socket.on("playerMovement", (movementData) => {
+    socket.on("playerMovement", movementData => {
       if (players[socket.id]) {
         players[socket.id].x = movementData.x;
         players[socket.id].y = movementData.y;
@@ -69,7 +74,7 @@ function startGameServer(server) {
       }
     });
 
-    socket.on("isPlayerHit", (explosionInfo) => {
+    socket.on("isPlayerHit", explosionInfo => {
       tilesToRemove = terrain.tilesHit(explosionInfo);
       io.emit("removeTiles", tilesToRemove);
       Object.values(players).forEach(currentPlayer => {
@@ -83,7 +88,7 @@ function startGameServer(server) {
       });
 
       let alivePlayers = getAlivePlayers(playerOrder);
-      
+
       if (alivePlayers.length <= 1) {
         if (alivePlayers.length == 1) {
           io.emit("playerWon", players[alivePlayers[0]].alias);
@@ -95,7 +100,7 @@ function startGameServer(server) {
       }
     });
 
-    socket.on("bulletFired", (inputInfo) => {
+    socket.on("bulletFired", inputInfo => {
       player = players[socket.id];
 
       bulletInfo = {
@@ -109,7 +114,7 @@ function startGameServer(server) {
       io.emit("fireBullet", bulletInfo);
     });
 
-    socket.on("toOtherClients", (data) => {
+    socket.on("toOtherClients", data => {
       var eventname = data["event"];
       delete data["event"];
       data["playerId"] = socket.id;
@@ -189,14 +194,13 @@ function createPlayer(playersObject, id, alias, playerOrder) {
     ready: false,
     hp: 10
   };
-  
+
   playerOrder.push(id);
   return playersObject[id];
 }
 
 // TODO: Refer to player usernames somehow, for testing?
 function resetPlayers(playerOrder) {
-  
   let newPlayers = {};
   playerOrder = []; //create new?
 
@@ -207,15 +211,15 @@ function resetPlayers(playerOrder) {
   return newPlayers; //return or set players
 }
 
-function newRound() {
+function newRound(playerOrder) {
   oldMap = currentMap;
   currentMap = terrain.createPlatformLayer();
   playerTurnIndex = 0;
   players = resetPlayers();
-  io.emit("updatePlatformLayer",{
+  io.emit("updatePlatformLayer", {
     new: currentMap,
-    old: oldMap}
-    );
+    old: oldMap
+  });
   io.emit("clearScene");
   startRound(playerOrder);
 }
@@ -237,11 +241,11 @@ function startRound(playerOrder) {
 }
 
 function calculateDmg(explosion, player) {
-  
   let radius = explosion.radius + 32;
   let distance = Math.hypot(explosion.x, explosion.y, player.x, player.y);
-  
-  if (Math.hypot(32, 20) >= distance) { // 20?
+
+  if (Math.hypot(32, 20) >= distance) {
+    // 20?
     return explosion.dmg;
   } else if (distance <= radius) {
     return (explosion.dmg * (1 - distance / radius)).toFixed();
@@ -251,7 +255,6 @@ function calculateDmg(explosion, player) {
 }
 
 function getAlivePlayers(playerOrder) {
-  
   let aliveArray = [];
 
   playerOrder.forEach(function(id) {
@@ -267,5 +270,10 @@ function resetScene() {
   io.emit("resetScene");
 }
 
-module.exports = { startGameServer, getAlivePlayers, startRoundIfAllReady, calculateDmg,
-                    createPlayer };
+module.exports = {
+  startGameServer,
+  getAlivePlayers,
+  startRoundIfAllReady,
+  calculateDmg,
+  createPlayer
+};

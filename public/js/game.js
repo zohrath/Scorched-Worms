@@ -10,35 +10,34 @@ let keyC;
 let allowedToEmit = false;
 let skipMenu = true;
 let edgeSize = 4;
-let platformLayer = {}
+let platformLayer = {};
 let tileset;
 let allowedToForce = true;
 
 class GameScene extends Phaser.Scene {
+  constructor() {
+    super({
+      key: "GameScene",
+      physics: {
+        arcade: {
+          debug: false,
+          gravity: { y: 200 }
+        },
+        matter: {
+          debug: false,
+          gravity: { y: 3 }
+        }
+      },
+      plugin: PhaserMatterCollisionPlugin // The plugin class
+    });
+  }
 
-  constructor ()
-    {
-        super({ key: 'GameScene',
-                physics: {
-                  arcade: {
-                    debug: false,
-                    gravity: { y: 200 }
-                  },
-                  matter: {
-                    debug: false,
-                    gravity: { y: 3 }
-                  }
-                },
-                  plugin: PhaserMatterCollisionPlugin // The plugin class
-              });
-    }
-
-  init (data) {
-    console.log ("----------------In GameScene----------------");
+  init(data) {
+    console.log("----------------In GameScene----------------");
     console.log("init", data);
     console.log("The alias: ", data.alias);
   }
-
+  
   preload() {
     this.load.image("green", "assets/green.png");
     this.load.image("tank_right", "assets/tank_right.png");
@@ -50,16 +49,13 @@ class GameScene extends Phaser.Scene {
     this.load.image("smoke", "assets/smoke-puff.png");
     this.load.image("bullet", "assets/bullet.png");
 
-    this.load.tilemapTiledJSON('map', 'assets/scorchedworms.json');
-    this.load.image('swImg', 'assets/scorchedworms.png');
+    this.load.tilemapTiledJSON("map", "assets/scorchedworms.json");
+    this.load.image("swImg", "assets/scorchedworms.png");
 
-    this.load.spritesheet( 'explosionSpriteSheet128', '/assets/explode.png', {
+    this.load.spritesheet("explosionSpriteSheet128", "/assets/explode.png", {
       frameWidth: 128,
       frameHeight: 128
     });
-
-    
-
   }
 
   create() {
@@ -67,7 +63,7 @@ class GameScene extends Phaser.Scene {
     let self = this;
     this.isMyTurn = false;
     this.ready = false;
-
+    
     createWorld(this);
     keyC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -80,7 +76,7 @@ class GameScene extends Phaser.Scene {
     // TODO change group -> {}?
     // this.player = this.physics.add.group();
     // this.explosions = this.physics.add.group();
-    
+
     createSocketListners(this);
 
     this.input.on(
@@ -101,8 +97,7 @@ class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-
-    if (keyC.isDown){
+    if (keyC.isDown) {
     }
     if (keyX.isDown) {
       console.log("type of playerCotainer ", typeof this.playerContainer);
@@ -117,9 +112,9 @@ class GameScene extends Phaser.Scene {
       console.log("force start");
       socket.emit("forceStart");
       this.ready;
-      setTimeout(function(){
+      setTimeout(function() {
         allowedToForce = true;
-      },1000)
+      }, 1000);
     }
     if (!this.ready) {
       if (keyR.isDown) {
@@ -140,8 +135,10 @@ class GameScene extends Phaser.Scene {
 
       if (this.playerContainer.oldPosition) {
         if (
-          Math.round(this.playerContainer.x) !== Math.round(this.playerContainer.oldPosition.x) ||
-          Math.round(this.playerContainer.y) !== Math.round(this.playerContainer.oldPosition.y)
+          Math.round(this.playerContainer.x) !==
+            Math.round(this.playerContainer.oldPosition.x) ||
+          Math.round(this.playerContainer.y) !==
+            Math.round(this.playerContainer.oldPosition.y)
         ) {
           socketEmit(
             "playerMovement",
