@@ -12,6 +12,7 @@ let skipMenu = true;
 let edgeSize = 4;
 let platformLayer = {}
 let tileset;
+let allowedToForce = true;
 
 class GameScene extends Phaser.Scene {
 
@@ -111,10 +112,14 @@ class GameScene extends Phaser.Scene {
       console.log("allowedToEmit: ", allowedToEmit);
     }
 
-    if (keyD.isDown) {
+    if (keyD.isDown && allowedToForce) {
+      allowedToForce = false;
       console.log("force start");
       socket.emit("forceStart");
       this.ready;
+      setTimeout(function(){
+        allowedToForce = true;
+      },1000)
     }
     if (!this.ready) {
       if (keyR.isDown) {
