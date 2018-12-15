@@ -7,7 +7,7 @@
     "start-dev": "NODE_ENV=development node server.js",
     "start-prod": "NODE_ENV=production node server.js",
     "basetest": "NODE_ENV=development jest test_area/base.test.js",
-    "test": "./node_modules/.bin/mocha --reporter spec"
+    "test": "nyc ./node_modules/.bin/mocha --reporter spec"
   },
   "author": "Scott Westover",
   "license": "ISC",
@@ -24,6 +24,7 @@
   "devDependencies": {
     "jest": "^23.6.0",
     "matter-collision-events": "^0.1.7",
+    "nyc": "^13.1.0",
     "supertest": "^3.3.0"
   }
 }
