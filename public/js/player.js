@@ -5,13 +5,22 @@ class Player {
   
     this.tank.setBounce(0.0001);
     this.tank.setMass(100);
-    this.tank.body.friction = 0.0001;
+    this.tank.body.friction = 0;
+    this.tank.body.frictionStatic = 0;
     this.tank.body.frictionAir = 0.3;
-    this.turret = scene.add.image(this.tank.x+31, this.tank.y+15, weapon);
+
+    this.turret = scene.add.image(this.tank.x+2, this.tank.y+15, weapon);
     this.turret.setOrigin(0, 0.5);
 
     this.playerId = playerInfo.playerId;
     this.alias = playerInfo.alias;
+    this.playerText = scene.add.text(this.tank.x, this.tank.y-50, playerInfo.alias, {
+      fontSize: "18px Arial",
+      fill: color,
+      align: "center"
+    });
+    this.playerText.setOrigin(0.5, 0)
+
     scene.add.existing(this.tank);
     console.log(this);
     //super(scene, playerInfo.x, playerInfo.y, 'sheet', 'tank_right_resized.png', {shape: scene.shapes.tank_right});
@@ -53,8 +62,13 @@ class Player {
   }
 
   setTurretPosition() {
-    this.turret.x = this.tank.x;
+    this.turret.x = this.tank.x+2;
     this.turret.y = this.tank.y-13;
+  }
+
+  setPlayerTextPosition() {
+    this.playerText.x = this.tank.x;
+    this.playerText.y = this.tank.y-50;
   }
 
   thrust(force) {
@@ -66,7 +80,7 @@ class Player {
   }
 
   fire(scene, angle, power) {
-    this.list[1].fire(scene, this.x, this.y, angle, power);
+    this.turret.fire(scene, this.x, this.y, angle, power);
   }
 
   getWeaponAngle() {
