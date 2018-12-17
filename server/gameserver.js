@@ -122,7 +122,7 @@ function startGameServer(server) {
     });
 
     socket.on("finishedTurn", () => {
-      newTurn(2000, playerOrder);
+      newTurn(playerOrder);
     });
 
     socket.on("clientReady", () => {
@@ -165,6 +165,8 @@ function nextPlayerAlias(playerOrder) {
   } while (playerSocketID == "DEAD");
 
   // TODO check that players ONLY have valid players
+  console.log(players);
+  console.log(players[playerSocketID]);
   if (players[playerSocketID].alias !== "undefined") {
     return players[playerSocketID].alias;
   } else {
@@ -225,7 +227,7 @@ function newRound(playerOrder) {
   startRound(playerOrder);
 }
 
-function newTurn(timeout = 0, playerOrder) {
+function newTurn(playerOrder, timeout=2000) {
   // console.log("newTurn: " + playerOrder);
   io.emit("syncGamestate", players);
   setTimeout(function() {
@@ -236,7 +238,7 @@ function newTurn(timeout = 0, playerOrder) {
 function startRound(playerOrder) {
   // console.log("startRound playerOrder: " + playerOrder);
   io.emit("currentPlayers", players);
-  newTurn(2000, playerOrder);
+  newTurn(playerOrder);
   gameRunning = true;
   clientsReady = 0;
 }
