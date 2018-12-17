@@ -70,8 +70,6 @@ function addOtherPlayer(scene, playerInfo) {
 }
 
 function movePlayer(scene, time, delta) {
-  scene.playerContainer.setTurretPosition();
-  scene.playerContainer.setPlayerTextPosition();
   if (scene.playerContainer.tank.body.velocity.x > 7) {
     scene.playerContainer.tank.body.setVelocityX(7);
   }

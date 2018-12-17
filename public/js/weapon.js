@@ -1,6 +1,7 @@
 class Weapon extends Phaser.GameObjects.Sprite {
   constructor(scene, weaponSpriteName, bulletSpritename, radius, dmg) {
     super(scene, 0, -7, weaponSpriteName);
+    this.setOrigin(0, 0.5);
     this.radius = radius;
     this.dmg = dmg;
     this.bulletSpritename = bulletSpritename;
@@ -8,6 +9,7 @@ class Weapon extends Phaser.GameObjects.Sprite {
   }
     
   fire(scene, x, y, angle, power) {
+      console.log("wepaon fire");
       let explosion = new Explosion(scene, this.radius, this.dmg,this.x,this.y, "bullet");
       let bullet = new Bullet(scene, this.radius, 'bullet', this.dmg, explosion);//scene.bullets.get();
       if (bullet) {

@@ -46,7 +46,7 @@ class Player {
   }
 
   fire(scene, angle, power) {
-    this.turret.fire(scene, this.x, this.y, angle, power);
+    this.turret.fire(scene, this.turret.x, this.turret.y, angle, power);
   }
 
   getWeaponAngle() {
