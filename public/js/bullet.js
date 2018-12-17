@@ -60,7 +60,6 @@ var Bullet = new Phaser.Class({
     let explosionSprite = scene.add
       .sprite(this.x, this.y, "explosionSpriteSheet")
       .setScale(2);
-    console.log(explosionSprite);
     explosionSprite.anims.play("explosionKey128");
 
     this.isPlayerHit();

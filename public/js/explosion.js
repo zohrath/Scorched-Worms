@@ -21,7 +21,6 @@ class Explosion extends Phaser.GameObjects.Sprite {
         //|| gameObjectB instanceof Phaser.GameObjects.Container
         if (gameObjectB !== undefined && gameObjectB instanceof Player) {
           // Now you know that gameObjectB is a Tile, so you can check the index, properties, etc.
-          console.log("PLAYER HIT", gameObjectB);
           playerHit(gameObjectB, this);
         }
       }
