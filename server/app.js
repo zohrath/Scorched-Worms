@@ -90,7 +90,7 @@ function startGameServer(server) {
       let alivePlayers = getAlivePlayers(playerOrder);
 
       if (alivePlayers.length <= 1) {
-        if (alivePlayers.length == 1) {
+        if (alivePlayers.length === 1) {
           io.emit("playerWon", players[alivePlayers[0]].alias);
         } else if (alivePlayers.length < 1) {
           io.emit("playerWon");
@@ -148,7 +148,7 @@ function countConnectedPlayers() {
 }
 
 function startRoundIfAllReady(playerOrder) {
-  if (clientsReady == playerOrder.length && clientsReady > 1) {
+  if (clientsReady === playerOrder.length && clientsReady > 1) {
     // send the players object to the new player
     startRound(playerOrder);
     return true;
@@ -162,7 +162,7 @@ function nextPlayerAlias(playerOrder) {
   do {
     playerTurnIndex = getNextPlayerTurnIndex(1, playerOrder);
     playerSocketID = playerOrder[playerTurnIndex];
-  } while (playerSocketID == "DEAD");
+  } while (playerSocketID === "DEAD");
 
   if (players[playerSocketID].alias !== "undefined") {
     return players[playerSocketID].alias;
@@ -173,7 +173,7 @@ function nextPlayerAlias(playerOrder) {
 
 function removeFromPlayerOrder(targetID, playerOrder) {
   playerOrder.forEach(function(id, i) {
-    if (targetID == id) {
+    if (targetID === id) {
       playerOrder[i] = "DEAD"; //remove from index i and 1 element
     }
   });
