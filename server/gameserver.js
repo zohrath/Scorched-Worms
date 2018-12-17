@@ -68,7 +68,6 @@ function startGameServer(server) {
       if (players[socket.id]) {
         players[socket.id].x = movementData.x;
         players[socket.id].y = movementData.y;
-        players[socket.id].rotation = movementData.rotation;
         // emit a message to all players about the player that moved
         socket.broadcast.emit("playerMoved", players[socket.id]);
       }
@@ -158,15 +157,13 @@ function startRoundIfAllReady(playerOrder) {
 
 function nextPlayerAlias(playerOrder) {
   let playerSocketID;
-
   do {
     playerTurnIndex = getNextPlayerTurnIndex(1, playerOrder);
     playerSocketID = playerOrder[playerTurnIndex];
-  } while (playerSocketID == "DEAD");
+  } while (playerSocketID === "DEAD");
 
+  //console.log(playerSocketID)
   // TODO check that players ONLY have valid players
-  console.log(players);
-  console.log(players[playerSocketID]);
   if (players[playerSocketID].alias !== "undefined") {
     return players[playerSocketID].alias;
   } else {

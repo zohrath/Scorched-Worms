@@ -41,7 +41,7 @@ function createEmitter(scene) {
 }
 
 function rotateTurret(tank, newAngle) {
-  tank.list[1].setRotation(newAngle);
+  tank.setWeaponAngle(newAngle);
 }
 
 function addPlayer(scene, playerInfo) {
@@ -70,11 +70,11 @@ function addOtherPlayer(scene, playerInfo) {
 }
 
 function movePlayer(scene, time, delta) {
-  if (scene.playerContainer.tank.body.velocity.x > 7) {
-    scene.playerContainer.tank.body.setVelocityX(7);
+  if (scene.playerContainer.body.velocity.x > 7) {
+    scene.playerContainer.body.setVelocityX(7);
   }
-  else if(scene.playerContainer.tank.body.velocity.x < -7){
-    scene.playerContainer.tank.setVelocityX(-7);
+  else if(scene.playerContainer.body.velocity.x < -7){
+    scene.playerContainer.setVelocityX(-7);
   }
   if (scene.cursors.left.isDown) {
     scene.playerContainer.thrustBack(0.5);
@@ -137,9 +137,11 @@ function damagePlayer(explosion, player){
 function updatePlayerPosition(scene,playerInfo){
 
   currPlayer = scene.otherPlayers[playerInfo.playerId];
-  
-  if(typeof(currPlayer) !== 'undefined'){
-    otherPlayer.setRotation(playerInfo.rotation);
-    otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+    if(typeof(currPlayer) !== 'undefined'){
+      console.log('oldPos turr', currPlayer.turret.x, currPlayer.turret.y, currPlayer.turret);
+      currPlayer.setPosition(playerInfo.x, playerInfo.y);
+      currPlayer.setPlayerTextPosition();
+      currPlayer.setTurretPosition();
+      console.log('new pos turr', currPlayer.turret.x, currPlayer.turret.y, currPlayer.turret);
   }
 }

@@ -1,48 +1,51 @@
-class Player {
+class Player extends Phaser.GameObjects.Sprite {
   constructor(scene, character, weapon, playerInfo, color) {
     scene.shapes = scene.cache.json.get('shapes');
-    this.tank = scene.matter.add.sprite(playerInfo.x, playerInfo.y, 'sheet', 'tank_right_resized.png', {shape: scene.shapes.tank_right});
-  
-    this.tank.setBounce(0.0001);
-    this.tank.setMass(100);
-    this.tank.body.friction = 0;
-    this.tank.body.frictionStatic = 0;
-    this.tank.body.frictionAir = 0.3;
+    super(scene, playerInfo.x, playerInfo.y, 'sheet', 'tank_right_resized.png', {shape: scene.shapes_right});
+    scene.matter.add.gameObject(this);
+    this.setBounce(0.0001);
+    this.setMass(100);
+    this.body.friction = 0;
+    this.body.frictionStatic = 0;
+    this.body.frictionAir = 0.3;
 
-    this.turret = new Weapon(scene, "turret", "bullet", 10, 10, this.tank.x+2, this.tank.y+15);
+    this.turret = new Weapon(scene, "turret", "bullet", 10, 10, this.x+2, this.y+15);
 
     this.playerId = playerInfo.playerId;
     this.alias = playerInfo.alias;
-    this.playerText = scene.add.text(this.tank.x, this.tank.y-50, playerInfo.alias, {
+    this.playerText = scene.add.text(this.x, this.y-50, playerInfo.alias, {
       fontSize: "18px Arial",
       fill: color,
       align: "center"
     });
     this.playerText.setOrigin(0.5, 0)
 
-    scene.add.existing(this.tank);
+    scene.add.existing(this);
   };
- 
-  setFlipX(value) {
-    this.tank.setFlipX(value);
-  }
-
+  
   setTurretPosition() {
-    this.turret.x = this.tank.x+2;
-    this.turret.y = this.tank.y-13;
+    this.turret.x = this.x+2;
+    this.turret.y = this.y-5;
   }
 
   setPlayerTextPosition() {
-    this.playerText.x = this.tank.x;
-    this.playerText.y = this.tank.y-50;
+    this.playerText.x = this.x;
+    this.playerText.y = this.y-50;
   }
 
+  // setPositionXY(x, y){
+  //   this.x = x;
+  //   this.y = y;
+  //   this.setTurretPosition();
+  //   this.setPlayerTextPosition();
+  // }
+
   thrust(force) {
-    this.tank.thrust(force);
+    this.thrust(force);
   }
 
   thrustBack(force) {
-    this.tank.thrustBack(force);
+    this.thrustBack(force);
   }
 
   fire(scene, angle, power) {
@@ -73,9 +76,11 @@ class Player {
     };
     return basicInfo;
   }
-  destroy() {
-    this.tank.destroy();
+  
+  playerDestroy() {
     this.turret.destroy();
     this.playerText.destroy();
+    this.destroy();
   }
+
 }

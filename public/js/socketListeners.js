@@ -43,7 +43,7 @@ function createRemovePlayerListener(scene) {
   socket.on("removePlayer", (playerId) => {
     if (socket.id == playerId) {
       // scene.playerContainer.setActive(false);
-      scene.playerContainer.destroy();
+      scene.playerContainer.playerDestroy();
       if (scene.isMyTurn) {
         socket.emit("finishedTurn");
         scene.isMyTurn = false;
@@ -52,7 +52,7 @@ function createRemovePlayerListener(scene) {
       Object.keys(scene.otherPlayers).forEach(currID => {
         if (currID !== "undefined" && currID === playerId) {
           //scene.otherPlayers[currID].setActive(false);
-          scene.otherPlayers[currID].destroy();
+          scene.otherPlayers[currID].playerDestroy();
         }
       });
     }
@@ -108,15 +108,15 @@ function createNextPlayerTurn(scene) {
 function createClearScene(scene) {
   socket.on("clearScene", () => {
     /*scene.otherPlayers.getChildren().forEach(function(player){
-      player.destroy();
+      player.playerDestroy();
     });*/
     Object.values(scene.otherPlayers).forEach(player => {
       if (player) {
-        player.destroy();
+        player.playerDestroy();
       }
     });
     if (scene.playerContainer) {
-      scene.playerContainer.destroy();
+      scene.playerContainer.playerDestroy();
     }
     if (scene.particles) {
       scene.particles.destroy();
