@@ -1,33 +1,49 @@
-class Player extends Phaser.GameObjects.Container {
-  constructor(scene, character, turretSprite, playerInfo, color) {
-    let characterSprite = scene.add.sprite(0, 0, character);
-    let weaponSprite = new Weapon(scene, turretSprite, "bullet", 48, 10);
-    let playerText = scene.add.text(0, 0, playerInfo.alias, {
+class Player {
+  constructor(scene, character, weapon, playerInfo, color) {
+    scene.shapes = scene.cache.json.get('shapes');
+    this.tank = scene.matter.add.sprite(playerInfo.x, playerInfo.y, 'sheet', 'tank_right_resized.png', {shape: scene.shapes.tank_right});
+  
+    this.tank.setBounce(0.0001);
+    this.tank.setMass(100);
+    this.tank.body.friction = 0;
+    this.tank.body.frictionStatic = 0;
+    this.tank.body.frictionAir = 0.3;
+
+    this.turret = scene.add.image(this.tank.x+2, this.tank.y+15, weapon);
+    this.turret.setOrigin(0, 0.5);
+
+    this.playerId = playerInfo.playerId;
+    this.alias = playerInfo.alias;
+    this.playerText = scene.add.text(this.tank.x, this.tank.y-50, playerInfo.alias, {
       fontSize: "18px Arial",
       fill: color,
       align: "center"
     });
+    this.playerText.setOrigin(0.5, 0)
 
-    weaponSprite.setOrigin(0, 0.5);
-    playerText.setOrigin(0.5, 2);
-    super(scene, playerInfo.x, playerInfo.y, []);
+    scene.add.existing(this.tank);
+  };
+ 
+  setFlipX(value) {
+    this.tank.setFlipX(value);
+  }
 
-    this.playerId = playerInfo.playerId;
-    this.setSize(64, 40);
-    this.add(characterSprite);
-    this.add(weaponSprite);
-    this.add(playerText);
+  setTurretPosition() {
+    this.turret.x = this.tank.x+2;
+    this.turret.y = this.tank.y-13;
+  }
 
-    scene.matter.add.gameObject(this);
+  setPlayerTextPosition() {
+    this.playerText.x = this.tank.x;
+    this.playerText.y = this.tank.y-50;
+  }
 
-    //
-    this.setBounce(0.0001);
-    this.setMass(100);
-    this.body.friction = 0.0001;
-    this.body.frictionAir = 0.3;
+  thrust(force) {
+    this.tank.thrust(force);
+  }
 
-    this.alias = playerInfo.alias;
-    scene.add.existing(this);
+  thrustBack(force) {
+    this.tank.thrustBack(force);
   }
 
   fire(scene, angle, power) {
@@ -35,11 +51,14 @@ class Player extends Phaser.GameObjects.Container {
   }
 
   getWeaponAngle() {
-    return this.list[1].rotation;
+    //return this.list[1].rotation;
+    return this.turret.rotation;
   }
 
   setWeaponAngle(angle) {
-    this.list[1].rotation = angle;
+    //this.list[1].rotation = angle;
+    //console.log(angle);
+    this.turret.rotation = angle;
   }
 
   flipCharacterX(bool) {
@@ -54,5 +73,10 @@ class Player extends Phaser.GameObjects.Container {
       playerId: this.playerId
     };
     return basicInfo;
+  }
+  destroy() {
+    this.tank.destroy();
+    this.turret.destroy();
+    this.playerText.destroy();
   }
 }

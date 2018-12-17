@@ -13,8 +13,8 @@ function playerHit(player,explosion){
 }
 
 function createTank(scene, playerInfo, color) {
-  let tankContainer = new Player(scene, 'tank', 'turret', playerInfo, color);
-  return tankContainer;
+  let tank = new Player(scene, 'tank', 'turret', playerInfo, color);
+  return tank;
 }
 
 
@@ -70,10 +70,12 @@ function addOtherPlayer(scene, playerInfo) {
 }
 
 function movePlayer(scene, time, delta) {
-  if (scene.playerContainer.body.velocity.x > 7) {
-    scene.playerContainer.setVelocityX(7);
+  scene.playerContainer.setTurretPosition();
+  scene.playerContainer.setPlayerTextPosition();
+  if (scene.playerContainer.tank.body.velocity.x > 7) {
+    scene.playerContainer.tank.body.setVelocityX(7);
   }
-  else if(scene.playerContainer.body.velocity.x < -7){
+  else if(scene.playerContainer.tank.body.velocity.x < -7){
     scene.playerContainer.setVelocityX(-7);
   }
   if (scene.cursors.left.isDown) {

@@ -32,15 +32,10 @@ class GameScene extends Phaser.Scene {
     });
   }
 
-  init(data) {
-    console.log("----------------In GameScene----------------");
-    console.log("init", data);
-    console.log("The alias: ", data.alias);
-  }
-  
+
   preload() {
     this.load.image("green", "assets/green.png");
-    this.load.image("tank_right", "assets/tank_right.png");
+    //this.load.image("tank_right", "assets/tank_right.png");
     this.load.image("tank_left", "assets/tank_left.png");
     this.load.image("tank", "assets/tank_right.png");
     this.load.image("background", "assets/background_vulcano.png");
@@ -56,6 +51,11 @@ class GameScene extends Phaser.Scene {
       frameWidth: 128,
       frameHeight: 128
     });
+
+    // Load sprite sheet generated with TexturePacker
+    this.load.multiatlas('sheet', 'assets/tank_right_resized.json', 'assets');
+    // Load body shapes from JSON file generated using PhysicsEditor
+    this.load.json('shapes', 'assets/tank_test.json');
   }
 
   create() {
@@ -85,8 +85,8 @@ class GameScene extends Phaser.Scene {
         let cursor = pointer;
         if (typeof this.playerContainer == "object") {
           mouseAngle = Phaser.Math.Angle.Between(
-            this.playerContainer.x,
-            this.playerContainer.y,
+            this.playerContainer.turret.x,
+            this.playerContainer.turret.y,
             cursor.x + this.cameras.main.scrollX,
             cursor.y + this.cameras.main.scrollY
           );
@@ -125,8 +125,8 @@ class GameScene extends Phaser.Scene {
     }
 
     if (
-      typeof this.playerContainer !== "undefined" &&
-      this.playerContainer.active
+      typeof this.playerContainer !== "undefined" //&&
+      //this.playerContainer.active
     ) {
       if (this.isMyTurn) {
         this.playerContainer.setWeaponAngle(mouseAngle);
@@ -166,15 +166,17 @@ class GameScene extends Phaser.Scene {
         x: this.playerContainer.x,
         y: this.playerContainer.y,
         rotation: this.playerContainer.rotation,
-        turretRotation: this.playerContainer.getWeaponAngle()
+        //turretRotation: this.playerContainer.getWeaponAngle()
       };
-      if (this.playerContainer.body.velocity.x > 1) {
+      if (this.playerContainer.tank.body.velocity.x > 1) {
         this.emitter.startFollow(this.playerContainer, -30, 8);
-        this.playerContainer.list[0].flipX = false;
+        //this.playerContainer.list[0].flipX = false;
+        this.playerContainer.setFlipX(false);
         this.emitter.on = true;
-      } else if (this.playerContainer.body.velocity.x < -1) {
+      } else if (this.playerContainer.tank.body.velocity.x < -1) {
         this.emitter.startFollow(this.playerContainer, 30, 8);
-        this.playerContainer.list[0].flipX = true;
+        //this.playerContainer.list[0].flipX = true;
+        this.playerContainer.setFlipX(true);
         this.emitter.on = true;
       } else {
         this.emitter.on = false;
