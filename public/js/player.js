@@ -80,7 +80,7 @@ class Player {
   }
 
   fire(scene, angle, power) {
-    this.turret.fire(scene, this.x, this.y, angle, power);
+    this.list[1].fire(scene, this.x, this.y, angle, power);
   }
 
   getWeaponAngle() {
@@ -108,6 +108,8 @@ class Player {
     return basicInfo;
   }
   destroy() {
-    this.tank.destroy()
+    this.tank.destroy();
+    this.turret.destroy();
+    this.playerText.destroy();
   }
 }
