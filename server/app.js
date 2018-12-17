@@ -9,8 +9,8 @@ let currentMap;
 
 let terrain = require("./terrain.js");
 
-let WIDTH = 800;
-let HEIGHT = 600;
+let WIDTH = 1024;
+let HEIGHT = 768;
 
 // Just to get initial test running, consider pruning
 var userName;
@@ -75,7 +75,8 @@ function startGameServer(server) {
     });
 
     socket.on("isPlayerHit", explosionInfo => {
-      tilesToRemove = terrain.tilesHit(explosionInfo);
+      tilesToRemove = terrain.tilesHit(explosionInfo,16);
+
       io.emit("removeTiles", tilesToRemove);
       Object.values(players).forEach(currentPlayer => {
         let playerID = currentPlayer.playerId;
@@ -95,7 +96,6 @@ function startGameServer(server) {
         } else if (alivePlayers.length < 1) {
           io.emit("playerWon");
         }
-        // newRound(2000); // TODO: Explain argument that is never used?
         newRound(playerOrder);
       }
     });
@@ -162,7 +162,7 @@ function nextPlayerAlias(playerOrder) {
   do {
     playerTurnIndex = getNextPlayerTurnIndex(1, playerOrder);
     playerSocketID = playerOrder[playerTurnIndex];
-  } while (playerSocketID == "DEAD");
+  } while (playerSocketID == "DEAD" );
 
   if (players[playerSocketID].alias !== "undefined") {
     return players[playerSocketID].alias;
@@ -188,7 +188,7 @@ function createPlayer(playersObject, id, alias, playerOrder) {
     alias: alias,
     rotation: 0,
     x: Math.floor(Math.random() * 700) + 50,
-    y: HEIGHT - 200,
+    y: HEIGHT/2,
     playerId: id,
     playerTurn: false, //TODO randomize for 1 player to be true
     ready: false,
@@ -212,14 +212,10 @@ function resetPlayers(playerOrder) {
 }
 
 function newRound(playerOrder) {
-  oldMap = currentMap;
   currentMap = terrain.createPlatformLayer();
   playerTurnIndex = 0;
   players = resetPlayers();
-  io.emit("updatePlatformLayer", {
-    new: currentMap,
-    old: oldMap
-  });
+  io.emit("updatePlatformLayer",currentMap);
   io.emit("clearScene");
   startRound(playerOrder);
 }
