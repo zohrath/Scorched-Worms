@@ -158,7 +158,8 @@ function createSyncGamestate(scene) {
 function createRemoveTiles(scene) {
   socket.on("removeTiles", (tiles) => {
     tiles.forEach(tile => {
-      removeTile(scene, tile.x, tile.y);
+      let tilesToRemove = platformLayer.graphic.getTileAtWorldXY(tile.x, tile.y);
+      removeTile(scene, tilesToRemove);
     });
   });
 }
@@ -172,15 +173,10 @@ function createAddTiles(scene) {
 }
 
 function createUpdatePlatformLayer(scene) {
-  socket.on("updatePlatformLayer", (maps) => {
-    let tilesToRemove = maps.old;
-    if (tilesToRemove) {
-      destroyMap(scene, tilesToRemove);
-    }
-    let tilesToAdd = maps.new;
-    tilesToAdd.forEach(tile => {
-      addTile(scene, tile.type, tile.x, tile.y);
-    });
+  socket.on("updatePlatformLayer", (map) => {
+    destroyMap(scene);
+    let tilesToAdd = map;
+    addTiles(scene,tilesToAdd);
     platformLayer.physic = scene.matter.world.convertTilemapLayer(
       platformLayer.graphic
     );

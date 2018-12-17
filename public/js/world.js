@@ -26,30 +26,36 @@ function createBullets(scene) {
   scene.bullets = []; // defa update <-
 }
 
-function destroyMap(scene, tiles) {
-  tiles.forEach(tile => {
-    for (i = tile.y; i < 768; i += 16) removeTile(scene, tile.x, i);
+function destroyMap(scene) {
+  let tiles = platformLayer.graphic.getTilesWithin();
+  tiles.forEach(tile =>{
+      removeTile(scene, tile);
   });
 }
 
-function removeTile(scene, x, y) {
-  let tile = platformLayer.graphic.getTileAtWorldXY(x, y);
+function removeTile(scene, tile) {
   if (tile) {
     var layer = tile.tilemapLayer;
     if (typeof tile.physics.matterBody !== "undefined")
       tile.physics.matterBody.destroy();
     layer.removeTileAt(tile.x, tile.y);
   }
-  // scene.matter.world.convertTilemapLayer(platformLayer.graphic);
+}
+
+function addTiles(scene,tiles){
+  tiles.forEach(tileCol =>{
+    tileCol.forEach(tile =>{
+      addTile(scene,tile.type,tile.x,tile.y);
+    })
+
+  });
+  let firstTile = platformLayer.graphic.getTileAtWorldXY(tiles[0][0].x,tiles[0][0].y);
+  let lastTile = platformLayer.graphic.getTileAtWorldXY(1024-8, 768 - 8);
+  platformLayer.graphic.setCollisionBetween(firstTile.index, lastTile.index);
 }
 
 function addTile(scene, type, x, y) {
-  let tile = platformLayer.graphic.putTileAtWorldXY(type, x, y);
-  if (tile) {
-    platformLayer.graphic.fill(13, tile.x, tile.y + 1, 1, 768 - tile.y / 16); //768 is the height and 16 is tile height;
-    let lastTile = platformLayer.graphic.getTileAtWorldXY(x, 768 - 8); //768 is the height and 8 is half tile height;
-    platformLayer.graphic.setCollisionBetween(tile.index, lastTile.index);
-  }
+  return platformLayer.graphic.putTileAtWorldXY(type, x, y);
 }
 
 function createTerrain(scene) {
