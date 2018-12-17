@@ -15,8 +15,12 @@ function tilesHit(explosionInfo, tileSize = 1) {
   return tilesToRemove;
 }
 
+function updatePlatformLayer(layer,tilesToRemove) {
+
+}
+
 function createPlatformLayer() {
-  let tileWidth = 16;
+  let tileSize = 16;
   let width = 1024;
   let height = 768;
   let tilesToAdd = [];
@@ -24,10 +28,12 @@ function createPlatformLayer() {
   let nextHeight = colHeight;
   let type;
   lastHeight = colHeight;
-  for (i = 0; i < width; i = i + tileWidth) {
-    nextHeight = colHeight + getRndInteger(-1, 1) * 16;
-    if (nextHeight < tileWidth) {
-      nextHeight = height - tileWidth;
+  let tileColumn;
+  for (i = 0; i < width; i = i + tileSize) {
+    tileColumn = [];
+    nextHeight = colHeight + getRndInteger(-1, 1) * tileSize;
+    if (nextHeight < tileSize) {
+      nextHeight = height - tileSize;
     }
 
     type = 1;
@@ -39,12 +45,20 @@ function createPlatformLayer() {
       type = 3;
     }
 
-    tilesToAdd.push({
+    tileColumn.push({
       type: type,
       x: i,
       y: colHeight
     });
 
+    for(j = colHeight+tileSize; j<height;j += tileSize){
+      tileColumn.push({
+        type: 13,
+        x: i,
+        y: j
+      });
+    }
+    tilesToAdd.push(tileColumn);
     lastHeight = colHeight;
     colHeight = nextHeight;
   }
