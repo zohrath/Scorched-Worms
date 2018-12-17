@@ -76,7 +76,7 @@ function movePlayer(scene, time, delta) {
     scene.playerContainer.tank.body.setVelocityX(7);
   }
   else if(scene.playerContainer.tank.body.velocity.x < -7){
-    scene.playerContainer.setVelocityX(-7);
+    scene.playerContainer.tank.setVelocityX(-7);
   }
   if (scene.cursors.left.isDown) {
     scene.playerContainer.thrustBack(0.5);

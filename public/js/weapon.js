@@ -1,7 +1,8 @@
 class Weapon extends Phaser.GameObjects.Sprite{
 
-    constructor(scene, weaponSpriteName, bulletSpritename, radius, dmg) {
-        super(scene, 0, -7, weaponSpriteName);
+    constructor(scene, weaponSpriteName, bulletSpritename, radius, dmg, x, y) {
+        super(scene, x, y, weaponSpriteName);
+        this.setOrigin(0, 0.5);
         this.radius = radius;
         this.dmg = dmg;
         this.bulletSpritename = bulletSpritename;
@@ -17,7 +18,7 @@ class Weapon extends Phaser.GameObjects.Sprite{
             scene.bullets.push(bullet);
             bullet.fire(x, y, angle, power);
         }
-        else{
+        else{ 
             console.log("invalid bullet, oh noes!")
         }
         

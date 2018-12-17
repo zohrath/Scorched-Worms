@@ -9,8 +9,7 @@ class Player {
     this.tank.body.frictionStatic = 0;
     this.tank.body.frictionAir = 0.3;
 
-    this.turret = scene.add.image(this.tank.x+2, this.tank.y+15, weapon);
-    this.turret.setOrigin(0, 0.5);
+    this.turret = new Weapon(scene, "turret", "bullet", 10, 10, this.tank.x+2, this.tank.y+15);
 
     this.playerId = playerInfo.playerId;
     this.alias = playerInfo.alias;
@@ -80,7 +79,7 @@ class Player {
   }
 
   fire(scene, angle, power) {
-    this.list[1].fire(scene, this.x, this.y, angle, power);
+    this.turret.fire(scene, this.x, this.y, angle, power);
   }
 
   getWeaponAngle() {
