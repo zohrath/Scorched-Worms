@@ -5,7 +5,6 @@ var Bullet = new Phaser.Class({
     this.bulletParticles = null;
     createBulletEmitter(scene, this);
     this.bulletEmitter.startFollow(this);
-    this.bulletEmitter.on = false;
     Phaser.GameObjects.Sprite.call(this, scene, 0, 0, sprite);
 
     this.radius = radius;
@@ -59,8 +58,7 @@ var Bullet = new Phaser.Class({
 
     let explosionSprite = scene.add
       .sprite(this.x, this.y, "explosionSpriteSheet")
-      .setScale(2);
-    console.log(explosionSprite);
+      .setScale(1); // TODDO: setScale depending on radius
     explosionSprite.anims.play("explosionKey128");
 
     this.isPlayerHit();

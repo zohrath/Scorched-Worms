@@ -164,6 +164,7 @@ function nextPlayerAlias(playerOrder) {
     playerSocketID = playerOrder[playerTurnIndex];
   } while (playerSocketID == "DEAD");
 
+  // TODO check that players ONLY have valid players
   if (players[playerSocketID].alias !== "undefined") {
     return players[playerSocketID].alias;
   } else {

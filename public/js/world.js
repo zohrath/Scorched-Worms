@@ -104,7 +104,7 @@ function createWeaponEmitter(scene, radius, imgSize) {
   let weaponParticles = scene.add.particles("green");
   scene.weaponEmitter = weaponParticles.createEmitter({
     on: true,
-    active: true,
+    active: false, // TODO: toggle when shot (if desired)
     speed: 50,
     scale: { start: 0, end: 0.5 }, //end to be radius/img.size
     blendMode: "ADD"

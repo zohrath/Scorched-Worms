@@ -48,7 +48,6 @@ function createPlatformLayer() {
     lastHeight = colHeight;
     colHeight = nextHeight;
   }
-  console.log(tilesToAdd);
   return tilesToAdd;
 }
 
