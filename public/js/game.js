@@ -1,4 +1,3 @@
-let platforms;
 let cursors;
 let player;
 let power = 0;
@@ -7,15 +6,40 @@ let socket;
 let keyD;
 let keyR;
 let keyX;
+let keyC;
 let allowedToEmit = false;
 let skipMenu = true;
+let edgeSize = 4;
+let platformLayer = {};
+let tileset;
+let allowedToForce = true;
 
 class GameScene extends Phaser.Scene {
   constructor() {
-    super({ key: "GameScene" });
+    super({
+      key: "GameScene",
+      physics: {
+        arcade: {
+          debug: false,
+          gravity: { y: 200 }
+        },
+        matter: {
+          debug: false,
+          gravity: { y: 3 }
+        }
+      },
+      plugin: PhaserMatterCollisionPlugin // The plugin class
+    });
   }
 
+  init(data) {
+    console.log("----------------In GameScene----------------");
+    console.log("init", data);
+    console.log("The alias: ", data.alias);
+  }
+  
   preload() {
+    this.load.image("green", "assets/green.png");
     this.load.image("tank_right", "assets/tank_right.png");
     this.load.image("tank_left", "assets/tank_left.png");
     this.load.image("tank", "assets/tank_right.png");
@@ -24,46 +48,36 @@ class GameScene extends Phaser.Scene {
     this.load.image("turret", "assets/turret.png");
     this.load.image("smoke", "assets/smoke-puff.png");
     this.load.image("bullet", "assets/bullet.png");
+
+    this.load.tilemapTiledJSON("map", "assets/scorchedworms.json");
+    this.load.image("swImg", "assets/scorchedworms.png");
+
+    this.load.spritesheet("explosionSpriteSheet128", "/assets/explode.png", {
+      frameWidth: 128,
+      frameHeight: 128
+    });
   }
 
   create() {
     this.nextTic = 0;
-    let scene = this;
+    let self = this;
     this.isMyTurn = false;
     this.ready = false;
+    
     createWorld(this);
+    keyC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
     keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
     this.cursors = this.input.keyboard.createCursorKeys();
 
     socket = io();
-    this.otherPlayers = this.physics.add.group();
-    this.player = this.physics.add.group();
-    this.explosions = this.physics.add.group();
-    createSocketListners(scene);
-    //COLLIDERS
-    this.physics.add.collider(
-      this.bullets,
-      this.terrain,
-      explodeBullet,
-      null,
-      scene,
-    );
-    this.physics.add.collider(
-      this.bullets,
-      this.otherPlayers,
-      explodeBullet,
-      null,
-      scene
-    );
-    // this.physics.add.collider(
-    //   this.bullets,
-    //   this.player,
-    //   explodeBullet,
-    //   null,
-    //   scene
-    // );
+    this.otherPlayers = {};
+    // TODO change group -> {}?
+    // this.player = this.physics.add.group();
+    // this.explosions = this.physics.add.group();
+
+    createSocketListners(this);
 
     this.input.on(
       "pointermove",
@@ -83,6 +97,8 @@ class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    if (keyC.isDown) {
+    }
     if (keyX.isDown) {
       console.log("type of playerCotainer ", typeof this.playerContainer);
       console.log("isMyTurn: ", this.isMyTurn);
@@ -91,10 +107,14 @@ class GameScene extends Phaser.Scene {
       console.log("allowedToEmit: ", allowedToEmit);
     }
 
-    if (keyD.isDown) {
+    if (keyD.isDown && allowedToForce) {
+      allowedToForce = false;
       console.log("force start");
       socket.emit("forceStart");
       this.ready;
+      setTimeout(function() {
+        allowedToForce = true;
+      }, 1000);
     }
     if (!this.ready) {
       if (keyR.isDown) {
@@ -115,10 +135,10 @@ class GameScene extends Phaser.Scene {
 
       if (this.playerContainer.oldPosition) {
         if (
-          this.playerContainer.x !== this.playerContainer.oldPosition.x ||
-          this.playerContainer.y !== this.playerContainer.oldPosition.y ||
-          this.playerContainer.rotation !==
-            this.playerContainer.oldPosition.rotation
+          Math.round(this.playerContainer.x) !==
+            Math.round(this.playerContainer.oldPosition.x) ||
+          Math.round(this.playerContainer.y) !==
+            Math.round(this.playerContainer.oldPosition.y)
         ) {
           socketEmit(
             "playerMovement",
@@ -132,8 +152,8 @@ class GameScene extends Phaser.Scene {
         }
 
         if (
-          this.playerContainer.getWeaponAngle() !==
-          this.playerContainer.oldPosition.turretRotation
+          Math.round(this.playerContainer.getWeaponAngle()) !==
+          Math.round(this.playerContainer.oldPosition.turretRotation)
         ) {
           socketEmit("toOtherClients", {
             event: "moveTurret",
@@ -148,11 +168,11 @@ class GameScene extends Phaser.Scene {
         rotation: this.playerContainer.rotation,
         turretRotation: this.playerContainer.getWeaponAngle()
       };
-      if (this.playerContainer.body.velocity.x > 0) {
+      if (this.playerContainer.body.velocity.x > 1) {
         this.emitter.startFollow(this.playerContainer, -30, 8);
         this.playerContainer.list[0].flipX = false;
         this.emitter.on = true;
-      } else if (this.playerContainer.body.velocity.x < 0) {
+      } else if (this.playerContainer.body.velocity.x < -1) {
         this.emitter.startFollow(this.playerContainer, 30, 8);
         this.playerContainer.list[0].flipX = true;
         this.emitter.on = true;
@@ -169,14 +189,16 @@ let config = {
   parent: "ScorchedWorms",
   width: 1024,
   height: 768,
-  physics: {
-    default: "arcade",
-    arcade: {
-      debug: true,
-      gravity: { y: 300 }
-    }
-  },
-  scene: [MainMenu, GameScene]
+  scene: [MainMenu, GameScene],
+  plugins: {
+    scene: [
+      {
+        plugin: PhaserMatterCollisionPlugin, // The plugin class
+        key: "GameScene", // Where to store in Scene.Systems, e.g. scene.sys.matterCollision
+        mapping: "matterCollision" // Where to store in the Scene, e.g. scene.matterCollision
+      }
+    ]
+  }
 };
 
-let game = new Phaser.Game(config);
+var game = new Phaser.Game(config);

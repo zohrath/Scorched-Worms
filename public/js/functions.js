@@ -1,6 +1,6 @@
 function explodeBullet(bullet, object) {
   bullet.explode(this);
-  bullet.hide();
+  //bullet.hide();
 }
 
 function playerHit(player,explosion){
@@ -15,6 +15,18 @@ function playerHit(player,explosion){
 function createTank(scene, playerInfo, color) {
   let tankContainer = new Player(scene, 'tank', 'turret', playerInfo, color);
   return tankContainer;
+}
+
+
+function createBulletEmitter(scene, bullet) {
+  bullet.bulletParticles = scene.add.particles("green");
+  bullet.bulletEmitter = bullet.bulletParticles.createEmitter({
+    on: false,
+    active: true,
+    speed: 50,
+    scale: { start: 0.3, end: 0},
+    blendMode: "ADD"
+  });
 }
 
 function createEmitter(scene) {
@@ -38,30 +50,44 @@ function addPlayer(scene, playerInfo) {
   scene.alias = playerInfo.alias
   let color = "#00ff00";
   scene.playerContainer = createTank(scene, playerInfo, color);
+}
 
+// TODO RM
+function fireBullet(scene, x, y, angle, power) {
+  //let bullet = scene.bullets.get();
+  let bullet = new Bullet(scene);
+  if (bullet) {
+    bullet.fire(x, y, angle, power);
+  }
 }
 
 function addOtherPlayer(scene, playerInfo) {
   let color = "#ff0000";
   otherPlayer = createTank(scene, playerInfo, color);
   otherPlayer.playerId = playerInfo.playerId;
-  scene.otherPlayers.add(otherPlayer);
+  //scene.otherPlayers.add(otherPlayer);
+  scene.otherPlayers[playerInfo.playerId] = otherPlayer;
 }
 
 function movePlayer(scene, time, delta) {
-
+  if (scene.playerContainer.body.velocity.x > 7) {
+    scene.playerContainer.setVelocityX(7);
+  }
+  else if(scene.playerContainer.body.velocity.x < -7){
+    scene.playerContainer.setVelocityX(-7);
+  }
   if (scene.cursors.left.isDown) {
-    scene.playerContainer.body.setAccelerationX(-500);
+    scene.playerContainer.thrustBack(0.5);
   } else if (scene.cursors.right.isDown) {
-    scene.playerContainer.body.setAccelerationX(500);
+    scene.playerContainer.thrust(0.5);
   } else {
-    scene.playerContainer.body.setAccelerationX(0);
+    //scene.playerContainer.setVelocity(0,0);
   }
-  if (scene.cursors.up.isDown && scene.playerContainer.body.touching.down) {
-    scene.playerContainer.body.velocity.y = -100;
+  /*if (scene.cursors.up.isDown && scene.playerContainer.body.velocity.y > 0) {
+    scene.playerContainer.thrustRight(-0.02);
   } else if (scene.cursors.down.isDown) {
-    scene.turretInContainer.rotation--;
-  }
+    //scene.turretInContainer.rotation--;
+  }*/
   // The if statement below this is never true. Something is wrong with keyX.
   if (keyX.isdown && scene.playerContainer.body.touching.down) {
     scene.playerContainer.body.velocity.y = -100;
@@ -85,7 +111,6 @@ function movePlayer(scene, time, delta) {
       power = 0;
     }
   }
-
 }
 
 function socketEmit(emitName,data,force=false){
@@ -107,4 +132,14 @@ function damagePlayer(explosion, player){
   //else if
 
   //emit explode bullet
+}
+
+function updatePlayerPosition(scene,playerInfo){
+
+  currPlayer = scene.otherPlayers[playerInfo.playerId];
+  
+  if(typeof(currPlayer) !== 'undefined'){
+    otherPlayer.setRotation(playerInfo.rotation);
+    otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+  }
 }

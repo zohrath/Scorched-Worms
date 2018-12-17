@@ -1,7 +1,7 @@
 class Player extends Phaser.GameObjects.Container {
-  constructor(scene, character, weapon, playerInfo, color) {
+  constructor(scene, character, turretSprite, playerInfo, color) {
     let characterSprite = scene.add.sprite(0, 0, character);
-    let weaponSprite = new Weapon(scene, "turret", "bullet", 10, 10);
+    let weaponSprite = new Weapon(scene, turretSprite, "bullet", 48, 10);
     let playerText = scene.add.text(0, 0, playerInfo.alias, {
       fontSize: "18px Arial",
       fill: color,
@@ -18,11 +18,14 @@ class Player extends Phaser.GameObjects.Container {
     this.add(weaponSprite);
     this.add(playerText);
 
-    scene.physics.world.enable(this);
-    this.body.setBounce(0.3).setCollideWorldBounds(true);
-    this.body.setMaxVelocity(300).setDragX(300);
+    scene.matter.add.gameObject(this);
 
-    scene.physics.add.collider(this, scene.terrain);
+    //
+    this.setBounce(0.0001);
+    this.setMass(100);
+    this.body.friction = 0.0001;
+    this.body.frictionAir = 0.3;
+
     this.alias = playerInfo.alias;
     scene.add.existing(this);
   }
