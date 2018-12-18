@@ -9,6 +9,8 @@ let currentMap;
 
 let terrain = require("./terrain.js");
 
+
+let TILESIZE = 16;
 let WIDTH = 1024;
 let HEIGHT = 768;
 
@@ -75,7 +77,7 @@ function startGameServer(server) {
 
     socket.on("isPlayerHit", explosionInfo => {
       tilesToRemove = terrain.tilesHit(explosionInfo,16);
-
+      terrain.updatePlatformLayer(currentMap,tilesToRemove);
       io.emit("removeTiles", tilesToRemove);
       Object.values(players).forEach(currentPlayer => {
         let playerID = currentPlayer.playerId;
@@ -212,7 +214,7 @@ function resetPlayers(playerOrder) {
 }
 
 function newRound(playerOrder) {
-  currentMap = terrain.createPlatformLayer();
+  currentMap = terrain.createPlatformLayer(WIDTH,HEIGHT,TILESIZE);
   playerTurnIndex = 0;
   players = resetPlayers();
   io.emit("updatePlatformLayer",currentMap);
@@ -221,8 +223,10 @@ function newRound(playerOrder) {
 }
 
 function newTurn(playerOrder, timeout=2000) {
-  // console.log("newTurn: " + playerOrder);
-  io.emit("syncGamestate", players);
+  io.emit("syncGamestate", {    
+    playerInfo: players,
+    mapInfo: currentMap
+  });
   setTimeout(function() {
     io.emit("nextPlayerTurn", nextPlayerAlias(playerOrder));
   }, timeout); //delay to sync allowedToEmit and bullet destroy

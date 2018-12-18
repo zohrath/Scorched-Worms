@@ -146,11 +146,12 @@ function createResetScene(scene) {
 }
 
 function createSyncGamestate(scene) {
-  socket.on("syncGamestate", (players) => {
-    Object.values(players).forEach(playerInfo => {
+  socket.on("syncGamestate", (syncInfo) => {
+    destroyMap(scene);
+    createMap(scene,syncInfo.mapInfo)
+    Object.values(syncInfo.playerInfo).forEach(playerInfo => {
       updatePlayerPosition(scene, playerInfo);
       // TODO: add hp sync
-      // TODO: add terrain sync
     });
   });
 }
@@ -159,7 +160,7 @@ function createRemoveTiles(scene) {
   socket.on("removeTiles", (tiles) => {
     tiles.forEach(tile => {
       let tilesToRemove = platformLayer.graphic.getTileAtWorldXY(tile.x, tile.y);
-      removeTile(scene, tilesToRemove);
+      // removeTile(scene, tilesToRemove);
     });
   });
 }
@@ -175,10 +176,6 @@ function createAddTiles(scene) {
 function createUpdatePlatformLayer(scene) {
   socket.on("updatePlatformLayer", (map) => {
     destroyMap(scene);
-    let tilesToAdd = map;
-    addTiles(scene,tilesToAdd);
-    platformLayer.physic = scene.matter.world.convertTilemapLayer(
-      platformLayer.graphic
-    );
+    createMap(scene,map)
   });
 }

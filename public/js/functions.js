@@ -135,13 +135,10 @@ function damagePlayer(explosion, player){
 }
 
 function updatePlayerPosition(scene,playerInfo){
-
   currPlayer = scene.otherPlayers[playerInfo.playerId];
     if(typeof(currPlayer) !== 'undefined'){
-      console.log('oldPos turr', currPlayer.turret.x, currPlayer.turret.y, currPlayer.turret);
       currPlayer.setPosition(playerInfo.x, playerInfo.y);
       currPlayer.setPlayerTextPosition();
       currPlayer.setTurretPosition();
-      console.log('new pos turr', currPlayer.turret.x, currPlayer.turret.y, currPlayer.turret);
   }
 }
