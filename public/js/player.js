@@ -24,21 +24,14 @@ class Player extends Phaser.GameObjects.Sprite {
   };
   
   setTurretPosition() {
-    this.turret.x = this.x+2;
-    this.turret.y = this.y-5;
+      this.turret.x = this.x+2;
+      this.turret.y = this.y-5;
   }
 
   setPlayerTextPosition() {
     this.playerText.x = this.x;
     this.playerText.y = this.y-50;
   }
-
-  // setPositionXY(x, y){
-  //   this.x = x;
-  //   this.y = y;
-  //   this.setTurretPosition();
-  //   this.setPlayerTextPosition();
-  // }
 
   thrust(force) {
     this.thrust(force);
@@ -53,13 +46,10 @@ class Player extends Phaser.GameObjects.Sprite {
   }
 
   getWeaponAngle() {
-    //return this.list[1].rotation;
     return this.turret.rotation;
   }
 
   setWeaponAngle(angle) {
-    //this.list[1].rotation = angle;
-    //console.log(angle);
     this.turret.rotation = angle;
   }
 
@@ -76,11 +66,19 @@ class Player extends Phaser.GameObjects.Sprite {
     };
     return basicInfo;
   }
-  
-  playerDestroy() {
+
+  destroyPlayer() {
+
     this.turret.destroy();
     this.playerText.destroy();
     this.destroy();
   }
 
+  getCurrentPos(){
+    return this.body.position;
+  }
+
+  getPrevPos(){
+    return this.body.positionPrev;
+  }
 }

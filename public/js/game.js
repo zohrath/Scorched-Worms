@@ -59,6 +59,7 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    console.log(this);
     this.nextTic = 0;
     let self = this;
     this.isMyTurn = false;
@@ -132,14 +133,15 @@ class GameScene extends Phaser.Scene {
         this.playerContainer.setWeaponAngle(mouseAngle);
         movePlayer(this, time, delta);
       }
+      
       this.playerContainer.setTurretPosition();
       this.playerContainer.setPlayerTextPosition();
-      if (this.playerContainer.oldPosition) {
+      let prevPos = this.playerContainer.getPrevPos(); 
+      let currPos = this.playerContainer.getCurrentPos(); 
+      if (prevPos) {
         if (
-          Math.round(this.playerContainer.x) !==
-            Math.round(this.playerContainer.oldPosition.x) ||
-          Math.round(this.playerContainer.y) !==
-            Math.round(this.playerContainer.oldPosition.y)
+          Math.round(currPos.x) !== Math.round(prevPos.x) ||
+          Math.round(currPos.y) !== Math.round(prevPos.y)
         ) {
           socketEmit(
             "playerMovement",
@@ -150,11 +152,11 @@ class GameScene extends Phaser.Scene {
 
         if (
           Math.round(this.playerContainer.getWeaponAngle()) !==
-          Math.round(this.playerContainer.oldPosition.turretRotation)
+          Math.round(prevPos.turretRotation)
         ) {
           socketEmit("toOtherClients", {
             event: "moveTurret",
-            turretRotation: this.playerContainer.oldPosition.turretRotation
+            turretRotation: prevPos.turretRotation
           });
         }
       }
@@ -162,16 +164,14 @@ class GameScene extends Phaser.Scene {
       this.playerContainer.oldPosition = {
         x: this.playerContainer.x,
         y: this.playerContainer.y,
-        //turretRotation: this.playerContainer.getWeaponAngle()
       };
       if (this.playerContainer.body.velocity.x > 1) {
         this.emitter.startFollow(this.playerContainer, -30, 8);
-        //this.playerContainer.list[0].flipX = false;
         this.playerContainer.setFlipX(false);
         this.emitter.on = true;
+
       } else if (this.playerContainer.body.velocity.x < -1) {
         this.emitter.startFollow(this.playerContainer, 30, 8);
-        //this.playerContainer.list[0].flipX = true;
         this.playerContainer.setFlipX(true);
         this.emitter.on = true;
       } else {

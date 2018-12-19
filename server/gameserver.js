@@ -19,7 +19,7 @@ var userName;
 var clients = {};
 
 function startGameServer(server) {
-  let playerOrder = [];
+  var playerOrder = [];
 
   io = socketio.listen(server);
 
@@ -79,10 +79,13 @@ function startGameServer(server) {
     socket.on("isPlayerHit", explosionInfo => {
       tilesToRemove = terrain.tilesHit(explosionInfo,16);
       terrain.updatePlatformLayer(currentMap,tilesToRemove);
+      let damgeTaken = 0;
       io.emit("removeTiles", tilesToRemove);
       Object.values(players).forEach(currentPlayer => {
         let playerID = currentPlayer.playerId;
-        currentPlayer.hp -= calculateDmg(explosionInfo, currentPlayer);
+        let currDmg = calculateDmg(explosionInfo, currentPlayer);
+        currentPlayer.hp -= currDmg;
+        damgeTaken += currDmg; 
         if (currentPlayer.hp <= 0) {
           io.emit("removePlayer", playerID);
           removeFromPlayerOrder(playerID, playerOrder);
@@ -93,12 +96,14 @@ function startGameServer(server) {
       let alivePlayers = getAlivePlayers(playerOrder);
 
       if (alivePlayers.length <= 1) {
-        if (alivePlayers.length == 1) {
+        if (alivePlayers.length === 1) {
           io.emit("playerWon", players[alivePlayers[0]].alias);
         } else if (alivePlayers.length < 1) {
           io.emit("playerWon");
         }
         newRound(playerOrder);
+      }else if (damgeTaken > 0){
+        io.emit("updateHP", players)
       }
     });
 
@@ -150,7 +155,7 @@ function countConnectedPlayers() {
 }
 
 function startRoundIfAllReady(playerOrder) {
-  if (clientsReady == playerOrder.length && clientsReady > 1) {
+  if (clientsReady === playerOrder.length && clientsReady > 1) {
     // send the players object to the new player
     startRound(playerOrder);
     return true;
@@ -176,7 +181,7 @@ function nextPlayerAlias(playerOrder) {
 
 function removeFromPlayerOrder(targetID, playerOrder) {
   playerOrder.forEach(function(id, i) {
-    if (targetID == id) {
+    if (targetID === id) {
       playerOrder[i] = "DEAD"; //remove from index i and 1 element
     }
   });
@@ -202,24 +207,41 @@ function createPlayer(playersObject, id, alias, playerOrder) {
   return playersObject[id];
 }
 
+function createPlayer2(id, alias) {
+  let newPlayer = {
+    alias: alias,
+    rotation: 0,
+    x: Math.floor(Math.random() * 700) + 50,
+    y: HEIGHT/4,
+    playerId: id,
+    playerTurn: false, //TODO randomize for 1 player to be true
+    ready: false,
+    hp: 10
+  };
+  return newPlayer;
+}
+
 // TODO: Refer to player usernames somehow, for testing?
 function resetPlayers(playerOrder) {
   let newPlayers = {};
-  playerOrder = []; //create new?
+  playerOrder.length = 0; //create new?
 
   Object.values(io.sockets.sockets).forEach((socket, i) => {
     let newAlias = "Player " + i; //(socket.id in players) ? players[socket.id].alias : "Player " + i;
-    createPlayer(newPlayers, socket.id, newAlias, playerOrder);
+    let newPlayer = createPlayer2(socket.id, newAlias);
+    newPlayers[socket.id] = newPlayer;
+    playerOrder.push(socket.id);
   });
+  console.log("newPlayerOrder", playerOrder);
   return newPlayers; //return or set players
 }
 
 function newRound(playerOrder) {
   currentMap = terrain.createPlatformLayer(WIDTH,HEIGHT,TILESIZE);
   playerTurnIndex = 0;
-  players = resetPlayers();
-  io.emit("updatePlatformLayer",currentMap);
+  players = resetPlayers(playerOrder);
   io.emit("clearScene");
+  io.emit("updatePlatformLayer", currentMap);
   startRound(playerOrder);
 }
 
@@ -247,16 +269,14 @@ function startRound(playerOrder) {
 
 function calculateDmg(explosion, player) {
   let radius = explosion.radius + 32;
-  let distance = Math.hypot(explosion.x-player.x, explosion.y - player.y);
+  let distance = Math.hypot(explosion.x - player.x, explosion.y - player.y);
   let dmg = 0;
-
   if (Math.hypot(32, 20) >= distance) {
-    // 20?
-    dmg = explosion.dmg;
+    dmg =  explosion.dmg;
   } else if (distance <= radius) {
     dmg = (explosion.dmg * (1 - distance / radius)).toFixed();
   }
-  console.log(dmg, distance / radius, distance, radius)
+
   return dmg;
 }
 

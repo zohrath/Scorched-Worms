@@ -35,7 +35,7 @@ function createPlatformLayer(width,height,tileSize) {
   for (i = 0; i < width; i += tileSize) {
     tileColumn = {};
     nextHeight = colHeight + getRndInteger(-1, 1) * tileSize;
-    if (nextHeight < tileSize) {
+    if (nextHeight > height -tileSize) {
       nextHeight = height - tileSize;
     }
 

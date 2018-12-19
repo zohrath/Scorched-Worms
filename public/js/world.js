@@ -65,6 +65,7 @@ function addTiles(scene,tiles){
   console.log(firstTileCoords,lastTileCoords)
   let firstTile = platformLayer.graphic.getTileAtWorldXY(firstTileCoords.x,firstTileCoords.y);
   let lastTile = platformLayer.graphic.getTileAtWorldXY(lastTileCoords.x, lastTileCoords.y);
+  console.log(firstTile,lastTile);
   platformLayer.graphic.setCollisionBetween(firstTile.index, lastTile.index);
 }
 
@@ -121,8 +122,8 @@ function createCenterText(scene, text) {
 function createWeaponEmitter(scene, radius, imgSize) {
   let weaponParticles = scene.add.particles("green");
   scene.weaponEmitter = weaponParticles.createEmitter({
-    on: true,
-    active: false, // TODO: toggle when shot (if desired)
+    on: false,
+    active: false,
     speed: 50,
     scale: { start: 0, end: 0.5 }, //end to be radius/img.size
     blendMode: "ADD"
