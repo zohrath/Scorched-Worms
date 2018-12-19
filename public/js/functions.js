@@ -125,19 +125,19 @@ function damagePlayer(explosion, player){
   //emit explode bullet
 }
 
-function updatePlayerPosition(scene,playerInfo){
+function updatePlayerPosition(scene, playerInfo){
 
   currPlayer = scene.otherPlayers[playerInfo.playerId];
   
   if(typeof(currPlayer) !== 'undefined'){
-    otherPlayer.setRotation(playerInfo.rotation);
     otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+    currPlayer.syncSprites(playerInfo.rotation);
   }
 }
 
 function updateAllPlayers(scene){
   Object.values(scene.otherPlayers).forEach(player => {
-    player.update();
+    player.syncSprites();
   });
-  scene.playerContainer.update();
+  scene.playerContainer.syncSprites();
 }
