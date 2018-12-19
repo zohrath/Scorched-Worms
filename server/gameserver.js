@@ -24,10 +24,11 @@ function startGameServer(server) {
   io = socketio.listen(server);
 
   io.sockets.on("connection", socket => {
-    // create a new player and add it to our players object
     if (gameRunning) {
       socket.emit("currentPlayers", players);
+      syncGamestateEmit(socket,players,currentMap);
     } else {
+      // create a new player and add it to our players object
       createPlayer(
         players,
         socket.id,
@@ -223,13 +224,17 @@ function newRound(playerOrder) {
 }
 
 function newTurn(playerOrder, timeout=2000) {
-  io.emit("syncGamestate", {    
-    playerInfo: players,
-    mapInfo: currentMap
-  });
+  syncGamestateEmit(io,players,currentMap);
   setTimeout(function() {
     io.emit("nextPlayerTurn", nextPlayerAlias(playerOrder));
   }, timeout); //delay to sync allowedToEmit and bullet destroy
+}
+
+function syncGamestateEmit(sendTo,players,map){
+  sendTo.emit("syncGamestate", {    
+    playerInfo: players,
+    mapInfo: map
+  });
 }
 
 function startRound(playerOrder) {

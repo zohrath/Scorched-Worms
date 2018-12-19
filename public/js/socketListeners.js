@@ -15,8 +15,10 @@ function createSocketListners(scene) {
 }
 
 function createCurrentPlayersListener(scene) {
-  socket.on("currentPlayers", (players) => {
+  socket.on("currentPlayers", players => {
+    console.log("test", players);
     Object.values(players).forEach(value => {
+      console.log(value);
       if (value.playerId === socket.id) {
         addPlayer(scene, value);
         scene.ready = true;
@@ -150,6 +152,7 @@ function createSyncGamestate(scene) {
     destroyMap(scene);
     createMap(scene,syncInfo.mapInfo)
     Object.values(syncInfo.playerInfo).forEach(playerInfo => {
+      console.log(playerInfo);
       updatePlayerPosition(scene, playerInfo);
       // TODO: add hp sync
     });
