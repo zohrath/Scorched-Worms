@@ -147,12 +147,13 @@ class GameScene extends Phaser.Scene {
           Math.round(currPos.y) !== Math.round(prevPos.y)
           ) {
           updateAllPlayers(this);
+          let rotation = this.playerContainer.getTankRotation();
           socketEmit(
             "playerMovement",
             {
               x: currPos.x,
               y: currPos.y,
-              rotation: this.playerContainer.rotation // TODO rm
+              rotation: rotation // TODO rm
             },
             true
           );

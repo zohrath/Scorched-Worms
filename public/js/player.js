@@ -30,10 +30,20 @@ class Player {
   setFlipX(value) {
     this.tank.setFlipX(value);
   }
+  
+  setPosition(x, y){
+    this.tank.body.position.x = x; 
+    this.tank.body.position.y = y;
+    this.syncSprites(); //onödigt? ev synch senare skede
+  }
+
+  setTurretRotation(rotation){
+    this.turret.rotation = rotation;
+  }
 
   setTurretPosition() {
-    this.turret.x = this.tank.x+2;
-    this.turret.y = this.tank.y-13;
+    this.turret.x = this.tank.body.position.x+2;
+    this.turret.y = this.tank.body.position.y-13;
   }
 
   setPlayerTextPosition() {
@@ -51,7 +61,6 @@ class Player {
 
   fire(scene, angle, power) {
     let pos = this.getCurrentPos()
-    console.log("in player fire scene:", scene, "x,y", pos.x, pos.y, " angle, power:", angle, power);
     this.turret.fire(scene, pos.x, pos.y, angle, power);
   }
 
@@ -59,6 +68,14 @@ class Player {
     //return this.list[1].rotation;
     return this.turret.rotation;
   }
+
+  getTankRotation(){
+    return this.tank.rotation;
+  }
+
+  setTankRotation(rotation){
+    this.tank.rotation = rotation;
+  } 
 
   setWeaponAngle(angle) {
     //this.list[1].rotation = angle;
@@ -86,9 +103,15 @@ class Player {
     this.playerText.destroy();
   }
 
-  update(){
+  syncSprites(rotation=null){
+    //console.log("set tank rotation", rotation);
     this.setTurretPosition();
     this.setPlayerTextPosition();
+    if(rotation){
+      console.log("In if statement, made it!");
+      this.setTankRotation(rotation);
+    }
+
   }
 
   getCurrentPos(){
@@ -98,4 +121,5 @@ class Player {
   getPrevPos(){
     return this.tank.body.positionPrev;
   }
+
 }
