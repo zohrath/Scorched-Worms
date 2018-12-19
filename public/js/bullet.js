@@ -23,7 +23,7 @@ var Bullet = new Phaser.Class({
         if (
           gameObjectB !== undefined &&
           (gameObjectB instanceof Phaser.Tilemaps.Tile ||
-            gameObjectB instanceof Player)
+            gameObjectB instanceof Phaser.GameObjects.Sprite) // Not an instance of the player class
         ) {
           // Now you know that gameObjectB is a Tile, so you can check the index, properties, etc.
           if (this.allowedToExplode) {
