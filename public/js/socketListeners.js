@@ -16,9 +16,7 @@ function createSocketListners(scene) {
 
 function createCurrentPlayersListener(scene) {
   socket.on("currentPlayers", players => {
-    console.log("test", players);
     Object.values(players).forEach(value => {
-      console.log(value);
       if (value.playerId === socket.id) {
         addPlayer(scene, value);
         scene.ready = true;
