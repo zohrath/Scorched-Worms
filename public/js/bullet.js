@@ -6,13 +6,15 @@ var Bullet = new Phaser.Class({
     createBulletEmitter(scene, this);
     this.bulletEmitter.startFollow(this);
     this.bulletEmitter.on = false;
-    Phaser.GameObjects.Sprite.call(this, scene, 0, 0, sprite);
+    scene.matter.add.sprite(this, scene, 0, 0, sprite);
+
+    this.setActive(false);
 
     this.radius = radius;
     this.dmg = dmg;
     this.allowedToExplode = true;
 
-    scene.add.existing(this);
+    // scene.add.existing(this);
     scene.matter.add.gameObject(this);
     scene.matterCollision.addOnCollideStart({
       objectA: this,
@@ -32,10 +34,11 @@ var Bullet = new Phaser.Class({
         }
       }
     });
+    console.log("in constr", this);
   },
 
   fire: function(x, y, angle, speed) {
-    console.log("x,y", x, " , ", y);
+    console.log("pre fire", this);
     this.setActive(true);
     this.setVisible(true);
     this.bulletEmitter.on = true;
@@ -46,7 +49,7 @@ var Bullet = new Phaser.Class({
     this.body.angle = angle;
     this.setMass(1);
     this.thrust(speed / 5000);
-    console.log("firing mah laza", this);
+    console.log("post fire", this);
   },
 
   hide: function() {
