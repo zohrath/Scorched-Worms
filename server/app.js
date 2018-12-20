@@ -68,7 +68,7 @@ function startGameServer(server) {
       if (players[socket.id]) {
         players[socket.id].x = movementData.x;
         players[socket.id].y = movementData.y;
-        players[socket.id].rotation = movementData.rotation;
+        players[socket.id].angle = movementData.angle;
         // emit a message to all players about the player that moved
         socket.broadcast.emit("playerMoved", players[socket.id]);
       }
@@ -190,31 +190,18 @@ function getNextPlayerTurnIndex(offset = 1, playerOrder) {
 function createPlayer(playersObject, id, alias, playerOrder) {
   playersObject[id] = {
     alias: alias,
-    rotation: 0,
+    angle: 0,
     x: Math.floor(Math.random() * 700) + 50,
     y: HEIGHT/2,
     playerId: id,
     playerTurn: false, //TODO randomize for 1 player to be true
     ready: false,
-    hp: 10
+    hp: 10,
+    turretAngle: 0
   };
 
   playerOrder.push(id);
   return playersObject[id];
-}
-
-function createPlayer2(id, alias) {
-  let newPlayer = {
-    alias: alias,
-    rotation: 0,
-    x: Math.floor(Math.random() * 700) + 50,
-    y: HEIGHT/4,
-    playerId: id,
-    playerTurn: false, //TODO randomize for 1 player to be true
-    ready: false,
-    hp: 10
-  };
-  return newPlayer;
 }
 
 // TODO: Refer to player usernames somehow, for testing?
@@ -224,12 +211,9 @@ function resetPlayers(playerOrder) {
 
   Object.values(io.sockets.sockets).forEach((socket, i) => {
     let newAlias = "Player " + i; //(socket.id in players) ? players[socket.id].alias : "Player " + i;
-    let newPlayer = createPlayer2(socket.id, newAlias);
-    newPlayers[socket.id] = newPlayer;
-    playerOrder.push(socket.id);
+    createPlayer(newPlayers, socket.id, newAlias, playerOrder);
   });
-  console.log("newPlayerOrder", playerOrder);
-  return newPlayers; //return or set players
+  return newPlayers;
 }
 
 function newRound(playerOrder) {
