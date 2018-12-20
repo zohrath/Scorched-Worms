@@ -131,7 +131,7 @@ function updatePlayerPosition(scene, playerInfo){
   
   if(typeof(currPlayer) !== 'undefined'){
     otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-    currPlayer.syncSprites(playerInfo.rotation);
+    currPlayer.syncSprites(playerInfo.angle);
   }
 }
 
@@ -140,4 +140,8 @@ function updateAllPlayers(scene){
     player.syncSprites();
   });
   scene.playerContainer.syncSprites();
+}
+
+function diffValue(val1, val2, minimum){
+  return (Math.abs(val1-val2) >=  minimum);
 }
