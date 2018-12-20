@@ -90,12 +90,13 @@ class GameScene extends Phaser.Scene {
       function(pointer) {
         let cursor = pointer;
         if (typeof this.playerContainer == "object") {
-          mouseAngle = Phaser.Math.Angle.Between(
-            this.playerContainer.turret.x,
-            this.playerContainer.turret.y,
+          let mouseRotation = Phaser.Math.Angle.Between(
             cursor.x + this.cameras.main.scrollX,
-            cursor.y + this.cameras.main.scrollY
-          );
+            cursor.y + this.cameras.main.scrollY,
+            this.playerContainer.turret.x,
+            this.playerContainer.turret.y
+            );
+          mouseAngle = Phaser.Math.RAD_TO_DEG*mouseRotation - 180;
         }
       },
       this
@@ -143,36 +144,34 @@ class GameScene extends Phaser.Scene {
       let currPos = this.playerContainer.getCurrentPos();
       if (prevPos) {
         if (
-          Math.round(currPos.x) !== Math.round(prevPos.x) ||
-          Math.round(currPos.y) !== Math.round(prevPos.y)
+          diffValue(currPos.x, prevPos.x, 2)||
+          diffValue(currPos.y, prevPos.y, 2) ||
+          currPos.turretAngle !== prevPos.turretAngle
           ) {
           updateAllPlayers(this);
-          let rotation = this.playerContainer.getTankRotation();
           socketEmit(
             "playerMovement",
             {
               x: currPos.x,
               y: currPos.y,
-              rotation: rotation // TODO rm
+              angle: currPos.angle,
             },
             true
           );
         }
 
-        if (
-          Math.round(this.playerContainer.getWeaponAngle()) !==
-          Math.round(this.playerContainer.oldPosition.turretRotation)
-        ) {
+        if(diffValue(currPos.turretAngle, prevPos.turretAngle, 5)){
           socketEmit("toOtherClients", {
             event: "moveTurret",
-            turretRotation: this.playerContainer.oldPosition.turretRotation
+            turretRotation: currPos.turretAngle
           });
+
         }
+
       }
       // save old position data
-      this.playerContainer.oldPosition = {
-        rotation: this.playerContainer.rotation,
-      };
+      this.playerContainer.setPrevPos(currPos);
+
       if (this.playerContainer.tank.body.velocity.x > 1) {
         this.emitter.startFollow(this.playerContainer, -30, 8);
         this.playerContainer.setFlipX(false);
@@ -186,7 +185,6 @@ class GameScene extends Phaser.Scene {
         this.emitter.on = false;
       }
     }
-    // emit player movement
   }
 }
 

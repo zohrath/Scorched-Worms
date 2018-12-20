@@ -20,7 +20,7 @@ class Player {
     });
 
     this.playerText.setOrigin(0.5, 1);
-    this.oldPosition = {turretRotation: 0};
+    this.prevPosition = {x: playerInfo.x, y: playerInfo.y, angle: 0, turretAngle: 0};
     // scene.add.existing(this);
     scene.add.existing(this.turret);
     //super(scene, playerInfo.x, playerInfo.y, 'sheet', 'tank_right_resized.png', {shape: scene.shapes.tank_right});
@@ -37,8 +37,8 @@ class Player {
     this.syncSprites(); //onödigt? ev synch senare skede
   }
 
-  setTurretRotation(rotation){
-    this.turret.rotation = rotation;
+  setTurretAngle(angle){
+    this.turret.angle = angle;
   }
 
   setTurretPosition() {
@@ -65,22 +65,22 @@ class Player {
   }
 
   getWeaponAngle() {
-    //return this.list[1].rotation;
-    return this.turret.rotation;
+    //return this.list[1].angle;
+    return Math.round(this.turret.angle);
   }
 
-  getTankRotation(){
-    return this.tank.rotation;
+  getTankAngle(){
+    return this.tank.angle;
   }
 
-  setTankRotation(rotation){
-    this.tank.rotation = rotation;
+  setTankAngle(angle){
+    this.tank.angle = angle;
   } 
 
   setWeaponAngle(angle) {
-    //this.list[1].rotation = angle;
+    //this.list[1].angle = angle;
     //console.log(angle);
-    this.turret.rotation = angle;
+    this.turret.angle = angle;
   }
 
   flipCharacterX(bool) {
@@ -103,23 +103,35 @@ class Player {
     this.playerText.destroy();
   }
 
-  syncSprites(rotation=null){
-    //console.log("set tank rotation", rotation);
+  syncSprites(angle=null){
+    //console.log("set tank angle", angle);
     this.setTurretPosition();
     this.setPlayerTextPosition();
-    if(rotation){
+    if(angle){
       console.log("In if statement, made it!");
-      this.setTankRotation(rotation);
+      this.setTankAngle(angle);
     }
 
   }
 
   getCurrentPos(){
-    return this.tank.body.position;
+    let pos = this.tank.body.position;
+    let angle = Math.round(this.tank.angle);
+    let turretAngle = this.getWeaponAngle()
+    return {x: Math.round(pos.x), y: Math.round(pos.y), angle: angle, turretAngle: turretAngle};
   }
 
+  setPrevPos(newPos){
+    this.prevPosition = {
+      x: newPos.x,
+      y: newPos.y,
+      angle: newPos.angle,
+      turretAngle: newPos.turretAngle
+    };
+  }
   getPrevPos(){
-    return this.tank.body.positionPrev;
+    //return this.tank.body.positionPrev;
+    return this.prevPosition
   }
 
 }
