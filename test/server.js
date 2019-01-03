@@ -2,10 +2,10 @@ const io = require("socket.io-client");
 const should = require("should");
 const socketURL = "http://0.0.0.0:8081";
 const assert = require("chai").assert;
-const getAlivePlayers = require("../server/app").getAlivePlayers;
-const startRoundIfAllReady = require("../server/app").startRoundIfAllReady;
-const calculateDmg = require("../server/app").calculateDmg;
-const createPlayer = require("../server/app").createPlayer;
+const getAlivePlayers = require("../server/gameserver").getAlivePlayers;
+const startRoundIfAllReady = require("../server/gameserver").startRoundIfAllReady;
+const calculateDmg = require("../server/gameserver").calculateDmg;
+const createPlayer = require("../server/gameserver").createPlayer;
 
 const chatUser1 = { name: "Tom" };
 const chatUser2 = { name: "Sally" };
