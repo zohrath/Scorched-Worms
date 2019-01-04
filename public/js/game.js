@@ -8,7 +8,7 @@ let keyR;
 let keyX;
 let keyC;
 let allowedToEmit = false;
-let skipMenu = true;
+let skipMenu = false;
 let edgeSize = 4;
 let platformLayer = {};
 let tileset;
