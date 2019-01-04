@@ -60,30 +60,14 @@ function addOtherPlayer(scene, playerInfo) {
   scene.otherPlayers[playerInfo.playerId] = otherPlayer;
 }
 
-function movePlayer(scene, time, delta) {
-  if (scene.playerContainer.body.velocity.x > 7) {
-    scene.playerContainer.body.setVelocityX(7);
-  }
-  else if(scene.playerContainer.body.velocity.x < -7){
-    scene.playerContainer.setVelocityX(-7);
-  }
+function moveMyPlayer(scene, time, delta) {
+  let direction;
   if (scene.cursors.left.isDown) {
-    scene.playerContainer.thrustBack(0.5);
-  } else if (scene.cursors.right.isDown) {
-    scene.playerContainer.thrust(0.5);
-  } else {
-    //scene.playerContainer.setVelocity(0,0);
+    direction = "left";
   }
-  /*if (scene.cursors.up.isDown && scene.playerContainer.body.velocity.y > 0) {
-    scene.playerContainer.thrustRight(-0.02);
-  } else if (scene.cursors.down.isDown) {
-    //scene.turretInContainer.rotation--;
-  }*/
-  // The if statement below this is never true. Something is wrong with keyX.
-  if (keyX.isdown && scene.playerContainer.body.touching.down) {
-    scene.playerContainer.body.velocity.y = -100;
+  else if (scene.cursors.right.isDown) {
+    direction = "right";
   }
-
   // SPACE
   if (scene.cursors.space.isDown) {
     scene.spaceDown = true;
@@ -102,7 +86,40 @@ function movePlayer(scene, time, delta) {
       power = 0;
     }
   }
+  if (direction) {
+    socketEmit(
+      "playerThrust",
+      direction,
+      true
+    );
+  }
+  movePlayer(scene, scene.playerContainer, direction);
 }
+
+
+function movePlayer(scene, player, direction) {
+  if (player.body.velocity.x > 7) {
+    player.body.setVelocityX(7);
+  }
+  else if(scene.playerContainer.body.velocity.x < -7){
+    player.setVelocityX(-7);
+  }
+  if (direction == "left") {
+    player.thrustBack(0.5);
+  } else if (direction == "right") {
+    player.thrust(0.5);
+  } else {
+    //scene.playerContainer.setVelocity(0,0);
+  }
+  /*if (scene.cursors.up.isDown && scene.playerContainer.body.velocity.y > 0) {
+    scene.playerContainer.thrustRight(-0.02);
+  } else if (scene.cursors.down.isDown) {
+    //scene.turretInContainer.rotation--;
+  }*/
+  // The if statement below this is never true. Something is wrong with keyX.
+  }
+
+  
 
 function socketEmit(emitName,data,force=false){
   if (allowedToEmit || force){
@@ -128,7 +145,7 @@ function damagePlayer(explosion, player){
 function updatePlayerPosition(scene,playerInfo){
   currPlayer = scene.otherPlayers[playerInfo.playerId];
     if(typeof(currPlayer) !== 'undefined'){
-      currPlayer.setPosition(playerInfo.x, playerInfo.y);
+      //currPlayer.setPosition(playerInfo.x, playerInfo.y);
       currPlayer.setPlayerTextPosition();
       currPlayer.setTurretPosition();
   }

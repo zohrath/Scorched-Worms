@@ -13,6 +13,7 @@ function createSocketListners(scene) {
   createRemoveTiles(scene);
   createUpdatePlatformLayer(scene);
   createUpdateHP(scene);
+  createThrustListener(scene);
 }
 
 function createCurrentPlayersListener(scene) {
@@ -192,6 +193,16 @@ function createUpdateHP(scene){
       console.log(playerInfo);
       console.log(playerToUpdate);
       playerToUpdate.list[2].setText(playerInfo.alias + "\n HP: " + playerInfo.hp);
+    });
+  });
+}
+
+function createThrustListener(scene) {
+  socket.on("applyThrust", (thrustInfo) => {
+    Object.keys(scene.otherPlayers).forEach(currID => {
+      if (currID === thrustInfo.socketID) {
+        movePlayer(scene, scene.otherPlayers[currID], thrustInfo.direction);
+      }
     });
   });
 }

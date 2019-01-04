@@ -147,6 +147,11 @@ function startGameServer(server) {
     socket.on("forceStart", () => {
       newRound(playerOrder);
     });
+
+    socket.on("playerThrust", (direction) => {
+      console.log({"direction": direction, "socketID": socket.id});
+      io.emit("applyThrust", {"direction": direction, "socketID": socket.id});
+    })
   });
 }
 
