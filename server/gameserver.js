@@ -26,6 +26,7 @@ function startGameServer(server) {
   io.sockets.on("connection", socket => {
     if (gameRunning) {
       socket.emit("currentPlayers", players);
+      // console.log("Sending players: ", players);
       syncGamestateEmit(socket,players,currentMap);
     } else {
       // create a new player and add it to our players object
@@ -48,7 +49,8 @@ function startGameServer(server) {
       countConnectedPlayers(),
       "connected and",
       playerOrder.length,
-      "in game."
+      "in game.",
+      players.alias
     );
     // when a player disconnects, remove them from our players object
     socket.on("disconnect", () => {
@@ -133,6 +135,7 @@ function startGameServer(server) {
     });
 
     socket.on("clientReady", () => {
+      console.log("Client ready called");
       if (typeof players[socket.id] !== "undefined") {
         if (!players[socket.id].ready) {
           clientsReady++;
@@ -157,6 +160,7 @@ function countConnectedPlayers() {
 function startRoundIfAllReady(playerOrder) {
   if (clientsReady === playerOrder.length && clientsReady > 1) {
     // send the players object to the new player
+    console.log("Starting round", playerOrder.alias);
     startRound(playerOrder);
     return true;
   }
@@ -169,9 +173,9 @@ function nextPlayerAlias(playerOrder) {
     playerTurnIndex = getNextPlayerTurnIndex(1, playerOrder);
     playerSocketID = playerOrder[playerTurnIndex];
   } while (playerSocketID === "DEAD");
-
   //console.log(playerSocketID)
   // TODO check that players ONLY have valid players
+  console.log("playerOrder alias: ", playerOrder);
   if (players[playerSocketID].alias !== "undefined") {
     return players[playerSocketID].alias;
   } else {
@@ -245,8 +249,10 @@ function newRound(playerOrder) {
   startRound(playerOrder);
 }
 
+// TODO: Fix bug where playerOrder is not sent to nextPlayerAlias
 function newTurn(playerOrder, timeout=2000) {
   syncGamestateEmit(io,players,currentMap);
+  console.log("playerOrder: ", playerOrder);
   setTimeout(function() {
     io.emit("nextPlayerTurn", nextPlayerAlias(playerOrder));
   }, timeout); //delay to sync allowedToEmit and bullet destroy
