@@ -40,7 +40,7 @@ var Bullet = new Phaser.Class({
     this.bulletEmitter.on = true;
     this.bulletEmitter.active = true;
     //  Bullets fire from the middle of the screen to the given x/y
-    this.setPosition(x, y - 60);
+    this.setPosition(x, y);
     //this.setOrigin(0.5, 0.5);
     this.body.angle = angle;
     this.setMass(1);
