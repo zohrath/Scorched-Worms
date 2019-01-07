@@ -8,7 +8,7 @@ let keyR;
 let keyX;
 let keyC;
 let allowedToEmit = false;
-let skipMenu = true;
+let skipMenu = false;
 let edgeSize = 4;
 let platformLayer = {};
 let tileset;
@@ -32,6 +32,11 @@ class GameScene extends Phaser.Scene {
     });
   }
 
+  init(data) {
+    console.log("############ In game.js #############");
+    console.log("Name:", data.alias);
+    console.log(data);
+  }
 
   preload() {
     this.load.image("green", "assets/green.png");
@@ -56,6 +61,9 @@ class GameScene extends Phaser.Scene {
     this.load.multiatlas('sheet', 'assets/tank_right_resized.json', 'assets');
     // Load body shapes from JSON file generated using PhysicsEditor
     this.load.json('shapes', 'assets/tank_test.json');
+
+    this.load.audio('soundtrack','assets/DancingCloudsChiptuneSong.ogg');
+    this.load.audio('explosion', 'assets/explosion.ogg');
   }
 
   create() {
@@ -66,6 +74,7 @@ class GameScene extends Phaser.Scene {
     this.ready = false;
     
     createWorld(this);
+    createAudio(this);
     keyC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
