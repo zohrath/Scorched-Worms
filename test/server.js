@@ -6,13 +6,14 @@ const getAlivePlayers = require("../server/gameserver").getAlivePlayers;
 const startRoundIfAllReady = require("../server/gameserver").startRoundIfAllReady;
 const calculateDmg = require("../server/gameserver").calculateDmg;
 const createPlayer = require("../server/gameserver").createPlayer;
-
+const getNextPlayerSocketId = require("../server/gameserver").getNextPlayerSocketId;
+const nextPlayerAlias = require("../server/gameserver").nextPlayerAlias;
 const chatUser1 = { name: "Tom" };
 const chatUser2 = { name: "Sally" };
 const chatUser3 = { name: "Dana" };
 
-// describe("Basic server test functionality", function() {
-//     it("Should broadcast usernames to all users", (done) => {
+// describe("Username broadcast", function() {
+//     it("Should broadcast usernames to all users", done => {
 //         var client1 = io.connect(socketURL);
 
 //         client1.on('connect', () => {
@@ -24,14 +25,14 @@ const chatUser3 = { name: "Dana" };
 //             client2.emit('username', chatUser2);
 //           });
 
-//           client2.on('new user', (usersName) => {
+//           client2.on('new user', usersName => { // !!!!
 //             usersName.should.equal(chatUser2.name + " has joined.");
 //             client2.disconnect();
 //           });
 //         });
 
 //         var numUsers = 0;
-//         client1.on('new user', (usersName) => {
+//         client1.on('new user', usersName => {
 //           numUsers += 1;
 
 //           if(numUsers === 2){
@@ -41,7 +42,41 @@ const chatUser3 = { name: "Dana" };
 //           }
 //         });
 //     });
+// });
+
+// describe("RemovePlayer broadcast", function() {
+//   it("Should return one player remaining after two connects and one removal", done => {
+//     var client1 = io.connect(socketURL);
+    
+//     client1.on('connect', () => {
+      
+//       var client2 = io.connect(socketURL);
+//       client2.on('connect', () => {
+//         client1.emit('clientReady');
+//         client2.emit('clientReady');
+//         client2.emit('disconnect');
+//         client2.disconnect();
+  
+  
+//         client1.emit('disconnect');
+//         client1.disconnect();
+//       });
+
+//       done();
+      
+//       // client1.on('currentPlayers', players => {
+        
+//       // });
+      
+      
+//       // client2.on('connect', () => {
+        
+//       //   client1.emit('disconnect');
+//       // });
+//     });
+    
 //   });
+// });
 
 // Removeplayer number of players left
 // Removing player that doesn't exist
@@ -166,5 +201,45 @@ describe("createPlayer", function() {
     playerOrder.push(id1);
     let result2 = createPlayer(result1, id2, alias2, playerOrder);
     assert.equal(result2.alias, alias2);
+  });
+});
+
+describe("getNextPlayerSocketId", function() {
+  it("Returns expected player socket Id value and playerOrder index of socket Id", () => {
+    let playerOrder = ['DEAD', 'DEAD', 'C', 'DEAD'];
+
+    let result1 = getNextPlayerSocketId(playerOrder, 2);
+    assert.equal(result1[0], 'C');
+    assert.equal(result1[1], 2);
+
+    let playerOrder2 = ['DEAD', 'B', 'C', 'D'];
+    let result2 = getNextPlayerSocketId(playerOrder2, 3);
+    assert.equal(result2[0], 'B');
+    assert.equal(result2[1], 1);
+
+    let playerOrder3 = [];
+    let result3 = getNextPlayerSocketId(playerOrder3, 0);
+    assert.equal(result3, undefined);
+  });
+});
+
+describe("nextPlayerAlias", function () {
+  it("Returns correct alias with multiple players", () => {
+    let playerOrder = ['DEAD', 'B', 'C', 'D'];
+    let players = 
+      {'DEAD': {alias: 'Player 0'},
+       'B': {alias: 'Player 1'},
+       'C': {alias: 'Player 2'},
+       'D': {alias: 'Player 3'}}
+    let result = nextPlayerAlias(playerOrder, 0, players);
+    assert.equal(result, 'Player 1');
+  });
+
+  it("Returns correct alias with one player", () => {
+    let playerOrder = ['B'];
+    let players = 
+      {'B': {alias: 'Player 0'}}
+    let result = nextPlayerAlias(playerOrder, 0, players);
+    assert.equal(result, 'Player 0');
   });
 });

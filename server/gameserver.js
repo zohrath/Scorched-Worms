@@ -26,6 +26,7 @@ function startGameServer(server) {
   io.sockets.on("connection", socket => {
     if (gameRunning) {
       socket.emit("currentPlayers", players);
+      // console.log("Sending players: ", players);
       syncGamestateEmit(socket,players,currentMap);
     } else {
       let clientAlias = socket.handshake.headers['alias'];
@@ -51,7 +52,8 @@ function startGameServer(server) {
       countConnectedPlayers(),
       "connected and",
       playerOrder.length,
-      "in game."
+      "in game.",
+      players.alias
     );
     // when a player disconnects, remove them from our players object
     socket.on("disconnect", () => {
@@ -136,6 +138,7 @@ function startGameServer(server) {
     });
 
     socket.on("clientReady", () => {
+      console.log("Client ready called");
       if (typeof players[socket.id] !== "undefined") {
         if (!players[socket.id].ready) {
           clientsReady++;
@@ -164,26 +167,44 @@ function countConnectedPlayers() {
 function startRoundIfAllReady(playerOrder) {
   if (clientsReady === playerOrder.length && clientsReady > 1) {
     // send the players object to the new player
+    console.log("Starting round", playerOrder.alias);
+    currentMap = terrain.createPlatformLayer(WIDTH,HEIGHT,TILESIZE);
     startRound(playerOrder);
     return true;
   }
   return false;
 }
 
-function nextPlayerAlias(playerOrder) {
-  let playerSocketID;
-  do {
-    playerTurnIndex = getNextPlayerTurnIndex(1, playerOrder);
-    playerSocketID = playerOrder[playerTurnIndex];
-  } while (playerSocketID === "DEAD");
-
-  //console.log(playerSocketID)
-  // TODO check that players ONLY have valid players
-  if (players[playerSocketID].alias !== "undefined") {
-    return players[playerSocketID].alias;
-  } else {
-    return;
+function getNextPlayerSocketId(playerOrder, startingIndex) {
+  for (let i = 0; i < playerOrder.length; i++) {
+    const val = (i + startingIndex) % (playerOrder.length - 1);
+    const currentPlayer = playerOrder[val];
+    
+    if (currentPlayer !== "DEAD") {
+      return [currentPlayer, val];
+    }
   }
+}
+
+function getPlayerAlias(socketId, playersTest = players) {
+  try {
+    return playersTest[socketId].alias;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function nextPlayerAlias(playerOrder, startingIndex, playersTest = players) {
+   
+  var alias = playersTest[playerOrder[startingIndex]].alias;
+  
+  if (playerOrder.length > 1) {
+    const id = getNextPlayerSocketId(playerOrder, startingIndex);
+    alias = getPlayerAlias(id[0], playersTest);
+    playerTurnIndex = id[1];
+  
+  }
+  return alias;
 }
 
 function removeFromPlayerOrder(targetID, playerOrder) {
@@ -192,10 +213,6 @@ function removeFromPlayerOrder(targetID, playerOrder) {
       playerOrder[i] = "DEAD"; //remove from index i and 1 element
     }
   });
-}
-
-function getNextPlayerTurnIndex(offset = 1, playerOrder) {
-  return (playerTurnIndex + offset) % playerOrder.length;
 }
 
 function createPlayer(playersObject, id, alias, playerOrder) {
@@ -252,10 +269,16 @@ function newRound(playerOrder) {
   startRound(playerOrder);
 }
 
+// TODO: Fix bug where playerOrder is not sent to nextPlayerAlias
 function newTurn(playerOrder, timeout=2000) {
   syncGamestateEmit(io,players,currentMap);
+  console.log("playerOrder: ", playerOrder);
+  let x = playerOrder;
+  console.log("x: ", x);
+  let next = nextPlayerAlias(x, playerTurnIndex);
+  console.log("next: ", next);
   setTimeout(function() {
-    io.emit("nextPlayerTurn", nextPlayerAlias(playerOrder));
+    io.emit("nextPlayerTurn", next);
   }, timeout); //delay to sync allowedToEmit and bullet destroy
 }
 
@@ -306,7 +329,9 @@ function resetScene() {
 module.exports = {
   startGameServer,
   getAlivePlayers,
-  startRoundIfAllReady,
   calculateDmg,
-  createPlayer
+  startRoundIfAllReady,
+  createPlayer,
+  getNextPlayerSocketId,
+  nextPlayerAlias
 };
