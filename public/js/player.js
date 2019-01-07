@@ -9,7 +9,7 @@ class Player extends Phaser.GameObjects.Sprite {
     this.body.frictionStatic = 0;
     this.body.frictionAir = 0.3;
 
-    this.turret = new Weapon(scene, "turret", "bullet", 10, 10, this.x+2, this.y+15);
+    this.turret = new Weapon(scene, "turret", "bullet", 10, 10, this.x, this.y+15);
 
     this.playerId = playerInfo.playerId;
     this.alias = playerInfo.alias;
@@ -21,10 +21,11 @@ class Player extends Phaser.GameObjects.Sprite {
     this.playerText.setOrigin(0.5, 0)
 
     scene.add.existing(this);
+    console.log(this);
   };
   
   setTurretPosition() {
-      this.turret.x = this.x+2;
+      this.turret.x = this.x;
       this.turret.y = this.y-5;
   }
 
@@ -42,7 +43,7 @@ class Player extends Phaser.GameObjects.Sprite {
   }
 
   fire(scene, angle, power) {
-    this.turret.fire(scene, this.turret.x, this.turret.y, angle, power);
+    this.turret.fire(scene, (this.turret.x+40*Math.cos(this.getWeaponAngle())), (this.turret.y+15*Math.sin(this.getWeaponAngle())), angle, power);
   }
 
   getWeaponAngle() {
