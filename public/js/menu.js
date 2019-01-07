@@ -16,19 +16,19 @@ class MainMenu extends Phaser.Scene {
   }
 
   create() {
-    this.createButton(game, 512, 500 - 2, 200, 100, "Start Game", function() {
+    this.createButton(game, 512, 500, 200, 100, "Start Game", function() {
       let playeralias = this.getPlayerAlias();
       if (playeralias != false) {
         this.scene.start("GameScene", { alias: playeralias });
       }
     });
 
-    this.createButton(game, 512, 500 + 92, 200, 100, "Help", function() {
+    this.createButton(game, 512, 500 + 80, 200, 100, "Help", function() {
       alert("There will be instructions here at some point.");
       console.log("Help!");
     });
 
-    this.createButton(game, 512, 500 + 192, 200, 100, "Exit", function() {
+    this.createButton(game, 512, 500 + 160, 200, 100, "Exit", function() {
       console.log();
       if (confirm('Are you sure you want to exit the game?')) {
         // Player want to exit the game.
