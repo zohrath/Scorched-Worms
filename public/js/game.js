@@ -32,6 +32,11 @@ class GameScene extends Phaser.Scene {
     });
   }
 
+  init(data) {
+    console.log("############ In game.js #############");
+    console.log("Name:", data.alias);
+    console.log(data);
+  }
 
   preload() {
     this.load.image("green", "assets/green.png");

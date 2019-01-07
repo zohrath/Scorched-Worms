@@ -46,7 +46,6 @@ class MainMenu extends Phaser.Scene {
     var username = prompt("Please enter your alias: ", "Anon");
     while (username == "") {
       username = prompt("You need to enter a valid alias. Try again!", "Anon");
-      console.log(username);
       if (username == null) {
         return false;
       }
