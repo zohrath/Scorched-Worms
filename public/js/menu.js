@@ -18,7 +18,9 @@ class MainMenu extends Phaser.Scene {
   create() {
     this.createButton(game, 512, 500 - 2, 200, 100, "Start Game", function() {
       let playeralias = this.getPlayerAlias();
-      this.scene.start("GameScene", { alias: playeralias });
+      if (playeralias != false) {
+        this.scene.start("GameScene", { alias: playeralias });
+      }
     });
 
     this.createButton(game, 512, 500 + 92, 200, 100, "Help", function() {
@@ -36,15 +38,18 @@ class MainMenu extends Phaser.Scene {
     });
 
     menuscreen = this.add.sprite(512, 384, "menubackground").setDepth(0);
-    menuscreen.setScale(1);
 
     menuscreen.setOrigin(0.5, 0.5);
   }
 
   getPlayerAlias() {
     var username = prompt("Please enter your alias: ", "Anon");
-    while (username == null || username == "") {
-      username = prompt("You need to enter a valid alias. Try again!", "Anon")
+    while (username == "") {
+      username = prompt("You need to enter a valid alias. Try again!", "Anon");
+      console.log(username);
+      if (username == null) {
+        return false;
+      }
     }
     return username;
   }
@@ -55,13 +60,13 @@ class MainMenu extends Phaser.Scene {
       .setInteractive()
       .setDepth(1);
     menuButton.setOrigin(0.5, 0.5);
-    menuButton.setScale(2);
+    menuButton.setScale(1.5);
     /* menuButton.width = w;
         menuButton.height = h;
  */
     var menuButtonText = this.add
       .text(menuButton.x, menuButton.y, string, {
-        font: "32px Arial",
+        font: "26px Arial",
         fill: "#fff",
         align: "center"
       })
