@@ -8,7 +8,7 @@ let keyR;
 let keyX;
 let keyC;
 let allowedToEmit = false;
-let skipMenu = true;
+let skipMenu = false;
 let edgeSize = 4;
 let platformLayer = {};
 let tileset;
@@ -32,6 +32,11 @@ class GameScene extends Phaser.Scene {
     });
   }
 
+  init(data) {
+    console.log("############ In game.js #############");
+    console.log("Name:", data.alias);
+    console.log(data);
+  }
 
   preload() {
     this.load.image("green", "assets/green.png");
