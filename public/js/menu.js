@@ -12,27 +12,40 @@ class MainMenu extends Phaser.Scene {
       this.scene.start("GameScene");
     }
     this.load.image("button_black", "assets/button_black.png");
-    this.load.image("menubackground", "assets/menustolen.jpg");
+    this.load.image("menubackground", "assets/background_menu_vulcano.png");
   }
 
   create() {
-    this.createButton(game, 500, 500 + 32, 200, 100, "Start Game", function() {
+    this.createButton(game, 512, 500 - 2, 200, 100, "Start Game", function() {
       let playeralias = this.getPlayerAlias();
       this.scene.start("GameScene", { alias: playeralias });
     });
 
-    this.createButton(game, 500, 500 + 192, 200, 100, "Exit", function() {
-      console.log("Exit!");
+    this.createButton(game, 512, 500 + 92, 200, 100, "Help", function() {
+      alert("There will be instructions here at some point.");
+      console.log("Help!");
+    });
+
+    this.createButton(game, 512, 500 + 192, 200, 100, "Exit", function() {
+      console.log();
+      if (confirm('Are you sure you want to exit the game?')) {
+        // Player want to exit the game.
+        console.log("Exiting!"); 
+        // Make the screen black and tell the user to simply close the window or tab.
+      } 
     });
 
     menuscreen = this.add.sprite(512, 384, "menubackground").setDepth(0);
-    menuscreen.setScale(4);
+    menuscreen.setScale(1);
 
     menuscreen.setOrigin(0.5, 0.5);
   }
 
   getPlayerAlias() {
     var username = prompt("Please enter your alias: ", "Anon");
+    while (username == null || username == "") {
+      username = prompt("You need to enter a valid alias. Try again!", "Anon")
+    }
     return username;
   }
 
