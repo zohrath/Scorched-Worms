@@ -32,12 +32,6 @@ class GameScene extends Phaser.Scene {
     });
   }
 
-  init(data) {
-    console.log("############ In game.js #############");
-    console.log("Name:", data.alias);
-    console.log(data);
-  }
-
   preload() {
     this.load.image("green", "assets/green.png");
     //this.load.image("tank_right", "assets/tank_right.png");
@@ -63,7 +57,11 @@ class GameScene extends Phaser.Scene {
     this.load.json('shapes', 'assets/tank_test.json');
   }
 
-  create() {
+  create(data) {
+    console.log("############ In create in game.js #############");
+    console.log("Name:", data.alias);
+    console.log("data", data);
+    console.log("###############################################");
     console.log(this);
     this.nextTic = 0;
     let self = this;
@@ -77,7 +75,15 @@ class GameScene extends Phaser.Scene {
     keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    socket = io();
+    socket = io({
+      transportOptions: {
+        polling: {
+          extraHeaders: {
+            'alias': data.alias
+          }
+        }
+      }
+    });
     this.otherPlayers = {};
     // TODO change group -> {}?
     // this.player = this.physics.add.group();
