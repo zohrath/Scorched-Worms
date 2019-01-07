@@ -79,7 +79,7 @@ function createMoveTurretListener(scene) {
   socket.on("moveTurret", (turretInfo) => {
     Object.values(scene.otherPlayers).forEach(otherPlayer => {
       if (turretInfo.playerId === otherPlayer.playerId) {
-        otherPlayer.setTurretRotation(turretInfo.turretRotation);
+        otherPlayer.setWeaponAngle(turretInfo.turretRotation);
       }
     });
   });
