@@ -111,6 +111,17 @@ function movePlayer(scene, player, direction) {
   } else {
     //scene.playerContainer.setVelocity(0,0);
   }
+  if (player.body.velocity.x > 1) {
+    scene.emitter.startFollow(player, -30, 8);
+    player.setFlipX(false);
+    scene.emitter.on = true;
+  } else if (player.body.velocity.x < -1) {
+    scene.emitter.startFollow(player, 30, 8);
+    player.setFlipX(true);
+    scene.emitter.on = true;
+  } else {
+    scene.emitter.on = false;
+  }
   /*if (scene.cursors.up.isDown && scene.playerContainer.body.velocity.y > 0) {
     scene.playerContainer.thrustRight(-0.02);
   } else if (scene.cursors.down.isDown) {
