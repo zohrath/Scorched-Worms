@@ -93,8 +93,8 @@ class GameScene extends Phaser.Scene {
           let mouseRotation = Phaser.Math.Angle.Between(
             cursor.x + this.cameras.main.scrollX,
             cursor.y + this.cameras.main.scrollY,
-            this.playerContainer.turret.x,
-            this.playerContainer.turret.y
+            this.playerContainer.x,
+            this.playerContainer.y
             );
           mouseAngle = Phaser.Math.RAD_TO_DEG*mouseRotation - 180;
         }
@@ -144,11 +144,10 @@ class GameScene extends Phaser.Scene {
       let currPos = this.playerContainer.getCurrentPos();
       if (prevPos) {
         if (
-          diffValue(currPos.x, prevPos.x, 2)||
-          diffValue(currPos.y, prevPos.y, 2) ||
-          currPos.turretAngle !== prevPos.turretAngle
+          diffValue(currPos.x, prevPos.x, 1)||
+          diffValue(currPos.y, prevPos.y, 1) ||
+          currPos.angle !== prevPos.angle
           ) {
-          updateAllPlayers(this);
           socketEmit(
             "playerMovement",
             {
@@ -160,7 +159,7 @@ class GameScene extends Phaser.Scene {
           );
         }
 
-        if(diffValue(currPos.turretAngle, prevPos.turretAngle, 5)){
+        if(diffValue(currPos.turretAngle, prevPos.turretAngle, 2)){
           socketEmit("toOtherClients", {
             event: "moveTurret",
             turretRotation: currPos.turretAngle
@@ -172,12 +171,12 @@ class GameScene extends Phaser.Scene {
       // save old position data
       this.playerContainer.setPrevPos(currPos);
 
-      if (this.playerContainer.tank.body.velocity.x > 1) {
+      if (this.playerContainer.body.velocity.x > 1) {
         this.emitter.startFollow(this.playerContainer, -30, 8);
         this.playerContainer.setFlipX(false);
         this.emitter.on = true;
 
-      } else if (this.playerContainer.tank.body.velocity.x < -1) {
+      } else if (this.playerContainer.body.velocity.x < -1) {
         this.emitter.startFollow(this.playerContainer, 30, 8);
         this.playerContainer.setFlipX(true);
         this.emitter.on = true;
