@@ -47,11 +47,10 @@ describe("createPlatformLayer",function(){
   
   let height = 20;
   let width = 10;
-  let allowedTypes = [];
   let matrix = createPlatformLayer(width,height,1);
-
+  
   it("checks all tiles in the matrix", () =>{
-    let res = true;
+    let allowedTypes = [];
     Object.entries(matrix).forEach(function(key,col){
       Object.entries(col).forEach(function(key,elem){
         
