@@ -56,6 +56,7 @@ class GameScene extends Phaser.Scene {
     this.load.multiatlas('sheet', 'assets/tank_right_resized.json', 'assets');
     // Load body shapes from JSON file generated using PhysicsEditor
     this.load.json('shapes', 'assets/tank_test.json');
+    this.load.audio('soundtrack','assets/DancingCloudsChiptuneSong.ogg');
   }
 
   create() {
@@ -66,6 +67,7 @@ class GameScene extends Phaser.Scene {
     this.ready = false;
     
     createWorld(this);
+    createAudio(this);
     keyC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
