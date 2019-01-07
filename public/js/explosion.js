@@ -8,6 +8,7 @@ class Explosion extends Phaser.GameObjects.Sprite {
     this.image = image;
     this.setCircle(4);
     this.setScale(radius);
+    
     scene.add.existing(this);
 
     this.setActive(true);
@@ -31,7 +32,6 @@ class Explosion extends Phaser.GameObjects.Sprite {
     this.x = x;
     this.y = y;
     this.setOrigin(0.5, 0.5);
-
     this.setVisible(true);
     this.setActive(true);
   }

@@ -56,15 +56,21 @@ class GameScene extends Phaser.Scene {
     this.load.multiatlas('sheet', 'assets/tank_right_resized.json', 'assets');
     // Load body shapes from JSON file generated using PhysicsEditor
     this.load.json('shapes', 'assets/tank_test.json');
-  }
 
+    
+    this.load.audio('soundtrack','assets/DancingCloudsChiptuneSong.ogg');
+    this.load.audio('explosion', 'assets/explosion.ogg');
+  }
   create() {
+
     console.log(this);
+    this.isMyTurn = false;
     this.nextTic = 0;
     let self = this;
     this.isMyTurn = false;
     this.ready = false;
     
+    createSound(this);
     createWorld(this);
     keyC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -109,6 +115,7 @@ class GameScene extends Phaser.Scene {
     }
 
     if (keyD.isDown && allowedToForce) {
+      this.isMyTurn = false;
       allowedToForce = false;
       console.log("force start");
       socket.emit("forceStart");
@@ -165,6 +172,7 @@ class GameScene extends Phaser.Scene {
         x: this.playerContainer.x,
         y: this.playerContainer.y,
       };
+      /*
       if (this.playerContainer.body.velocity.x > 1) {
         this.emitter.startFollow(this.playerContainer, -30, 8);
         this.playerContainer.setFlipX(false);
@@ -177,6 +185,7 @@ class GameScene extends Phaser.Scene {
       } else {
         this.emitter.on = false;
       }
+      */
     }
     // emit player movement
   }

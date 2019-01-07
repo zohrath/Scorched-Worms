@@ -40,6 +40,21 @@ function createEmitter(scene) {
   });
 }
 
+function createSound(scene) {
+  scene.music = scene.sound.add('soundtrack');
+  scene.explosionSound = scene.sound.add('explosion');
+  let musicConfig = {
+      mute: false,
+      volume: 1,
+      rate: 1,
+      detune: 0,
+      seek: 0,
+      loop: true,
+      delay: 0
+  }
+  scene.music.play(musicConfig);
+}
+
 function rotateTurret(tank, newAngle) {
   tank.setWeaponAngle(newAngle);
 }
