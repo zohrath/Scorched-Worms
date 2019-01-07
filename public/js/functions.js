@@ -12,8 +12,9 @@ function playerHit(player,explosion){
   });
 }
 
-function createTank(scene, playerInfo, color) {
-  let tank = new Player(scene, 'tank', 'turret', playerInfo, color);
+function createTank(scene, playerInfo, color, isStatic) {
+  let tank = new Player(scene, 'tank', 'turret', playerInfo, color, isStatic);
+  console.log("new tank", tank);
   return tank;
 }
 
@@ -49,23 +50,23 @@ function addPlayer(scene, playerInfo) {
   scene.isMyTurn = playerInfo.playerTurn;
   scene.alias = playerInfo.alias
   let color = "#00ff00";
-  scene.playerContainer = createTank(scene, playerInfo, color);
+  scene.playerContainer = createTank(scene, playerInfo, color, false);
 }
 
 function addOtherPlayer(scene, playerInfo) {
   let color = "#ff0000";
-  otherPlayer = createTank(scene, playerInfo, color);
+  otherPlayer = createTank(scene, playerInfo, color, true);
   otherPlayer.playerId = playerInfo.playerId;
   //scene.otherPlayers.add(otherPlayer);
   scene.otherPlayers[playerInfo.playerId] = otherPlayer;
 }
 
 function movePlayer(scene, time, delta) {
-  if (scene.playerContainer.tank.body.velocity.x > 7) {
-    scene.playerContainer.tank.body.setVelocityX(7);
+  if (scene.playerContainer.body.velocity.x > 7) {
+    scene.playerContainer.body.setVelocityX(7);
   }
-  else if(scene.playerContainer.tank.body.velocity.x < -7){
-    scene.playerContainer.tank.setVelocityX(-7);
+  else if(scene.playerContainer.body.velocity.x < -7){
+    scene.playerContainer.setVelocityX(-7);
   }
   if (scene.cursors.left.isDown) {
     scene.playerContainer.thrustBack(0.5);
@@ -131,15 +132,8 @@ function updatePlayerPosition(scene, playerInfo){
   
   if(typeof(currPlayer) !== 'undefined'){
     otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-    currPlayer.syncSprites(playerInfo.angle);
+    otherPlayer.setAngle(playerInfo.angle);
   }
-}
-
-function updateAllPlayers(scene){
-  Object.values(scene.otherPlayers).forEach(player => {
-    player.syncSprites();
-  });
-  scene.playerContainer.syncSprites();
 }
 
 function diffValue(val1, val2, minimum){
