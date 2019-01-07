@@ -42,7 +42,7 @@ function createEmitter(scene) {
 
 function createAudio(scene) {
   scene.music = scene.sound.add('soundtrack');
-  //scene.explosionSound = scene.sound.add('explosion');
+  scene.explosionSound = scene.sound.add('explosion');
   let musicConfig = {
       mute: false,
       volume: 1,

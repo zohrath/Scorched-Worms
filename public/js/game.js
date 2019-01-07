@@ -56,7 +56,9 @@ class GameScene extends Phaser.Scene {
     this.load.multiatlas('sheet', 'assets/tank_right_resized.json', 'assets');
     // Load body shapes from JSON file generated using PhysicsEditor
     this.load.json('shapes', 'assets/tank_test.json');
+
     this.load.audio('soundtrack','assets/DancingCloudsChiptuneSong.ogg');
+    this.load.audio('explosion', 'assets/explosion.ogg');
   }
 
   create() {
