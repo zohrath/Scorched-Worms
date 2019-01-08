@@ -1,7 +1,7 @@
 function createWorld(scene) {
-  // createBackground(scene);
 
   createBullets(scene);
+  createBackground(scene);
   createTerrain(scene);
   createPowerText(scene);
   createTurnText(scene);
@@ -11,9 +11,10 @@ function createWorld(scene) {
   scene.matter.world.setBounds((left = true), (right = true));
 }
 
-// function createBackground(scene) {
-//   scene.terrain = scene.add.sprite(512, 384, "background");
-// }
+function createBackground(scene) {
+  scene.background = scene.add.sprite(512, 384, "background_mountain");
+  console.log("background", scene.background);
+}
 
 function createBullets(scene) {
   if (scene.hasOwnProperty("bullets")) {

@@ -48,6 +48,7 @@ class GameScene extends Phaser.Scene {
     this.load.image("turret", "assets/turret.png");
     this.load.image("smoke", "assets/smoke-puff.png");
     this.load.image("bullet", "assets/bullet.png");
+    this.load.image("background_mountain", "assets/background_mountain.png")
 
     this.load.tilemapTiledJSON("map", "assets/scorchedworms.json");
     this.load.image("swImg", "assets/scorchedworms.png");
