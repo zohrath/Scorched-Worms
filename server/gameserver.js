@@ -30,13 +30,16 @@ function startGameServer(server) {
       // console.log("Sending players: ", players);
       syncGamestateEmit(socket,players,currentMap);
     } else {
+      let clientAlias = socket.handshake.headers['alias'];
+      
       // create a new player and add it to our players object
       createPlayer(
         players,
         socket.id,
-        "Player " + playerOrder.length,
+        clientAlias,
         playerOrder
       );
+      console.log(clientAlias);
     }
 
     socket.on("username", user => {
@@ -151,6 +154,10 @@ function startGameServer(server) {
     socket.on("forceStart", () => {
       newRound(playerOrder);
     });
+
+    socket.on("sendAlias", data => {
+      players[socket.id].alias = data.alias;
+    });
   });
 }
 
@@ -243,7 +250,7 @@ function resetPlayers(playerOrder) {
   playerOrder.length = 0; //create new?
 
   Object.values(io.sockets.sockets).forEach((socket, i) => {
-    let newAlias = "Player " + i; //(socket.id in players) ? players[socket.id].alias : "Player " + i;
+    let newAlias = (socket.id in players) ? players[socket.id].alias : "Player " + i;
     let newPlayer = createPlayer2(socket.id, newAlias);
     newPlayers[socket.id] = newPlayer;
     playerOrder.push(socket.id);

@@ -42,8 +42,11 @@ class MainMenu extends Phaser.Scene {
     menuscreen.setOrigin(0.5, 0.5);
   }
 
-  getPlayerAlias() {
-    var username = prompt("Please enter your alias: ", "Anon");
+  getPlayerAlias(alias = "Anon", usesAlias = false) {
+    if (usesAlias) {
+      return alias;
+    }
+    var username = prompt("Please enter your alias: ", alias);
     while (username == "") {
       username = prompt("You need to enter a valid alias. Try again!", "Anon");
       if (username == null) {

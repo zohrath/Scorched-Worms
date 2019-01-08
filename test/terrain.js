@@ -1,7 +1,7 @@
 // const io = require("socket.io-client");
 // const should = require("should");
 // const socketURL = "http://0.0.0.0:8081";
-// const assert = require("chai").assert;
+const assert = require("chai").assert;
 
 const tilesHit = require("../server/terrain").tilesHit;
 const createPlatformLayer = require("../server/terrain").createPlatformLayer;
@@ -35,8 +35,59 @@ let matrix = createPlatformLayer(512, 768, 16);
 let before = JSON.parse(JSON.stringify(matrix))
 let tiles = tilesHit({ x: 500, y: 500, radius: 200 }, 16);
 updatePlatformLayer(matrix, tiles);
-let res = testRemoveTiles(before,matrix,tiles);
-console.log("Result",res);
+
+Object.entries(matrix).forEach(function(key,col){
+  Object.entries(col).forEach(function(key,elem){
+    
+    validTile(elem,width,height,allowedTypes)
+  });
+});
+
+describe("createPlatformLayer",function(){
+  
+  let height = 20;
+  let width = 10;
+  let matrix = createPlatformLayer(width,height,1);
+  
+  it("checks all tiles in the matrix", () =>{
+    let allowedTypes = [];
+    Object.entries(matrix).forEach(function(key,col){
+      Object.entries(col).forEach(function(key,elem){
+        
+        assert.isTrue(validTile(elem,width,height,allowedTypes))
+      });
+    });
+
+  });
+    
+});
+
+
+describe("testRemoveTiles", function (){
+  it("testRemoveTiles",() =>{
+
+    assert.isTrue(testRemoveTiles(before,matrix,tiles));
+  });
+
+});
+
+
+function validTile(tile,allowedWidth,allowedHeight,allowedTypes){
+  if(!(tile.x <= allowedWidth && tile.x >= 0)){
+    return false;
+  }
+
+  if(!(tile.y <= allowedHeight && tile.y >= 0)){
+    return false;
+  }
+
+  console.log(allowedTypes.includes(tile.type));
+  if(!(allowedTypes.includes(tile.type))){
+    return false;
+  }
+
+  return true;
+}
 
 function testRemoveTiles(layerBefore, layerAfter, tiles) {
   let array = matrixDifference(layerBefore,layerAfter) 
