@@ -143,8 +143,8 @@ class GameScene extends Phaser.Scene {
       return;
     }
 
-    if (
-      typeof this.playerContainer !== "undefined" //&&
+    if ( this && 
+      typeof this.playerContainer !== "undefined" && this.playerContainer.body
       //this.playerContainer.active
     ) {
       if (this.isMyTurn) {
