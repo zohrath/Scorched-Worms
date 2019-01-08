@@ -1,3 +1,5 @@
+const State = require('./State');
+
 let socketio = require("socket.io");
 let players = {};
 // IDs, TODO: randomize
@@ -6,9 +8,7 @@ let io;
 let clientsReady = 0;
 let gameRunning = false;
 let currentMap;
-
 let terrain = require("./terrain.js");
-
 
 let TILESIZE = 16;
 let WIDTH = 1024;
@@ -20,7 +20,8 @@ var clients = {};
 
 function startGameServer(server) {
   var playerOrder = [];
-
+  let state = new State([]);
+  console.log(state.playerOrder);
   io = socketio.listen(server);
 
   io.sockets.on("connection", socket => {
@@ -159,8 +160,6 @@ function countConnectedPlayers() {
 
 function startRoundIfAllReady(playerOrder) {
   if (clientsReady === playerOrder.length && clientsReady > 1) {
-    // send the players object to the new player
-    console.log("Starting round", playerOrder.alias);
     currentMap = terrain.createPlatformLayer(WIDTH,HEIGHT,TILESIZE);
     startRound(playerOrder);
     return true;
@@ -283,7 +282,7 @@ function syncGamestateEmit(sendTo,players,map){
 }
 
 function startRound(playerOrder) {
-  // console.log("startRound playerOrder: " + playerOrder);
+  console.log("startRound playerOrder: " + playerOrder);
   io.emit("currentPlayers", players);
   newTurn(playerOrder);
   gameRunning = true;
@@ -326,5 +325,6 @@ module.exports = {
   startRoundIfAllReady,
   createPlayer,
   getNextPlayerSocketId,
-  nextPlayerAlias
+  nextPlayerAlias,
+  getPlayerAlias
 };
