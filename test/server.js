@@ -55,8 +55,11 @@ describe("RemovePlayer broadcast", function() {
         client1.emit('clientReady');
         client2.emit('clientReady');
         client2.emit('disconnect');
+        client1.on('removePlayer', playerID => {
+        
+        });
         client2.disconnect();
-  
+        
   
         client1.emit('disconnect');
         client1.disconnect();
