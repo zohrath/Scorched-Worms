@@ -106,12 +106,12 @@ function createTurnText(scene) {
 function createCenterText(scene, text) {
   scene.winText = scene.add.text(
     game.canvas.width * 0.5,
-    game.canvas.height * 0.5,
+    game.canvas.height * 0.3,
     text,
     {
       align: "center",
       fontSize: "64px",
-      fill: "#999",
+      fill: "#000",
       boundsAlignH: "center", // bounds center align horizontally
       boundsAlignV: "middle"
     }

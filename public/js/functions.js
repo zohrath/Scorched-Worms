@@ -149,3 +149,29 @@ function updatePlayerPosition(scene,playerInfo){
       currPlayer.setEmitter(scene);
   }
 }
+
+function createScoreBoardText(scoreboard){
+  let string = "Rank  Score  Name";
+  scoreboard.forEach(function(player,i)  {
+    let pos = i+1;
+    string +="\n"+ (pos);
+    if (pos==1) {
+      string += "st"
+    } else if (pos==2) {
+      string += "nd"
+    } else if(pos==3) {
+      string += "rd"
+    } else {
+      string += "th"
+    }
+    scoreSpace = " ".repeat(8-player.score.toString().length);
+    let playerName = player.alias;
+    if (playerName.length > 8){
+      console.log("FÖR LÅNG!!",playerName.substring(0,8),playerName.substring(0,3))
+      playerName = playerName.substring(0,8) + "...";
+    }
+    string += scoreSpace + player.score+ "  " + playerName;
+
+  });
+  return string;
+}

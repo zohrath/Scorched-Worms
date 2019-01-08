@@ -8,15 +8,18 @@ function createSocketListners(scene) {
   createStartTurn(scene);
   createNextPlayerTurn(scene);
   createClearScene(scene);
+  createShowScoreboard(scene);
   createPlayerWon(scene);
   createSyncGamestate(scene);
   createRemoveTiles(scene);
   createUpdatePlatformLayer(scene);
   createUpdateHP(scene);
+  
 }
 
 function createCurrentPlayersListener(scene) {
   socket.on("currentPlayers", players => {
+    console.log(players);
     Object.values(players).forEach(value => {
       if (value.playerId === socket.id) {
         addPlayer(scene, value);
@@ -122,6 +125,31 @@ function createClearScene(scene) {
     if (scene.particles) {
       scene.particles.destroy();
     }
+  });
+}
+
+function createShowScoreboard(scene) {
+  socket.on("showScoreboard",(scoreboard) => {
+    console.log(scoreboard);
+    let scoreText = createScoreBoardText(scoreboard);
+    scene.scoreboardText = scene.add.text(
+      game.canvas.width * 0.5,
+      game.canvas.height * 0.4,
+      scoreText,
+      {
+        align: "left",
+        fontSize: "40px",
+        fill: "#000",
+        boundsAlignH: "center", // bounds center align horizontally
+        boundsAlignV: "left"
+      }
+    );
+    scene.scoreboardText.setOrigin(0.5, 0.5);
+
+
+    setTimeout(function() {
+      scene.scoreboardText.destroy();
+    }, 3000);
   });
 }
 

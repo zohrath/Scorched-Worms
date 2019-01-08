@@ -5,10 +5,10 @@ const assert = require("chai").assert;
 const getAlivePlayers = require("../server/gameserver").getAlivePlayers;
 const startRoundIfAllReady = require("../server/gameserver").startRoundIfAllReady;
 const calculateDmg = require("../server/gameserver").calculateDmg;
-const createPlayer = require("../server/gameserver").createPlayer;
+const createPlayerCharacter = require("../server/gameserver").createPlayerCharacter;
 const getNextPlayerSocketId = require("../server/gameserver").getNextPlayerSocketId;
 const nextPlayerAlias = require("../server/gameserver").nextPlayerAlias;
-const sortScoreBoard = require("../server/gameserver").sortScoreBoard;
+const sortByScore = require("../server/gameserver").sortByScore;
 const chatUser1 = { name: "Tom" };
 const chatUser2 = { name: "Sally" };
 const chatUser3 = { name: "Dana" };
@@ -185,7 +185,7 @@ describe("calculateDmg", function() {
   it("Returns partial damage to player when distance <= radius", () => {});
 });
 
-describe("createPlayer", function() {
+describe("createPlayerCharacter", function() {
   it("gives proper player values when given proper arguments", () => {
     let players = {};
     let playerOrder = [];
@@ -199,11 +199,11 @@ describe("createPlayer", function() {
     let alias4 = "Player Tor";
     let alias5 = "Player Nurre";
 
-    let result1 = createPlayer(players, id1, alias1, playerOrder);
+    let result1 = createPlayerCharacter(id1, alias1);
     assert.equal(result1.alias, alias1);
 
     playerOrder.push(id1);
-    let result2 = createPlayer(result1, id2, alias2, playerOrder);
+    let result2 = createPlayerCharacter(id2, alias2);
     assert.equal(result2.alias, alias2);
   });
 });
@@ -249,7 +249,7 @@ describe("nextPlayerAlias", function () {
 });
 
 describe("scoreBoard", function () {
-  it("test sortScoreBoard", () => {
+  it("test sortByScore", () => {
     players = [{score:1},{score:-1},{score: 1},{score: 50},{score:0}]
     correctOrder = [
       {score: 50},
@@ -258,17 +258,17 @@ describe("scoreBoard", function () {
       {score:0},
       {score:-1}
     ]
-    assert.deepEqual(sortScoreBoard(players),correctOrder);
+    assert.deepEqual(sortByScore(players),correctOrder);
     players = [{score:1},{score:-1}]
     correctOrder = [
       {score:1},
       {score:-1}
     ]
-    assert.deepEqual(sortScoreBoard(players),correctOrder);
+    assert.deepEqual(sortByScore(players),correctOrder);
     players = []
     correctOrder = [
     ]
-    assert.deepEqual(sortScoreBoard(players),correctOrder);
+    assert.deepEqual(sortByScore(players),correctOrder);
     
   });
 });
