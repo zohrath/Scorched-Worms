@@ -1,6 +1,5 @@
 class Player extends Phaser.GameObjects.Container {
   constructor(scene, character, turretSprite, playerInfo, color, isStatic) {
-    console.log("playerInfo", playerInfo)
     super(scene, playerInfo.x, playerInfo.y, []);
     
     this.tank = scene.add.sprite(0, 0, character);
@@ -30,7 +29,6 @@ class Player extends Phaser.GameObjects.Container {
     this.alias = playerInfo.alias;
     this.prevPosition = {x: playerInfo.x, y: playerInfo.y, angle: 0, turretAngle: 0};
     scene.add.existing(this);
-    console.log("player", this);
   }
 
   setFlipX(value) {
@@ -60,9 +58,11 @@ class Player extends Phaser.GameObjects.Container {
   // }
 
   fire(scene, angle, power) {
-    let pos = this.getCurrentPos()
-    console.log("print fire", (this.x+40*Math.cos(angle) - this.x), (this.y+40*Math.sin(angle) - this.y));
-    this.turret.fire(scene, (this.x+40*Math.cos(angle)), (this.y+40*Math.sin(angle)), angle, power);
+    let endTurret = new Phaser.Geom.Point(this.x, this.y-5);
+    //console.log("print fire", (this.x+40*Math.cos(angle) - this.x), (this.y+40*Math.sin(angle) - this.y));
+    endTurret.x += (Math.cos(angle*Math.PI/180) * 40);
+    endTurret.y += (Math.sin(angle*Math.PI/180) * 40);
+    this.turret.fire(scene, endTurret.x, endTurret.y, angle, power);
   }
 
   getWeaponAngle() {
@@ -97,7 +97,6 @@ class Player extends Phaser.GameObjects.Container {
   }
 
   destroyPlayer() {
-    console.log("dest player");
     this.tank.destroy();
     this.turret.destroy();
     this.playerText.destroy();
