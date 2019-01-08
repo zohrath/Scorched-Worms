@@ -14,7 +14,6 @@ function playerHit(player,explosion){
 
 function createTank(scene, playerInfo, color, isStatic) {
   let tank = new Player(scene, 'tank', 'turret', playerInfo, color, isStatic);
-  console.log("new tank", tank);
   return tank;
 }
 

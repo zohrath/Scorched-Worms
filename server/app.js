@@ -23,6 +23,8 @@ function startGameServer(server) {
 
   io.sockets.on("connection", socket => {
     // create a new player and add it to our players object
+    let x = io.sockets.sockets;
+    console.log("clients", x);
     if (gameRunning) {
       socket.emit("currentPlayers", players);
     } else {
@@ -252,7 +254,7 @@ function calculateDmg(explosion, player) {
     dmg = (explosion.dmg * (1 - distance / radius)).toFixed();
   }
   
-  console.log("DMG", dmg, " D: ", distance, " R: ", radius);
+  //console.log("DMG", dmg, " D: ", distance, " R: ", radius);
   return dmg;
 }
 
@@ -271,6 +273,12 @@ function getAlivePlayers(playerOrder) {
 function resetScene() {
   io.emit("resetScene");
 }
+
+function getActiveConnections(players){
+  Object.values(io.sockets.sockets).forEach((socket, i) => {
+  });
+}
+
 
 module.exports = {
   startGameServer,
