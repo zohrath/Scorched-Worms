@@ -1,3 +1,5 @@
+const State = require('./State');
+
 let socketio = require("socket.io");
 let players = {};
 // IDs, TODO: randomize
@@ -6,9 +8,7 @@ let io;
 let clientsReady = 0;
 let gameRunning = false;
 let currentMap;
-
 let terrain = require("./terrain.js");
-
 
 let TILESIZE = 16;
 let WIDTH = 1024;
@@ -20,7 +20,8 @@ var clients = {};
 
 function startGameServer(server) {
   var playerOrder = [];
-
+  let state = new State([]);
+  console.log(state.playerOrder);
   io = socketio.listen(server);
 
   io.sockets.on("connection", socket => {
@@ -29,13 +30,16 @@ function startGameServer(server) {
       // console.log("Sending players: ", players);
       syncGamestateEmit(socket,players,currentMap);
     } else {
+      let clientAlias = socket.handshake.headers['alias'];
+      
       // create a new player and add it to our players object
       createPlayer(
         players,
         socket.id,
-        "Player " + playerOrder.length,
+        clientAlias,
         playerOrder
       );
+      console.log(clientAlias);
     }
 
     socket.on("username", user => {
@@ -150,6 +154,10 @@ function startGameServer(server) {
     socket.on("forceStart", () => {
       newRound(playerOrder);
     });
+
+    socket.on("sendAlias", data => {
+      players[socket.id].alias = data.alias;
+    });
   });
 }
 
@@ -159,8 +167,6 @@ function countConnectedPlayers() {
 
 function startRoundIfAllReady(playerOrder) {
   if (clientsReady === playerOrder.length && clientsReady > 1) {
-    // send the players object to the new player
-    console.log("Starting round", playerOrder.alias);
     currentMap = terrain.createPlatformLayer(WIDTH,HEIGHT,TILESIZE);
     startRound(playerOrder);
     return true;
@@ -244,7 +250,7 @@ function resetPlayers(playerOrder) {
   playerOrder.length = 0; //create new?
 
   Object.values(io.sockets.sockets).forEach((socket, i) => {
-    let newAlias = "Player " + i; //(socket.id in players) ? players[socket.id].alias : "Player " + i;
+    let newAlias = (socket.id in players) ? players[socket.id].alias : "Player " + i;
     let newPlayer = createPlayer2(socket.id, newAlias);
     newPlayers[socket.id] = newPlayer;
     playerOrder.push(socket.id);
@@ -283,7 +289,7 @@ function syncGamestateEmit(sendTo,players,map){
 }
 
 function startRound(playerOrder) {
-  // console.log("startRound playerOrder: " + playerOrder);
+  console.log("startRound playerOrder: " + playerOrder);
   io.emit("currentPlayers", players);
   newTurn(playerOrder);
   gameRunning = true;
@@ -326,5 +332,6 @@ module.exports = {
   startRoundIfAllReady,
   createPlayer,
   getNextPlayerSocketId,
-  nextPlayerAlias
+  nextPlayerAlias,
+  getPlayerAlias
 };
