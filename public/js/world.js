@@ -1,7 +1,7 @@
 function createWorld(scene) {
-  // createBackground(scene);
 
   createBullets(scene);
+  createBackground(scene);
   createTerrain(scene);
   createPowerText(scene);
   createTurnText(scene);
@@ -11,9 +11,10 @@ function createWorld(scene) {
   scene.matter.world.setBounds((left = true), (right = true));
 }
 
-// function createBackground(scene) {
-//   scene.terrain = scene.add.sprite(512, 384, "background");
-// }
+function createBackground(scene) {
+  let rand = Math.floor(Math.random() * scene.backgroundImages.length);
+  scene.background = scene.add.sprite(512, 384, scene.backgroundImages[rand]);
+}
 
 function createBullets(scene) {
   if (scene.hasOwnProperty("bullets")) {
@@ -76,9 +77,9 @@ function addTile(scene, type, x, y) {
 function createTerrain(scene) {
   scene.terrain = scene.make.tilemap({ key: "map" });
   tileset = scene.terrain.addTilesetImage("scorchedworms", "swImg");
-  var backgroundlayer = scene.terrain
+  /*var backgroundlayer = scene.terrain
     .createStaticLayer("bluesky", tileset, 0, 0)
-    .setScale(1);
+    .setScale(1);*/
   platformLayer.graphic = scene.terrain
     .createDynamicLayer("map", tileset, 0, 0)
     .setScale(1);

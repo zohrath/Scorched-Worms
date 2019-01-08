@@ -82,4 +82,14 @@ class Player extends Phaser.GameObjects.Sprite {
   getPrevPos(){
     return this.body.positionPrev;
   }
+  setEmitter(scene){
+    let currentPos = this.getCurrentPos();
+    let prevPos = this.getPrevPos();
+    if (currentPos.x>prevPos.x){
+      scene.emitter.startFollow(this.body, -30, 8);  
+    }
+    else if (currentPos.x<prevPos.x){
+      scene.emitter.startFollow(this.body, 30, 8);
+    }
+  }
 }

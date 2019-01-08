@@ -146,5 +146,6 @@ function updatePlayerPosition(scene,playerInfo){
       currPlayer.setPosition(playerInfo.x, playerInfo.y);
       currPlayer.setPlayerTextPosition();
       currPlayer.setTurretPosition();
+      currPlayer.setEmitter(scene);
   }
 }
