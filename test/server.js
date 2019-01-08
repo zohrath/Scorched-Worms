@@ -12,71 +12,71 @@ const chatUser1 = { name: "Tom" };
 const chatUser2 = { name: "Sally" };
 const chatUser3 = { name: "Dana" };
 
-// describe("Username broadcast", function() {
-//     it("Should broadcast usernames to all users", done => {
-//         var client1 = io.connect(socketURL);
+describe("Username broadcast", function() {
+    it("Should broadcast usernames to all users", done => {
+        var client1 = io.connect(socketURL);
 
-//         client1.on('connect', () => {
-//           client1.emit('username', chatUser1);
+        client1.on('connect', () => {
+          client1.emit('username', chatUser1);
 
-//           var client2 = io.connect(socketURL);
+          var client2 = io.connect(socketURL);
 
-//           client2.on('connect', () => {
-//             client2.emit('username', chatUser2);
-//           });
+          client2.on('connect', () => {
+            client2.emit('username', chatUser2);
+          });
 
-//           client2.on('new user', usersName => { // !!!!
-//             usersName.should.equal(chatUser2.name + " has joined.");
-//             client2.disconnect();
-//           });
-//         });
+          client2.on('new user', usersName => { // !!!!
+            usersName.should.equal(chatUser2.name + " has joined.");
+            client2.disconnect();
+          });
+        });
 
-//         var numUsers = 0;
-//         client1.on('new user', usersName => {
-//           numUsers += 1;
+        var numUsers = 0;
+        client1.on('new user', usersName => {
+          numUsers += 1;
 
-//           if(numUsers === 2){
-//             usersName.should.equal(chatUser2.name + " has joined.");
-//             client1.disconnect();
-//             done();
-//           }
-//         });
-//     });
-// });
+          if(numUsers === 2){
+            usersName.should.equal(chatUser2.name + " has joined.");
+            client1.disconnect();
+            done();
+          }
+        });
+    });
+});
 
-// describe("RemovePlayer broadcast", function() {
-//   it("Should return one player remaining after two connects and one removal", done => {
-//     var client1 = io.connect(socketURL);
+describe("RemovePlayer broadcast", function() {
+  it("Should return one player remaining after two connects and one removal", done => {
+    var client1 = io.connect(socketURL);
     
-//     client1.on('connect', () => {
+    client1.on('connect', () => {
       
-//       var client2 = io.connect(socketURL);
-//       client2.on('connect', () => {
-//         client1.emit('clientReady');
-//         client2.emit('clientReady');
-//         client2.emit('disconnect');
-//         client2.disconnect();
+      var client2 = io.connect(socketURL);
+      client2.on('connect', () => {
+        client1.emit('clientReady');
+        client2.emit('clientReady');
+        client2.emit('disconnect');
+        client2.disconnect();
   
   
-//         client1.emit('disconnect');
-//         client1.disconnect();
-//       });
+        client1.emit('disconnect');
+        client1.disconnect();
+      });
 
-//       done();
+      done();
       
-//       // client1.on('currentPlayers', players => {
+      // client1.on('currentPlayers', players => {
         
-//       // });
+      // });
       
       
-//       // client2.on('connect', () => {
+      // client2.on('connect', () => {
         
-//       //   client1.emit('disconnect');
-//       // });
-//     });
+      //   client1.emit('disconnect');
+      // });
+    });
     
-//   });
-// });
+  });
+});
 
 // Removeplayer number of players left
 // Removing player that doesn't exist

@@ -1,6 +1,7 @@
 class State {
-  constructor(playerOrder) {
-    this.playerOrder = playerOrder;
+  constructor() {
+    this.playerOrder = [];
+    this.players = {};
   }
 }
 

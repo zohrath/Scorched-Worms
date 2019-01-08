@@ -20,14 +20,14 @@ var clients = {};
 
 function startGameServer(server) {
   var playerOrder = [];
-  let state = new State([]);
-  console.log(state.playerOrder);
+  let state = new State(playerOrder);
+  
   io = socketio.listen(server);
 
   io.sockets.on("connection", socket => {
     if (gameRunning) {
       socket.emit("currentPlayers", players);
-      // console.log("Sending players: ", players);
+      
       syncGamestateEmit(socket,players,currentMap);
     } else {
       let clientAlias = socket.handshake.headers['alias'];
@@ -37,9 +37,9 @@ function startGameServer(server) {
         players,
         socket.id,
         clientAlias,
-        playerOrder
+        state.playerOrder
       );
-      console.log(clientAlias);
+      
     }
 
     socket.on("username", user => {
@@ -52,13 +52,13 @@ function startGameServer(server) {
       "a user connected,",
       countConnectedPlayers(),
       "connected and",
-      playerOrder.length,
+      state.playerOrder.length,
       "in game.",
       players.alias
     );
     // when a player disconnects, remove them from our players object
     socket.on("disconnect", () => {
-      console.log("user disconnected, ", countConnectedPlayers(), "connected");
+      
 
       io.emit("removePlayer", socket.id);
       // remove this player from our players object
@@ -139,7 +139,7 @@ function startGameServer(server) {
     });
 
     socket.on("clientReady", () => {
-      console.log("Client ready called");
+      
       if (typeof players[socket.id] !== "undefined") {
         if (!players[socket.id].ready) {
           clientsReady++;
@@ -189,7 +189,7 @@ function getPlayerAlias(socketId, playersTest = players) {
   try {
     return playersTest[socketId].alias;
   } catch (error) {
-    console.log(error);
+    
   }
 }
 
@@ -255,7 +255,7 @@ function resetPlayers(playerOrder) {
     newPlayers[socket.id] = newPlayer;
     playerOrder.push(socket.id);
   });
-  console.log("newPlayerOrder", playerOrder);
+  
   return newPlayers; //return or set players
 }
 
@@ -271,11 +271,9 @@ function newRound(playerOrder) {
 // TODO: Fix bug where playerOrder is not sent to nextPlayerAlias
 function newTurn(playerOrder, timeout=2000) {
   syncGamestateEmit(io,players,currentMap);
-  console.log("playerOrder: ", playerOrder);
   let x = playerOrder;
-  console.log("x: ", x);
   let next = nextPlayerAlias(x, playerTurnIndex);
-  console.log("next: ", next);
+  
   setTimeout(function() {
     io.emit("nextPlayerTurn", next);
   }, timeout); //delay to sync allowedToEmit and bullet destroy
@@ -289,7 +287,6 @@ function syncGamestateEmit(sendTo,players,map){
 }
 
 function startRound(playerOrder) {
-  console.log("startRound playerOrder: " + playerOrder);
   io.emit("currentPlayers", players);
   newTurn(playerOrder);
   gameRunning = true;
