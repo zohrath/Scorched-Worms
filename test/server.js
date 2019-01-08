@@ -8,6 +8,7 @@ const calculateDmg = require("../server/gameserver").calculateDmg;
 const createPlayer = require("../server/gameserver").createPlayer;
 const getNextPlayerSocketId = require("../server/gameserver").getNextPlayerSocketId;
 const nextPlayerAlias = require("../server/gameserver").nextPlayerAlias;
+const sortScoreBoard = require("../server/gameserver").sortScoreBoard;
 const chatUser1 = { name: "Tom" };
 const chatUser2 = { name: "Sally" };
 const chatUser3 = { name: "Dana" };
@@ -244,5 +245,30 @@ describe("nextPlayerAlias", function () {
       {'B': {alias: 'Player 0'}}
     let result = nextPlayerAlias(playerOrder, 0, players);
     assert.equal(result, 'Player 0');
+  });
+});
+
+describe("scoreBoard", function () {
+  it("test sortScoreBoard", () => {
+    players = [{score:1},{score:-1},{score: 1},{score: 50},{score:0}]
+    correctOrder = [
+      {score: 50},
+      {score: 1},
+      {score:1},
+      {score:0},
+      {score:-1}
+    ]
+    assert.deepEqual(sortScoreBoard(players),correctOrder);
+    players = [{score:1},{score:-1}]
+    correctOrder = [
+      {score:1},
+      {score:-1}
+    ]
+    assert.deepEqual(sortScoreBoard(players),correctOrder);
+    players = []
+    correctOrder = [
+    ]
+    assert.deepEqual(sortScoreBoard(players),correctOrder);
+    
   });
 });

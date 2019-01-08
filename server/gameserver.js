@@ -318,6 +318,16 @@ function getAlivePlayers(playerOrder) {
   return aliveArray;
 }
 
+function getScoreBoard(){
+  let scoreBoard = sortScortBoard(Object.values(players));
+  return scoreBoard;
+}
+
+function sortByScore(scoreBoard){
+  scoreBoard.sort( (a,b) => (a.score < b.score) ? 1 : ((b.score < a.score) ? -1 : 0)); 
+  return scoreBoard;
+}
+
 function resetScene() {
   io.emit("resetScene");
 }
@@ -330,5 +340,6 @@ module.exports = {
   createPlayer,
   getNextPlayerSocketId,
   nextPlayerAlias,
-  getPlayerAlias
+  getPlayerAlias,
+  sortScoreBoard,
 };
