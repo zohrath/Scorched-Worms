@@ -1,6 +1,6 @@
 class Explosion extends Phaser.GameObjects.Sprite {
   constructor(scene, radius, dmg, x, y, image) {
-    super(scene, x, y, image);
+    // super(scene, x, y, image);
     scene.matter.add.gameObject(this, { isStatic: true, isSensor: true });
     this.radius = radius;
     this.dmg = dmg;

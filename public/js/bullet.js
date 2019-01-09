@@ -56,8 +56,6 @@ var Bullet = new Phaser.Class({
 
   explode: function(scene) {
     this.allowedToExplode = false;
-    //scene.weaponEmitter.setScale(0.5);//this.radius/scene.weaponEmitter.size);
-    //scene.weaponEmitter.explode(200, this.x, this.y);
 
     let explosionSprite = scene.add
       .sprite(this.x, this.y, "explosionSpriteSheet")
