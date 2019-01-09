@@ -14,12 +14,17 @@ function createSocketListners(scene) {
   createRemoveTiles(scene);
   createUpdatePlatformLayer(scene);
   createUpdateHP(scene);
+  createReadyTextListener(scene);
+  createPressRTextListener(scene);
   
 }
 
 function createCurrentPlayersListener(scene) {
   socket.on("currentPlayers", players => {
-    console.log(players);
+
+    if(scene.lowCenterText){
+      scene.lowCenterText.destroy();
+    }
     Object.values(players).forEach(value => {
       if (value.playerId === socket.id) {
         addPlayer(scene, value);
@@ -165,8 +170,9 @@ function createPlayerWon(scene) {
     } else {
       displayText = "Draw!";
     }
-    centerText = createCenterText(scene, displayText);
+    centerText = createHighCenterText(scene, displayText);
     setTimeout(function() {
+
       centerText.destroy();
     }, 3000);
   });
@@ -226,4 +232,22 @@ function createUpdateHP(scene){
       playerToUpdate.list[2].setText(playerInfo.alias + "\n HP: " + playerInfo.hp);
     });
   });
+}
+
+createReadyTextListener
+function createPressRTextListener(scene){
+  socket.on("pressRText", () => {
+    createCenterText(scene,"Press R when ready");
+  });
+}
+
+function createReadyTextListener(scene){
+  socket.on("isReady",(data) => {
+    console.log("received isReady: ",data)
+    updateLowCenterText(scene,data.ready + " out of " + data.total + " Players ready");
+
+
+  })
+
+
 }

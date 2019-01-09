@@ -113,7 +113,8 @@ function createTurnText(scene) {
 }
 
 function createCenterText(scene, text) {
-  scene.winText = scene.add.text(
+  console.log("creating center text",text)
+  scene.highCenterText = scene.add.text(
     game.canvas.width * 0.5,
     game.canvas.height * 0.3,
     text,
@@ -125,8 +126,28 @@ function createCenterText(scene, text) {
       boundsAlignV: "middle"
     }
   );
-  scene.winText.setOrigin(0.5, 0.5);
-  return scene.winText;
+  scene.highCenterText.setOrigin(0.5, 0.5);
+}
+
+function updateLowCenterText(scene,text){
+  if(scene.lowCenterText){
+    scene.lowCenterText.destroy()
+    delete scene.lowCenterText;
+  }
+  scene.lowCenterText = scene.add.text(
+    game.canvas.width * 0.5,
+    game.canvas.height * 0.4,
+    text,
+    {
+      align: "center",
+      fontSize: "64px",
+      fill: "#000",
+      boundsAlignH: "center", // bounds center align horizontally
+      boundsAlignV: "middle"
+    }
+  );
+  scene.lowCenterText.setOrigin(0.5, 0.5);
+
 }
 
 function createWeaponEmitter(scene, radius, imgSize) {

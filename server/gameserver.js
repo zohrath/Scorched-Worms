@@ -5,7 +5,6 @@ let players = {};
 // IDs, TODO: randomize
 let playerTurnIndex = 0; //flag for whose turn it is
 let io;
-let clientsReady = 0;
 let gameRunning = false;
 let currentMap;
 let terrain = require("./terrain.js");
@@ -35,10 +34,14 @@ function startGameServer(server) {
     if (gameRunning) {
       syncGamestateEmit(socket,getPlayerCharacters(),currentMap);
     } else {
-      
-    // create a new player and add it to our players object 
-    currentPlayer.character = createPlayerCharacter(socket.id,clientAlias);
-    playerOrder.push(currentPlayer.character.id);
+      // create a new player and add it to our players object 
+      currentPlayer.character = createPlayerCharacter(socket.id,clientAlias);
+      playerOrder.push(currentPlayer.character.id);
+
+      socket.emit("pressRText");
+
+
+      emitReadyText(io,getAmountReady(),playerOrder.length);
       
     }
 
@@ -74,7 +77,9 @@ function startGameServer(server) {
       }
       socket.disconnect();
       delete players[socket.id];
-      startRoundIfAllReady(playerOrder);
+      if(!startRoundIfAllReady(playerOrder)){
+        emitReadyText(io,getAmountReady(),playerOrder.length)
+      }
       // emit a message to all players to remove this player
     });
 
@@ -150,11 +155,12 @@ function startGameServer(server) {
       
       if (typeof players[socket.id] !== "undefined") {
         if (!players[socket.id].ready) {
-          clientsReady++;
           players[socket.id].ready = true;
         }
 
-        startRoundIfAllReady(playerOrder);
+        if(!startRoundIfAllReady(playerOrder)){
+          emitReadyText(io,getAmountReady(),playerOrder.length);
+        };
       }
     });
 
@@ -174,6 +180,7 @@ function countConnectedPlayers() {
 }
 
 function startRoundIfAllReady(playerOrder) {
+  let clientsReady = getAmountReady();
   if (clientsReady === playerOrder.length && clientsReady > 1) {
     currentMap = terrain.createPlatformLayer(WIDTH,HEIGHT,TILESIZE);
     startRound(playerOrder);
@@ -233,6 +240,7 @@ function createPlayer(id,alias){
     alias: alias,
     score: 0,
     character: null,
+    ready: false,
   };
   return player;
 }
@@ -246,7 +254,6 @@ function createPlayerCharacter(id, alias) {
     y: HEIGHT/2,
     playerId: id,
     playerTurn: false, //TODO randomize for 1 player to be true
-    ready: false,
     hp: 10
   };
   return playerCharacter;
@@ -310,7 +317,6 @@ function startRound(playerOrder) {
   io.emit("currentPlayers", getPlayerCharacters());
   newTurn(playerOrder);
   gameRunning = true;
-  clientsReady = 0;
 }
 
 function calculateDmg(explosion, player) {
@@ -370,6 +376,24 @@ function getPlayerCharacters(){
     }
   })
   return res;
+}
+
+function emitReadyText(socket,clientsReady,total){
+  socket.emit("isReady",{
+    ready: clientsReady,
+    total: total
+  });
+}
+
+function getAmountReady(){
+  let result = 0;
+  Object.values(players).forEach(function(player){
+    if(player.ready){
+      result++;
+    }
+
+  });
+  return result;
 }
 
 module.exports = {
