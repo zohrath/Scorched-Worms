@@ -149,7 +149,10 @@ class GameScene extends Phaser.Scene {
     ) {
       if (this.isMyTurn) {
         this.playerContainer.setWeaponAngle(mouseAngle);
-        movePlayer(this, time, delta);
+        if(this.playerContainer.fuel > 0){
+          movePlayer(this, time, delta);
+        }
+        playerShot(this, time, delta);
       }
       
       this.playerContainer.setTurretPosition();

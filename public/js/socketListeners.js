@@ -101,8 +101,12 @@ function createNextPlayerTurn(scene) {
       scene.isMyTurn = true;
       scene.playerContainer.isMyTurn = true;
       scene.turnText.setColor("#00ff00");
+      scene.playerContainer.fuel = 100;
+      setFuelText(scene)
     } else {
       scene.turnText.setColor("#ff0000");
+      scene.playerContainer.fuel = 0;
+      setFuelText(scene)
       allowedToEmit = false;
     }
     scene.turnText.setText("Turn: " + alias);

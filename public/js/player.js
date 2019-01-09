@@ -8,9 +8,10 @@ class Player extends Phaser.GameObjects.Sprite {
     this.body.friction = 0;
     this.body.frictionStatic = 0;
     this.body.frictionAir = 0.3;
-
+    
     this.turret = new Weapon(scene, "turret", "bullet", 10, 10, this.x, this.y+15);
-
+    
+    this.fuel = 0;
     this.playerId = playerInfo.playerId;
     this.alias = playerInfo.alias;
     this.playerText = scene.add.text(this.x, this.y-50, playerInfo.alias, {

@@ -4,6 +4,7 @@ function createWorld(scene) {
   createBackground(scene);
   createTerrain(scene);
   createPowerText(scene);
+  createFuelText(scene);
   createTurnText(scene);
   createWeaponEmitter(scene, 5, 128);
   createAnims(scene);
@@ -96,8 +97,16 @@ function createPowerText(scene) {
   });
 }
 
+function createFuelText(scene){
+  scene.fuelText = scene.add.text(16, 48, "Fuel: 0", {
+    fontSize: "32px",
+    fill: "#999"
+  });
+
+}
+
 function createTurnText(scene) {
-  scene.turnText = scene.add.text(16, 64, "Turn: ", {
+  scene.turnText = scene.add.text(16, 80, "Turn: ", {
     fontSize: "32px",
     fill: "#999"
   });

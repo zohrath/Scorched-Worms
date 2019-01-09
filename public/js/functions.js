@@ -83,40 +83,42 @@ function movePlayer(scene, time, delta) {
     scene.playerContainer.setVelocityX(-7);
   }
   if (scene.cursors.left.isDown) {
+    scene.playerContainer.fuel -= 1;
+    setFuelText(scene)
     scene.playerContainer.thrustBack(0.5);
   } else if (scene.cursors.right.isDown) {
+    scene.playerContainer.fuel -= 1;
+    setFuelText(scene)
     scene.playerContainer.thrust(0.5);
-  } else {
-    //scene.playerContainer.setVelocity(0,0);
-  }
-  /*if (scene.cursors.up.isDown && scene.playerContainer.body.velocity.y > 0) {
-    scene.playerContainer.thrustRight(-0.02);
-  } else if (scene.cursors.down.isDown) {
-    //scene.turretInContainer.rotation--;
-  }*/
-  // The if statement below this is never true. Something is wrong with keyX.
-  if (keyX.isdown && scene.playerContainer.body.touching.down) {
-    scene.playerContainer.body.velocity.y = -100;
   }
 
-  // SPACE
-  if (scene.cursors.space.isDown) {
-    scene.spaceDown = true;
-    power = (power + Math.floor(delta / 2)) % 1000;
-    scene.powerText.setText("Power: " + power);
-  } else if (scene.cursors.space.isUp) {
-    if (scene.spaceDown && time > scene.nextTic) {
-      scene.nextTic = time + 500;
-      shotInfo = {
-        power: power,
-        angle: scene.playerContainer.getWeaponAngle()
-      };
-      scene.isMyTurn = false;
-      scene.spaceDown = false;
-      socketEmit("bulletFired", shotInfo);
-      power = 0;
+
+}
+
+function setFuelText(scene){
+  scene.fuelText.setText("Fuel: " + scene.playerContainer.fuel);
+}
+
+function playerShot(scene, time, delta){
+    // SPACE
+    if (scene.cursors.space.isDown) {
+      scene.spaceDown = true;
+      power = (power + Math.floor(delta / 2)) % 1000;
+      scene.powerText.setText("Power: " + power);
+    } else if (scene.cursors.space.isUp) {
+      if (scene.spaceDown && time > scene.nextTic) {
+        scene.nextTic = time + 500;
+        shotInfo = {
+          power: power,
+          angle: scene.playerContainer.getWeaponAngle()
+        };
+        scene.isMyTurn = false;
+        scene.spaceDown = false;
+        socketEmit("bulletFired", shotInfo);
+        power = 0;
+        scene.powerText.setText("Power: " + power);
+      }
     }
-  }
 }
 
 function socketEmit(emitName,data,force=false){
