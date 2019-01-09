@@ -152,7 +152,7 @@ function updatePlayerPosition(scene,playerInfo){
 
 function createScoreBoardText(scoreboard){
   let string = "Rank  Score  Name";
-  scoreboard.forEach(function(player,i)  {
+  scoreboard.some(function(player,i)  {
     let pos = i+1;
     string +="\n"+ (pos);
     if (pos==1) {
@@ -171,7 +171,7 @@ function createScoreBoardText(scoreboard){
       playerName = playerName.substring(0,8) + "...";
     }
     string += scoreSpace + player.score+ "  " + playerName;
-
+    return i>4;
   });
   return string;
 }
