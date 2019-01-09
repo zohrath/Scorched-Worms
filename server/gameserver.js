@@ -96,13 +96,13 @@ function startGameServer(server) {
     socket.on("isPlayerHit", explosionInfo => {
       tilesToRemove = terrain.tilesHit(explosionInfo,16);
       terrain.updatePlatformLayer(currentMap,tilesToRemove);
-      let damgeTaken = 0;
+      let damageTaken = 0;
       io.emit("removeTiles", tilesToRemove);
       Object.values(getPlayerCharacters()).forEach(currentPlayer => {
         let playerID = currentPlayer.playerId;
         let currDmg = calculateDmg(explosionInfo, currentPlayer);
         currentPlayer.hp -= currDmg;
-        damgeTaken += currDmg; 
+        damageTaken += currDmg; 
         if (currentPlayer.hp <= 0) {
           io.emit("removePlayer", playerID);
           removeFromPlayerOrder(playerID, playerOrder);
@@ -121,7 +121,7 @@ function startGameServer(server) {
         }
         io.emit("showScoreboard",getScoreboard());
         newRound(playerOrder);
-      }else if (damgeTaken > 0){
+      }else if (damageTaken > 0){
         io.emit("updateHP", getPlayerCharacters());
       }
     });

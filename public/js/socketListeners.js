@@ -170,10 +170,11 @@ function createPlayerWon(scene) {
     } else {
       displayText = "Draw!";
     }
-    centerText = createHighCenterText(scene, displayText);
+    centerText = createCenterText(scene, displayText);
     setTimeout(function() {
-
-      centerText.destroy();
+      if(centerText){
+        centerText.destroy();
+      }
     }, 3000);
   });
 }
@@ -227,8 +228,7 @@ function createUpdateHP(scene){
       if (playerInfo.playerId === socket.id) {
         playerToUpdate = scene.playerContainer;
       }
-      console.log(playerInfo);
-      console.log(playerToUpdate);
+      console.log("nytt hp",playerInfo);
       playerToUpdate.list[2].setText(playerInfo.alias + "\n HP: " + playerInfo.hp);
     });
   });

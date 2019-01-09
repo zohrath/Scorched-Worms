@@ -127,6 +127,7 @@ function createCenterText(scene, text) {
     }
   );
   scene.highCenterText.setOrigin(0.5, 0.5);
+  return scene.highCenterText;
 }
 
 function updateLowCenterText(scene,text){
