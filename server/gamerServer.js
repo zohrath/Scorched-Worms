@@ -32,7 +32,8 @@ function startGameServer(server) {
 
 
     if (gameRunning) {
-      syncGamestateEmit(socket,getPlayerCharacters(),currentMap);
+      socket.emit("currentPlayers", getPlayerCharacters());
+      syncGamestateEmit(socket, getPlayerCharacters(), currentMap);
     } else {
       // create a new player and add it to our players object 
       currentPlayer.character = createPlayerCharacter(socket.id,clientAlias);
@@ -77,43 +78,42 @@ function startGameServer(server) {
       }
       socket.disconnect();
       delete players[socket.id];
-      if(!startRoundIfAllReady(playerOrder)){
+      if(isAllReady(playerOrder)){
+        startRound(playerOrder);
+      }
+      else{
         emitReadyText(io,getAmountReady(),playerOrder.length)
       }
-      // emit a message to all players to remove this player
     });
 
     // when a player moves, update the player data
     socket.on("playerMovement", movementData => {
       if (players[socket.id]) {
-        players[socket.id].x = movementData.x;
-        players[socket.id].y = movementData.y;
-        players[socket.id].angle = movementData.angle;
+        players[socket.id].character.x = movementData.x;
+        players[socket.id].character.y = movementData.y;
+        players[socket.id].character.angle = movementData.angle;
         // emit a message to all players about the player that moved
-        socket.broadcast.emit("playerMoved", players[socket.id]);
+        socket.broadcast.emit("playerMoved", players[socket.id].character);
       }
     });
 
-    socket.on("isPlayerHit", explosionInfo => {
+    socket.on("finishedTurn", explosionInfo => {
       tilesToRemove = terrain.tilesHit(explosionInfo,16);
-      terrain.updatePlatformLayer(currentMap,tilesToRemove);
-      let damageTaken = 0;
-      io.emit("removeTiles", tilesToRemove);
+      terrain.updatePlatformLayer(currentMap, tilesToRemove);
+      //io.emit("removeTiles", tilesToRemove);
       Object.values(getPlayerCharacters()).forEach(currentPlayer => {
         let playerID = currentPlayer.playerId;
         let currDmg = calculateDmg(explosionInfo, currentPlayer);
         currentPlayer.hp -= currDmg;
-        damageTaken += currDmg; 
         if (currentPlayer.hp <= 0) {
           io.emit("removePlayer", playerID);
           removeFromPlayerOrder(playerID, playerOrder);
-          players[playerID].active = false;
+          let point = socket.id == playerID ? -1 : 1;
+          players[socket.id].score += point;
         }
       });
 
       let alivePlayers = getAlivePlayers(playerOrder);
-      console.log("vid liv: ",alivePlayers[0]);
-      console.log(players);
       if (alivePlayers.length <= 1) {
         if (alivePlayers.length === 1) {
           io.emit("playerWon", players[alivePlayers[0]].alias);
@@ -122,20 +122,21 @@ function startGameServer(server) {
         }
         io.emit("showScoreboard",getScoreboard());
         newRound(playerOrder);
-      }else if (damageTaken > 0){
+      }else {
         io.emit("updateHP", getPlayerCharacters());
+        newTurn(playerOrder);
       }
     });
 
     socket.on("bulletFired", inputInfo => {
-      player = players[socket.id];
+      let character = players[socket.id].character;
 
       bulletInfo = {
-        x: player.x,
-        y: player.y,
+        x: character.x,
+        y: character.y,
         power: inputInfo.power,
         angle: inputInfo.angle,
-        alias: player.alias
+        alias: character.alias
       };
 
       io.emit("fireBullet", bulletInfo);
@@ -148,10 +149,6 @@ function startGameServer(server) {
       socket.broadcast.emit(eventname, data);
     });
 
-    socket.on("finishedTurn", () => {
-      newTurn(2000, playerOrder);
-    });
-
     socket.on("clientReady", () => {
       
       if (typeof players[socket.id] !== "undefined") {
@@ -159,9 +156,12 @@ function startGameServer(server) {
           players[socket.id].ready = true;
         }
 
-        if(!startRoundIfAllReady(playerOrder)){
-          emitReadyText(io,getAmountReady(),playerOrder.length);
-        };
+        if(isAllReady(playerOrder)){
+          startRound(playerOrder);
+        }
+        else{
+          emitReadyText(io, getAmountReady(), playerOrder.length);
+        }
       }
     });
 
@@ -180,21 +180,16 @@ function countConnectedPlayers() {
   return Object.keys(io.sockets.sockets).length;
 }
 
-function startRoundIfAllReady(playerOrder) {
+function isAllReady(playerOrder) {
   let clientsReady = getAmountReady();
-  if (clientsReady === playerOrder.length && clientsReady > 1) {
-    currentMap = terrain.createPlatformLayer(WIDTH,HEIGHT,TILESIZE);
-    startRound(playerOrder);
-    return true;
-  }
-  return false;
+  return (clientsReady === playerOrder.length && clientsReady > 1)
 }
+
 
 function getNextPlayerSocketId(playerOrder, startingIndex) {
   for (let i = 0; i < playerOrder.length; i++) {
-    const val = (i + startingIndex) % (playerOrder.length - 1);
+    const val = (i + startingIndex) % (playerOrder.length);
     const currentPlayer = playerOrder[val];
-    
     if (currentPlayer !== "DEAD") {
       return [currentPlayer, val];
     }
@@ -210,23 +205,19 @@ function getPlayerAlias(socketId, playersTest = getPlayerCharacters()) {
 }
 
 //TODO compare nextPlayerAlias2 vs nextPlayerAlias
-function nextPlayerAlias2(playerOrder, startingIndex, playersTest = getPlayerCharacters()) {
-  console.log("startingIndex",startingIndex);
-  console.log("playerOrder",playerOrder);
-  console.log("playerOrder[startingIndex]",playerOrder[startingIndex]);
-  console.log("playersTest[playerOrder[startingIndex]]",playersTest[playerOrder[startingIndex]]); // TODO: krasch /Edvin
-  console.log("players",players);
-  
+function nextPlayerAlias(playerOrder, startingIndex, playersTest = getPlayerCharacters()) {  
   var alias = playersTest[playerOrder[startingIndex]].alias;
   
   if (playerOrder.length > 1) {
-    const id = getNextPlayerSocketId(playerOrder, startingIndex);
+    const id = getNextPlayerSocketId(playerOrder, startingIndex+1);
     alias = getPlayerAlias(id[0], playersTest);
     playerTurnIndex = id[1];
+  
   }
+  return alias;
 }
 
-function nextPlayerAlias(playerOrder) {
+function nextPlayerAlias2(playerOrder) {
   let playerSocketID;
 
   do {
@@ -277,36 +268,25 @@ function createPlayerCharacter(id, alias) {
   return playerCharacter;
 }
 
-function resetCharacter(id, alias) { //TODO: REMOVE WHEN FINISHED
-  let newPlayer = {
-    alias: alias,
-    rotation: 0,
-    x: Math.floor(Math.random() * 700) + 50,
-    y: HEIGHT/4,
-    playerId: id,
-    playerTurn: false, //TODO randomize for 1 player to be true
-    ready: false,
-    hp: 10
-  };
-  return newPlayer;
-}
-
 // TODO: Refer to player usernames somehow, for testing?
-function resetPlayers() {
-  let newOrder = []; //TODO verify 
+function resetPlayers(playerOrder) {
+  playerOrder.length = 0; //TODO verify 
   Object.entries(players).forEach(([id, playerData]) => {
     let newPlayer = createPlayerCharacter(id,playerData.alias)
     playerData.character = newPlayer;
-    newOrder.push(id);
+    playerOrder.push(id);
   });
-  
-  return newOrder; //return or set players
+  console.log("b4 shuffle", playerOrder)
+  playerOrder.sort(function() {  
+    return 0.5 - Math.random()
+  });
+  console.log("after shuffle", playerOrder)
 }
 
 function newRound(playerOrder) {
   currentMap = terrain.createPlatformLayer();
   playerTurnIndex = 0;
-  playerOrder = resetPlayers();
+  resetPlayers(playerOrder);
   io.emit("clearScene");
   io.emit("updatePlatformLayer", currentMap);
   startRound(playerOrder);
@@ -315,7 +295,7 @@ function newRound(playerOrder) {
 // TODO: Fix bug where playerOrder is not sent to nextPlayerAlias
 // TODO: Should it b x or playerOrder(desync prob?)
 function newTurn(playerOrder, timeout=2000) {
-  syncGamestateEmit(io,getPlayerCharacters(),currentMap);
+  syncGamestateEmit(io, getPlayerCharacters(), currentMap);
   let x = playerOrder;
   
   setTimeout(function() {
@@ -326,6 +306,7 @@ function newTurn(playerOrder, timeout=2000) {
 
 function startRound(playerOrder) {
   gameRunning = true;
+  currentMap = terrain.createPlatformLayer(WIDTH,HEIGHT,TILESIZE);
   io.emit("currentPlayers", getPlayerCharacters());
   newTurn(playerOrder);
 }
@@ -422,7 +403,6 @@ module.exports = {
   startGameServer,
   getAlivePlayers,
   calculateDmg,
-  startRoundIfAllReady,
   createPlayerCharacter,
   getNextPlayerSocketId,
   nextPlayerAlias,
