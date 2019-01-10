@@ -5,7 +5,7 @@ class Weapon extends Phaser.GameObjects.Sprite {
       this.radius = radius;
       this.dmg = dmg;
       this.bulletSpritename = bulletSpritename;
-      this.setPosition(x, y);
+      //this.setPosition(x, y);
       scene.matter.add.sprite(this);
     }
     
