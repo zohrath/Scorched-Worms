@@ -12,19 +12,6 @@ class Explosion extends Phaser.GameObjects.Sprite {
 
     this.setActive(true);
     this.setVisible(false);
-
-    scene.matterCollision.addOnCollideStart({
-      objectA: this,
-      callback: eventData => {
-        const { bodyB, gameObjectB } = eventData;
-
-        //|| gameObjectB instanceof Phaser.GameObjects.Container
-        if (gameObjectB !== undefined && gameObjectB instanceof Player) {
-          // Now you know that gameObjectB is a Tile, so you can check the index, properties, etc.
-          playerHit(gameObjectB, this);
-        }
-      }
-    });
   }
 
   explode(x, y) {

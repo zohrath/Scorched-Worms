@@ -103,12 +103,13 @@ class GameScene extends Phaser.Scene {
       function(pointer) {
         let cursor = pointer;
         if (typeof this.playerContainer == "object") {
-          mouseAngle = Phaser.Math.Angle.Between(
-            this.playerContainer.turret.x,
-            this.playerContainer.turret.y,
+          let mouseRotation = Phaser.Math.Angle.Between(
             cursor.x + this.cameras.main.scrollX,
-            cursor.y + this.cameras.main.scrollY
-          );
+            cursor.y + this.cameras.main.scrollY,
+            this.playerContainer.x,
+            this.playerContainer.y
+            );
+          mouseAngle = Phaser.Math.RAD_TO_DEG*mouseRotation - 180;
         }
       },
       this
@@ -156,37 +157,37 @@ class GameScene extends Phaser.Scene {
         playerShot(this, time, delta);
       }
       
-      this.playerContainer.setTurretPosition();
-      this.playerContainer.setPlayerTextPosition();
       let prevPos = this.playerContainer.getPrevPos(); 
-      let currPos = this.playerContainer.getCurrentPos(); 
+      let currPos = this.playerContainer.getCurrentPos();
       if (prevPos) {
         if (
-          Math.round(currPos.x) !== Math.round(prevPos.x) ||
-          Math.round(currPos.y) !== Math.round(prevPos.y)
-        ) {
+          diffValue(currPos.x, prevPos.x, 1)||
+          diffValue(currPos.y, prevPos.y, 1) ||
+          currPos.angle !== prevPos.angle
+          ) {
           socketEmit(
             "playerMovement",
-            this.playerContainer.getPlayerInfo(),
+            {
+              x: currPos.x,
+              y: currPos.y,
+              angle: currPos.angle,
+            },
             true
           );
         }
 
-        if (
-          Math.round(this.playerContainer.getWeaponAngle()) !==
-          Math.round(prevPos.turretRotation)
-        ) {
+        if(diffValue(currPos.turretAngle, prevPos.turretAngle, 2)){
           socketEmit("toOtherClients", {
             event: "moveTurret",
-            turretRotation: prevPos.turretRotation
+            turretRotation: currPos.turretAngle
           });
+
         }
+
       }
       // save old position data
-      this.playerContainer.oldPosition = {
-        x: this.playerContainer.x,
-        y: this.playerContainer.y,
-      };
+      this.playerContainer.setPrevPos(currPos);
+
       if (this.playerContainer.body.velocity.x > 1) {
         this.emitter.startFollow(this.playerContainer, -30, 8);
         this.playerContainer.setFlipX(false);
@@ -200,7 +201,6 @@ class GameScene extends Phaser.Scene {
         this.emitter.on = false;
       }
     }
-    // emit player movement
   }
 }
 

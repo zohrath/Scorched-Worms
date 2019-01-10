@@ -1,7 +1,7 @@
 let express = require("express");
 let expressApp = express();
 let server = require("http").Server(expressApp);
-let gameServer = require("./server/gameserver.js");
+let gameServer = require("./server/gamerServer.js");
 
 expressApp.use(express.static(__dirname + "/public"));
 

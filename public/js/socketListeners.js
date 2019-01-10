@@ -87,7 +87,7 @@ function createMoveTurretListener(scene) {
   socket.on("moveTurret", (turretInfo) => {
     Object.values(scene.otherPlayers).forEach(otherPlayer => {
       if (turretInfo.playerId === otherPlayer.playerId) {
-        rotateTurret(otherPlayer, turretInfo.turretRotation);
+        otherPlayer.setWeaponAngle(turretInfo.turretRotation);
       }
     });
   });
@@ -121,7 +121,7 @@ function createNextPlayerTurn(scene) {
 function createClearScene(scene) {
   socket.on("clearScene", () => {
     /*scene.otherPlayers.getChildren().forEach(function(player){
-      player.destroyPlayer();
+      player.destroy();
     });*/
     Object.values(scene.otherPlayers).forEach(player => {
       if (player) {
@@ -186,13 +186,11 @@ function createResetScene(scene) {
 }
 
 function createSyncGamestate(scene) {
-  socket.on("syncGamestate", (syncInfo) => {
-    destroyMap(scene);
-    createMap(scene,syncInfo.mapInfo)
-    Object.values(syncInfo.playerInfo).forEach(playerInfo => {
-      console.log(playerInfo);
+  socket.on("syncGamestate", (players) => {
+    Object.values(players).forEach(playerInfo => {
       updatePlayerPosition(scene, playerInfo);
       // TODO: add hp sync
+      // TODO: add terrain sync
     });
   });
 }
@@ -201,7 +199,7 @@ function createRemoveTiles(scene) {
   socket.on("removeTiles", (tiles) => {
     tiles.forEach(tile => {
       let tilesToRemove = platformLayer.graphic.getTileAtWorldXY(tile.x, tile.y);
-      // removeTile(scene, tilesToRemove);
+      removeTile(scene, tilesToRemove);
     });
   });
 }
@@ -217,7 +215,11 @@ function createAddTiles(scene) {
 function createUpdatePlatformLayer(scene) {
   socket.on("updatePlatformLayer", (map) => {
     destroyMap(scene);
-    createMap(scene,map)
+    let tilesToAdd = map;
+    addTiles(scene,tilesToAdd);
+    platformLayer.physic = scene.matter.world.convertTilemapLayer(
+      platformLayer.graphic
+    );
   });
 }
 
@@ -228,8 +230,7 @@ function createUpdateHP(scene){
       if (playerInfo.playerId === socket.id) {
         playerToUpdate = scene.playerContainer;
       }
-      console.log("nytt hp",playerInfo);
-      playerToUpdate.list[2].setText(playerInfo.alias + "\n HP: " + playerInfo.hp);
+      playerToUpdate.playerText.setText(playerInfo.alias + "\n HP: " + playerInfo.hp);
     });
   });
 }

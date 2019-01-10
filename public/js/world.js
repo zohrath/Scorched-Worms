@@ -28,13 +28,6 @@ function createBullets(scene) {
   scene.bullets = []; // defa update <-
 }
 
-function createMap(scene,mapMatrix){
-  addTiles(scene,mapMatrix);
-  platformLayer.physic = scene.matter.world.convertTilemapLayer(
-    platformLayer.graphic
-  );
-}
-
 function destroyMap(scene) {
   let tiles = platformLayer.graphic.getTilesWithin();
   tiles.forEach(tile =>{
@@ -45,29 +38,21 @@ function destroyMap(scene) {
 function removeTile(scene, tile) {
   if (tile) {
     var layer = tile.tilemapLayer;
-    if (typeof tile.physics.matterBody !== "undefined") {
+    if (typeof tile.physics.matterBody !== "undefined")
       tile.physics.matterBody.destroy();
-      layer.removeTileAt(tile.x, tile.y);
+    layer.removeTileAt(tile.x, tile.y);
   }
-}
 }
 
 function addTiles(scene,tiles){
-  let tilesMatrix = Object.values(tiles);
-  let tileColArray;
-  tilesMatrix.forEach(tileCol =>{
-    tileColArray = Object.values(tileCol);
-    tileColArray.forEach(tile =>{
+  tiles.forEach(tileCol =>{
+    tileCol.forEach(tile =>{
       addTile(scene,tile.type,tile.x,tile.y);
     })
 
   });
-  let firstTileCoords = Object.values(tilesMatrix[0])[0];
-  let lastTileCoords = tileColArray[tileColArray.length-1];
-  console.log(firstTileCoords,lastTileCoords)
-  let firstTile = platformLayer.graphic.getTileAtWorldXY(firstTileCoords.x,firstTileCoords.y);
-  let lastTile = platformLayer.graphic.getTileAtWorldXY(lastTileCoords.x, lastTileCoords.y);
-  console.log(firstTile,lastTile);
+  let firstTile = platformLayer.graphic.getTileAtWorldXY(tiles[0][0].x,tiles[0][0].y);
+  let lastTile = platformLayer.graphic.getTileAtWorldXY(1024-8, 768 - 8);
   platformLayer.graphic.setCollisionBetween(firstTile.index, lastTile.index);
 }
 
@@ -88,6 +73,8 @@ function createTerrain(scene) {
   platformLayer.physic = scene.matter.world.convertTilemapLayer(
     platformLayer.graphic
   );
+  // platformLayer.renderDebug();
+  //scene.matter.world.createDebugGraphic();
 }
 
 function createPowerText(scene) {

@@ -5,7 +5,10 @@ var Bullet = new Phaser.Class({
     this.bulletParticles = null;
     createBulletEmitter(scene, this);
     this.bulletEmitter.startFollow(this);
+    this.bulletEmitter.on = false;
     Phaser.GameObjects.Sprite.call(this, scene, 0, 0, sprite);
+
+    this.setActive(false);
 
     this.radius = radius;
     this.dmg = dmg;
@@ -33,19 +36,17 @@ var Bullet = new Phaser.Class({
     });
   },
 
+  //TODO see if pos correct
   fire: function(x, y, angle, speed) {
-    console.log("x,y", x, " , ", y);
     this.setActive(true);
     this.setVisible(true);
     this.bulletEmitter.on = true;
     this.bulletEmitter.active = true;
     //  Bullets fire from the middle of the screen to the given x/y
     this.setPosition(x, y);
-    //this.setOrigin(0.5, 0.5);
-    this.body.angle = angle;
+    this.setAngle(angle);
     this.setMass(1);
     this.thrust(speed / 5000);
-    console.log("firing mah laza", this);
   },
 
   hide: function() {

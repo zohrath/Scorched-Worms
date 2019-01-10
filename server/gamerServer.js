@@ -88,6 +88,7 @@ function startGameServer(server) {
       if (players[socket.id]) {
         players[socket.id].x = movementData.x;
         players[socket.id].y = movementData.y;
+        players[socket.id].angle = movementData.angle;
         // emit a message to all players about the player that moved
         socket.broadcast.emit("playerMoved", players[socket.id]);
       }
@@ -148,7 +149,7 @@ function startGameServer(server) {
     });
 
     socket.on("finishedTurn", () => {
-      newTurn(playerOrder);
+      newTurn(2000, playerOrder);
     });
 
     socket.on("clientReady", () => {
@@ -208,7 +209,8 @@ function getPlayerAlias(socketId, playersTest = getPlayerCharacters()) {
   }
 }
 
-function nextPlayerAlias(playerOrder, startingIndex, playersTest = getPlayerCharacters()) {
+//TODO compare nextPlayerAlias2 vs nextPlayerAlias
+function nextPlayerAlias2(playerOrder, startingIndex, playersTest = getPlayerCharacters()) {
   console.log("startingIndex",startingIndex);
   console.log("playerOrder",playerOrder);
   console.log("playerOrder[startingIndex]",playerOrder[startingIndex]);
@@ -221,7 +223,21 @@ function nextPlayerAlias(playerOrder, startingIndex, playersTest = getPlayerChar
     const id = getNextPlayerSocketId(playerOrder, startingIndex);
     alias = getPlayerAlias(id[0], playersTest);
     playerTurnIndex = id[1];
-  
+  }
+}
+
+function nextPlayerAlias(playerOrder) {
+  let playerSocketID;
+
+  do {
+    playerTurnIndex = getNextPlayerTurnIndex(1, playerOrder);
+    playerSocketID = playerOrder[playerTurnIndex];
+  } while (playerSocketID === "DEAD");
+
+  if (players[playerSocketID].alias !== "undefined") {
+    return players[playerSocketID].alias;
+  } else {
+    return;
   }
   return alias;
 }
@@ -249,12 +265,14 @@ function createPlayerCharacter(id, alias) {
   let playerCharacter = {
     id: id,
     alias: alias,
-    rotation: 0,
+    angle: 0,
     x: Math.floor(Math.random() * 700) + 50,
     y: HEIGHT/2,
     playerId: id,
     playerTurn: false, //TODO randomize for 1 player to be true
-    hp: 10
+    ready: false,
+    hp: 10,
+    turretAngle: 0
   };
   return playerCharacter;
 }
@@ -275,9 +293,8 @@ function resetCharacter(id, alias) { //TODO: REMOVE WHEN FINISHED
 
 // TODO: Refer to player usernames somehow, for testing?
 function resetPlayers() {
-  let newOrder = [];
+  let newOrder = []; //TODO verify 
   Object.entries(players).forEach(([id, playerData]) => {
-    let newAlias = playerData.alias;
     let newPlayer = createPlayerCharacter(id,playerData.alias)
     playerData.character = newPlayer;
     newOrder.push(id);
@@ -287,7 +304,7 @@ function resetPlayers() {
 }
 
 function newRound(playerOrder) {
-  currentMap = terrain.createPlatformLayer(WIDTH,HEIGHT,TILESIZE);
+  currentMap = terrain.createPlatformLayer();
   playerTurnIndex = 0;
   playerOrder = resetPlayers();
   io.emit("clearScene");
@@ -296,6 +313,7 @@ function newRound(playerOrder) {
 }
 
 // TODO: Fix bug where playerOrder is not sent to nextPlayerAlias
+// TODO: Should it b x or playerOrder(desync prob?)
 function newTurn(playerOrder, timeout=2000) {
   syncGamestateEmit(io,getPlayerCharacters(),currentMap);
   let x = playerOrder;
@@ -306,17 +324,10 @@ function newTurn(playerOrder, timeout=2000) {
   }, timeout); //delay to sync allowedToEmit and bullet destroy
 }
 
-function syncGamestateEmit(sendTo,players,map){
-  sendTo.emit("syncGamestate", {    
-    playerInfo: players,
-    mapInfo: map
-  });
-}
-
 function startRound(playerOrder) {
+  gameRunning = true;
   io.emit("currentPlayers", getPlayerCharacters());
   newTurn(playerOrder);
-  gameRunning = true;
 }
 
 function calculateDmg(explosion, player) {
@@ -324,11 +335,13 @@ function calculateDmg(explosion, player) {
   let distance = Math.hypot(explosion.x - player.x, explosion.y - player.y);
   let dmg = 0;
   if (Math.hypot(32, 20) >= distance) {
+    // 20?
     dmg =  explosion.dmg;
   } else if (distance <= radius) {
     dmg = (explosion.dmg * (1 - distance / radius)).toFixed();
   }
-
+  
+  //console.log("DMG", dmg, " D: ", distance, " R: ", radius);
   return dmg;
 }
 
@@ -395,6 +408,15 @@ function getAmountReady(){
   });
   return result;
 }
+
+function syncGamestateEmit(sendTo,players,map){
+  sendTo.emit("syncGamestate", {    
+    playerInfo: players,
+    mapInfo: map
+  });
+}
+
+
 
 module.exports = {
   startGameServer,

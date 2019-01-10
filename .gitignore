@@ -3,4 +3,3 @@ package-lock.json
 coverage/
 old/
 *.log
-.nyc_output

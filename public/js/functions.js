@@ -12,8 +12,8 @@ function playerHit(player,explosion){
   });
 }
 
-function createTank(scene, playerInfo, color) {
-  let tank = new Player(scene, 'tank', 'turret', playerInfo, color);
+function createTank(scene, playerInfo, color, isStatic) {
+  let tank = new Player(scene, 'tank', 'turret', playerInfo, color, isStatic);
   return tank;
 }
 
@@ -56,7 +56,7 @@ function createAudio(scene) {
 }
 
 function rotateTurret(tank, newAngle) {
-  tank.setWeaponAngle(newAngle);
+  tank.list[1].setRotation(newAngle);
 }
 
 function addPlayer(scene, playerInfo) {
@@ -64,12 +64,12 @@ function addPlayer(scene, playerInfo) {
   scene.isMyTurn = playerInfo.playerTurn;
   scene.alias = playerInfo.alias
   let color = "#00ff00";
-  scene.playerContainer = createTank(scene, playerInfo, color);
+  scene.playerContainer = createTank(scene, playerInfo, color, false);
 }
 
 function addOtherPlayer(scene, playerInfo) {
   let color = "#ff0000";
-  otherPlayer = createTank(scene, playerInfo, color);
+  otherPlayer = createTank(scene, playerInfo, color, true);
   otherPlayer.playerId = playerInfo.playerId;
   //scene.otherPlayers.add(otherPlayer);
   scene.otherPlayers[playerInfo.playerId] = otherPlayer;
@@ -142,14 +142,13 @@ function damagePlayer(explosion, player){
   //emit explode bullet
 }
 
-function updatePlayerPosition(scene,playerInfo){
+function updatePlayerPosition(scene, playerInfo){
+
   currPlayer = scene.otherPlayers[playerInfo.playerId];
     if(typeof(currPlayer) !== 'undefined'){
-      currPlayer.setPosition(playerInfo.x, playerInfo.y);
-      currPlayer.setPlayerTextPosition();
-      currPlayer.setTurretPosition();
-      currPlayer.setEmitter(scene);
-  }
+        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+        otherPlayer.setAngle(playerInfo.angle);
+      }
 }
 
 function createScoreBoardText(scoreboard){
@@ -176,4 +175,9 @@ function createScoreBoardText(scoreboard){
     return i>4;
   });
   return string;
+  
+}
+
+function diffValue(val1, val2, minimum){
+  return (Math.abs(val1-val2) >=  minimum);
 }
