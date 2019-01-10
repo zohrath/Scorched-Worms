@@ -54,7 +54,6 @@ function createRemovePlayerListener(scene) {
       // scene.playerContainer.setActive(false);
       scene.playerContainer.destroyPlayer();
       if (scene.isMyTurn) {
-        socket.emit("finishedTurn");
         scene.isMyTurn = false;
       }
     } else {
@@ -139,7 +138,6 @@ function createClearScene(scene) {
 
 function createShowScoreboard(scene) {
   socket.on("showScoreboard",(scoreboard) => {
-    console.log(scoreboard);
     let scoreText = createScoreBoardText(scoreboard);
     scene.scoreboardText = scene.add.text(
       game.canvas.width * 0.5,
@@ -170,7 +168,7 @@ function createPlayerWon(scene) {
     } else {
       displayText = "Draw!";
     }
-    centerText = createCenterText(scene, displayText);
+    let centerText = createCenterText(scene, displayText);
     setTimeout(function() {
       if(centerText){
         centerText.destroy();
@@ -186,14 +184,16 @@ function createResetScene(scene) {
 }
 
 function createSyncGamestate(scene) {
-  socket.on("syncGamestate", (players) => {
-    Object.values(players).forEach(playerInfo => {
+  socket.on("syncGamestate", (syncInfo) => {
+    destroyMap(scene);
+    createMap(scene,syncInfo.mapInfo)
+    Object.values(syncInfo.playerInfo).forEach(playerInfo => {
       updatePlayerPosition(scene, playerInfo);
       // TODO: add hp sync
-      // TODO: add terrain sync
     });
   });
 }
+
 
 function createRemoveTiles(scene) {
   socket.on("removeTiles", (tiles) => {
@@ -235,7 +235,6 @@ function createUpdateHP(scene){
   });
 }
 
-createReadyTextListener
 function createPressRTextListener(scene){
   socket.on("pressRText", () => {
     createCenterText(scene,"Press R when ready");
@@ -244,7 +243,6 @@ function createPressRTextListener(scene){
 
 function createReadyTextListener(scene){
   socket.on("isReady",(data) => {
-    console.log("received isReady: ",data)
     updateLowCenterText(scene,data.ready + " out of " + data.total + " Players ready");
 
 
