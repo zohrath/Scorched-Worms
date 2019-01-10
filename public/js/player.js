@@ -3,7 +3,7 @@ class Player extends Phaser.GameObjects.Container {
     super(scene, playerInfo.x, playerInfo.y, []);
     
     this.tank = scene.add.sprite(0, 0, character);
-    this.turret = new Weapon(scene, turretSprite, "bullet", 20, 10, 0, -5);
+    this.turret = new Weapon(scene, turretSprite, "bullet", 60, 10, 0, -5);
     this.alias = playerInfo.alias;
     this.playerText = scene.add.text(0, 0, playerInfo.alias + "\n HP: " + playerInfo.hp, {
     fontSize: "18px Arial",

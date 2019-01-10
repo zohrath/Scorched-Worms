@@ -23,8 +23,6 @@ function startGameServer(server) {
 
   io.sockets.on("connection", socket => {
     // create a new player and add it to our players object
-    let x = io.sockets.sockets;
-    console.log("clients", x);
     if (gameRunning) {
       socket.emit("currentPlayers", players);
     } else {
