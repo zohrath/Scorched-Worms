@@ -168,7 +168,6 @@ function createScoreBoardText(scoreboard){
     scoreSpace = " ".repeat(8-player.score.toString().length);
     let playerName = player.alias;
     if (playerName.length > 8){
-      console.log("FÖR LÅNG!!",playerName.substring(0,8),playerName.substring(0,3))
       playerName = playerName.substring(0,8) + "...";
     }
     string += scoreSpace + player.score+ "  " + playerName;
