@@ -51,8 +51,14 @@ var Bullet = new Phaser.Class({
 
   hide: function() {
     this.bulletEmitter.on = false;
+    let explosionInfo = {
+      radius: this.radius,
+      dmg: this.dmg,
+      x: this.x,
+      y: this.y
+    };
+    socketEmit("finishedTurn", explosionInfo);
     this.destroy();
-    socketEmit("finishedTurn");
   },
 
   explode: function(scene) {
@@ -63,17 +69,6 @@ var Bullet = new Phaser.Class({
       .setScale(2);
     explosionSprite.anims.play("explosionKey128");
     scene.explosionSound.play();
-    this.isPlayerHit();
     this.hide();
-  },
-
-  isPlayerHit: function() {
-    let explosionInfo = {
-      radius: this.radius,
-      dmg: this.dmg,
-      x: this.x,
-      y: this.y
-    };
-    socketEmit("isPlayerHit", explosionInfo);
   }
 });
