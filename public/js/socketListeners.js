@@ -16,6 +16,7 @@ function createSocketListners(scene) {
   createUpdateHP(scene);
   createReadyTextListener(scene);
   createPressRTextListener(scene);
+  createSetReadyListener(scene);
   
 }
 
@@ -71,6 +72,7 @@ function createRemovePlayerListener(scene) {
 
 function createFireBulletListener(scene) {
   socket.on("fireBullet", (bulletInfo) => {
+    console.log(bulletInfo);
     let playerToFire = scene.playerContainer;
 
     if (bulletInfo.alias !== scene.alias) {
@@ -102,7 +104,6 @@ function createStartTurn(scene) {
 
 function createNextPlayerTurn(scene) {
   socket.on("nextPlayerTurn", (nextPlayer) => {
-    console.log(nextPlayer)
     if (nextPlayer.id == socket.id) {
       allowedToEmit = true;
       scene.isMyTurn = true;
@@ -136,6 +137,9 @@ function createClearScene(scene) {
     if (scene.particles) {
       scene.particles.destroy();
     }
+    if (scene.highCenterText) {
+      scene.highCenterText.destroy();
+    }
   });
 }
 
@@ -167,15 +171,13 @@ function createPlayerWon(scene) {
   socket.on("playerWon", (player) => {
     let displayText;
     if (player) {
-      displayText = player + " won!";
+      displayText = player + " wins the round!";
     } else {
       displayText = "Draw!";
     }
-    let centerText = createCenterText(scene, displayText);
+    updateCenterText(scene, displayText);
     setTimeout(function() {
-      if(centerText){
-        centerText.destroy();
-      }
+      updateCenterText(scene, "");
     }, 3000);
   });
 }
@@ -245,16 +247,27 @@ function createUpdateHP(scene){
 
 function createPressRTextListener(scene){
   socket.on("pressRText", () => {
-    createCenterText(scene,"Press R when ready");
+    updateCenterText(scene,"Press R when ready");
   });
 }
 
 function createReadyTextListener(scene){
   socket.on("isReady",(data) => {
     updateLowCenterText(scene,data.ready + " out of " + data.total + " Players ready");
+    if(!scene.ready){
 
+      updateCenterText(scene,"Press R when ready");
+    }
 
   })
 
 
+}
+
+function createSetReadyListener(scene){
+  socket.on("setReady",(bool) => {
+    console.log("b",bool,scene.ready);
+    scene.ready = bool;
+    console.log("a",bool,scene.ready);
+  });
 }

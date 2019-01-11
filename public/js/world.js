@@ -111,21 +111,29 @@ function createTurnText(scene) {
   });
 }
 
-function createCenterText(scene, text) {
-  scene.highCenterText = scene.add.text(
-    game.canvas.width * 0.5,
-    game.canvas.height * 0.3,
-    text,
-    {
-      align: "center",
-      fontSize: "64px",
-      fill: "#000",
-      boundsAlignH: "center", // bounds center align horizontally
-      boundsAlignV: "middle"
-    }
-  );
-  scene.highCenterText.setOrigin(0.5, 0.5);
-  return scene.highCenterText;
+function updateCenterText(scene, text) {
+  console.log(text);
+  if(scene.highCenterText){
+    scene.highCenterText.destroy()
+    delete scene.highCenterText;
+  }
+  if(text && text.length > 0){
+    scene.highCenterText = scene.add.text(
+      game.canvas.width * 0.5,
+      game.canvas.height * 0.3,
+      text,
+      {
+        align: "center",
+        fontSize: "64px",
+        fill: "#000",
+        boundsAlignH: "center", // bounds center align horizontally
+        boundsAlignV: "middle"
+      }
+    );
+    scene.highCenterText.setOrigin(0.5, 0.5);
+    scene.highCenterText._visible = true;
+  }
+  console.log(scene.highCenterText);
 }
 
 function updateLowCenterText(scene,text){

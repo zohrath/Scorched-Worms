@@ -38,10 +38,6 @@ function startGameServer(server) {
       // create a new player and add it to our players object 
       currentPlayer.character = createPlayerCharacter(socket.id,clientAlias);
       playerOrder.push(currentPlayer.character.id);
-
-      socket.emit("pressRText");
-
-
       emitReadyText(io,getAmountReady(),playerOrder.length);
       
     }
@@ -72,12 +68,16 @@ function startGameServer(server) {
 
       io.emit("removePlayer", socket.id);
       // remove this player from our players object
+      delete players[socket.id];
       playerIndex = playerOrder.indexOf(socket.id);
       if (playerIndex >= 0) {
         playerOrder.splice(playerIndex, 1);
       }
       socket.disconnect();
-      delete players[socket.id];
+      if(countConnectedPlayers() < 2){
+        gameRunning = false;
+        io.emit("setReady",false);
+      }
       if(isAllReady(playerOrder)){
         newRound(playerOrder);
       }
@@ -206,10 +206,10 @@ function getPlayerAlias(socketId, playersTest = getPlayerCharacters()) {
 
 //TODO compare nextPlayerAlias2 vs nextPlayerAlias
 function nextPlayerAlias(playerOrder, startingIndex, playersTest = getPlayerCharacters()) {  
-  console.log("pO ",playerOrder);
-  console.log("playerOrder[startingIndex]", playerOrder[startingIndex]);
-  console.log("playersTest",playersTest);
-  console.log("playersTest[playerOrder[startingIndex]]",playersTest[playerOrder[startingIndex]]);
+  // console.log("pO ",playerOrder);
+  // console.log("playerOrder[startingIndex]", playerOrder[startingIndex]);
+  // console.log("playersTest",playersTest);
+  // console.log("playersTest[playerOrder[startingIndex]]",playersTest[playerOrder[startingIndex]]);
   if (playerOrder.length > 1) {
     var result = playersTest[playerOrder[startingIndex]];
     const id = getNextPlayerSocketId(playerOrder, startingIndex+1);
@@ -303,8 +303,10 @@ function newTurn(playerOrder, timeout=2000) {
   
   setTimeout(function() {
     let next = nextPlayerAlias(x, playerTurnIndex);
-    io.emit("nextPlayerTurn", players[next].character);
-    console.log(next);
+    let nextPlayer = players[next];
+    if(nextPlayer){
+      io.emit("nextPlayerTurn", nextPlayer.character);
+    }
   }, timeout); //delay to sync allowedToEmit and bullet destroy
 }
 

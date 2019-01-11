@@ -139,7 +139,10 @@ class GameScene extends Phaser.Scene {
     if (!this.ready) {
       if (keyR.isDown) {
         this.ready = true;
-        this.highCenterText.destroy();
+        if(this.highCenterText){
+
+          this.highCenterText.destroy();
+        }
         socket.emit("clientReady");
       }
       return;
