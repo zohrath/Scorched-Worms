@@ -15,7 +15,6 @@ function createSocketListners(scene) {
   createUpdatePlatformLayer(scene);
   createUpdateHP(scene);
   createReadyTextListener(scene);
-  createPressRTextListener(scene);
   createSetReadyListener(scene);
   
 }
@@ -242,12 +241,6 @@ function createUpdateHP(scene){
         }
       }
     });
-  });
-}
-
-function createPressRTextListener(scene){
-  socket.on("pressRText", () => {
-    updateCenterText(scene,"Press R when ready");
   });
 }
 
