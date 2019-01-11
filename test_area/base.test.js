@@ -6,7 +6,7 @@ const express = require("express");
 const request = require("supertest");
 const port = 8081;
 
-let gameServer = require("../server/app.js");
+let gameServer = require("../server/gamerServer.js");
 let server;
 let httpServerAddr;
 
