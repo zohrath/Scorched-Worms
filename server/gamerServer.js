@@ -36,8 +36,8 @@ function startGameServer(server) {
       syncGamestateEmit(socket, getPlayerCharacters(), currentMap);
     } else {
       // create a new player and add it to our players object 
-      currentPlayer.character = createPlayerCharacter(socket.id,clientAlias);
-      playerOrder.push(currentPlayer.character.id);
+      currentPlayer.character; // = createPlayerCharacter(socket.id,clientAlias);
+      // playerOrder.push(currentPlayer.character.id);
       emitReadyText(io,getAmountReady(),playerOrder.length);
       
     }
@@ -256,12 +256,14 @@ function createPlayer(id,alias){
 }
 
 function createPlayerCharacter(id, alias) {
+  let x = Math.floor(Math.random() * 700) + 50;
+  let y = getSpawnY(x) - 20;
   let playerCharacter = {
     id: id,
     alias: alias,
     angle: 0,
-    x: Math.floor(Math.random() * 700) + 50,
-    y: HEIGHT/2,
+    x: x,
+    y: y,
     playerId: id,
     playerTurn: false, //TODO randomize for 1 player to be true
     ready: false,
@@ -396,6 +398,25 @@ function syncGamestateEmit(sendTo,players,map){
   });
 }
 
+
+function getSpawnY(x){
+  let highestY = HEIGHT;
+  let col; 
+  let tile;
+  for(let i = x-30 ;i <= x+30;i++){
+    col = currentMap[i];
+    if(col){
+      let colArray = Object.values(col);
+      tile = colArray[0];
+      if(tile){
+        if(tile.y < highestY){
+        highestY = tile.y;
+        }
+      }
+    }
+  }
+  return highestY;
+}
 
 
 module.exports = {
