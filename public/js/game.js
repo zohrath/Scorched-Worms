@@ -64,11 +64,7 @@ class GameScene extends Phaser.Scene {
   }
 
   create(data) {
-    console.log("############ In create in game.js #############");
-    console.log("Name:", data.alias);
-    console.log("data", data);
-    console.log("###############################################");
-    console.log(this);
+ 
     this.nextTic = 0;
     let self = this;
     this.isMyTurn = false;
@@ -119,17 +115,16 @@ class GameScene extends Phaser.Scene {
   update(time, delta) {
     if (keyC.isDown) {
     }
-    if (keyX.isDown) {
-      console.log("type of playerCotainer ", typeof this.playerContainer);
-      console.log("isMyTurn: ", this.isMyTurn);
-      console.log("ready: ", this.ready);
-      console.log("this: ", this);
-      console.log("allowedToEmit: ", allowedToEmit);
-    }
+    // if (keyX.isDown) {
+    //   console.log("type of playerCotainer ", typeof this.playerContainer);
+    //   console.log("isMyTurn: ", this.isMyTurn);
+    //   console.log("ready: ", this.ready);
+    //   console.log("this: ", this);
+    //   console.log("allowedToEmit: ", allowedToEmit);
+    // }
 
     if (keyD.isDown && allowedToForce) {
       allowedToForce = false;
-      console.log("force start");
       socket.emit("forceStart");
       this.ready = true;
       setTimeout(function() {

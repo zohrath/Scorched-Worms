@@ -21,7 +21,7 @@ class Player extends Phaser.GameObjects.Container {
     this.add(this.playerText);
 
     // TODO: might be bugged
-    scene.matter.add.gameObject(this);//, { isStatic: isStatic});
+    scene.matter.add.gameObject(this, { isStatic: isStatic});
 
     this.setBounce(0.0001);
     this.setMass(100);

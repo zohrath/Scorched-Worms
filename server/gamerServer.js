@@ -2,8 +2,7 @@ const State = require('./State');
 
 let socketio = require("socket.io");
 let players = {};
-// IDs, TODO: randomize
-let playerTurnIndex = 0; //flag for whose turn it is
+let playerTurnIndex = 0;
 let io;
 let gameRunning = false;
 let currentMap;
@@ -26,7 +25,6 @@ function startGameServer(server) {
   io.sockets.on("connection", socket => {
     let clientAlias = socket.handshake.headers['alias'];
 
-      // create a new player and add it to our players object
     let currentPlayer =  createPlayer(socket.id,clientAlias);
     players[socket.id] = currentPlayer;
 
@@ -35,10 +33,8 @@ function startGameServer(server) {
       socket.emit("currentPlayers", getPlayerCharacters());
       syncGamestateEmit(socket, getPlayerCharacters(), currentMap);
     } else {
-      // create a new player and add it to our players object 
-      currentPlayer.character; // = createPlayerCharacter(socket.id,clientAlias);
-      // playerOrder.push(currentPlayer.character.id);
-      emitReadyText(io,getAmountReady(),playerOrder.length);
+      currentPlayer.character;
+      emitReadyText(io);
       
     }
 
@@ -82,7 +78,7 @@ function startGameServer(server) {
         newRound(playerOrder);
       }
       else if(!gameRunning){
-        emitReadyText(io,getAmountReady(),playerOrder.length)
+        emitReadyText(io)
       }
     });
 
@@ -160,7 +156,7 @@ function startGameServer(server) {
           newRound(playerOrder);
         }
         else{
-          emitReadyText(io, getAmountReady(), playerOrder.length);
+          emitReadyText(io);
         }
       }
     });
@@ -182,7 +178,7 @@ function countConnectedPlayers() {
 
 function isAllReady(playerOrder) {
   let clientsReady = getAmountReady();
-  return (clientsReady === playerOrder.length && clientsReady > 1)
+  return (clientsReady === countConnectedPlayers() && clientsReady > 1)
 }
 
 
@@ -373,10 +369,10 @@ function getPlayerCharacters(){
   return res;
 }
 
-function emitReadyText(socket,clientsReady,total){
+function emitReadyText(socket){
   socket.emit("isReady",{
-    ready: clientsReady,
-    total: total
+    ready: getAmountReady(),
+    total: countConnectedPlayers()
   });
 }
 
