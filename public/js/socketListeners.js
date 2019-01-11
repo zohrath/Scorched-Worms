@@ -21,7 +21,6 @@ function createSocketListners(scene) {
 
 function createCurrentPlayersListener(scene) {
   socket.on("currentPlayers", players => {
-
     if(scene.lowCenterText){
       scene.lowCenterText.destroy();
     }
@@ -44,14 +43,17 @@ function createNewPlayerListener(scene) {
 
 function createPlayerMovedListener(scene) {
   socket.on("playerMoved", playerInfo => {
-    updatePlayerPosition(scene, playerInfo);
+    if(playerInfo && playerInfo.x && playerInfo.y){
+
+      updatePlayerPosition(scene, playerInfo);
+    }
   });
 }
 
 function createRemovePlayerListener(scene) {
   socket.on("removePlayer", (playerId) => {
     if (socket.id == playerId) {
-      // scene.playerContainer.setActive(false);
+      scene.playerContainer.setActive(false);
       scene.playerContainer.destroyPlayer();
       if (scene.isMyTurn) {
         scene.isMyTurn = false;
@@ -99,8 +101,9 @@ function createStartTurn(scene) {
 }
 
 function createNextPlayerTurn(scene) {
-  socket.on("nextPlayerTurn", (alias) => {
-    if (alias == scene.alias) {
+  socket.on("nextPlayerTurn", (nextPlayer) => {
+    console.log(nextPlayer)
+    if (nextPlayer.id == socket.id) {
       allowedToEmit = true;
       scene.isMyTurn = true;
       scene.playerContainer.isMyTurn = true;
@@ -113,7 +116,7 @@ function createNextPlayerTurn(scene) {
       setFuelText(scene)
       allowedToEmit = false;
     }
-    scene.turnText.setText("Turn: " + alias);
+    scene.turnText.setText("Turn: " + nextPlayer.alias);
   });
 }
 
@@ -141,7 +144,7 @@ function createShowScoreboard(scene) {
     let scoreText = createScoreBoardText(scoreboard);
     scene.scoreboardText = scene.add.text(
       game.canvas.width * 0.5,
-      game.canvas.height * 0.4,
+      game.canvas.height * 0.5,
       scoreText,
       {
         align: "left",
@@ -226,11 +229,16 @@ function createUpdatePlatformLayer(scene) {
 function createUpdateHP(scene){
   socket.on("updateHP", (players) => {
     Object.values(players).forEach(playerInfo => {
-      let playerToUpdate = scene.otherPlayers[playerInfo.playerId];
-      if (playerInfo.playerId === socket.id) {
-        playerToUpdate = scene.playerContainer;
+      if (playerInfo.hp > 0){
+        let playerToUpdate = scene.otherPlayers[playerInfo.playerId];
+        if (playerInfo.playerId === socket.id) {
+          playerToUpdate = scene.playerContainer;
+        }
+        if(typeof(playerToUpdate.playerText) !== 'undefined'){
+  
+          playerToUpdate.playerText.setText(playerInfo.alias + "\n HP: " + playerInfo.hp);
+        }
       }
-      playerToUpdate.playerText.setText(playerInfo.alias + "\n HP: " + playerInfo.hp);
     });
   });
 }

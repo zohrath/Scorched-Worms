@@ -102,7 +102,7 @@ class GameScene extends Phaser.Scene {
       "pointermove",
       function(pointer) {
         let cursor = pointer;
-        if (typeof this.playerContainer == "object") {
+        if (typeof this.playerContainer == "object" && this.playerContainer.active) {
           let mouseRotation = Phaser.Math.Angle.Between(
             cursor.x + this.cameras.main.scrollX,
             cursor.y + this.cameras.main.scrollY,
@@ -131,25 +131,24 @@ class GameScene extends Phaser.Scene {
       allowedToForce = false;
       console.log("force start");
       socket.emit("forceStart");
-      this.ready;
+      this.ready = true;
       setTimeout(function() {
         allowedToForce = true;
       }, 1000);
     }
     if (!this.ready) {
       if (keyR.isDown) {
+        this.ready = true;
         this.highCenterText.destroy();
         socket.emit("clientReady");
-        this.ready = true;
       }
       return;
     }
 
     if ( this && 
-      typeof this.playerContainer !== "undefined" && this.playerContainer.body
-      //this.playerContainer.active
+      typeof this.playerContainer !== "undefined" && this.playerContainer.body && this.playerContainer.active
     ) {
-      if (this.isMyTurn) {
+      if (this.isMyTurn ) {
         this.playerContainer.setWeaponAngle(mouseAngle);
         if(this.playerContainer.fuel > 0){
           movePlayer(this, time, delta);

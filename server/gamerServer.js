@@ -79,9 +79,9 @@ function startGameServer(server) {
       socket.disconnect();
       delete players[socket.id];
       if(isAllReady(playerOrder)){
-        startRound(playerOrder);
+        newRound(playerOrder);
       }
-      else{
+      else if(!gameRunning){
         emitReadyText(io,getAmountReady(),playerOrder.length)
       }
     });
@@ -106,13 +106,13 @@ function startGameServer(server) {
         let currDmg = calculateDmg(explosionInfo, currentPlayer);
         currentPlayer.hp -= currDmg;
         if (currentPlayer.hp <= 0) {
-          io.emit("removePlayer", playerID);
           removeFromPlayerOrder(playerID, playerOrder);
+          io.emit("removePlayer", playerID);
           let point = socket.id == playerID ? -1 : 1;
           players[socket.id].score += point;
         }
       });
-
+      
       let alivePlayers = getAlivePlayers(playerOrder);
       if (alivePlayers.length <= 1) {
         if (alivePlayers.length === 1) {
@@ -157,7 +157,7 @@ function startGameServer(server) {
         }
 
         if(isAllReady(playerOrder)){
-          startRound(playerOrder);
+          newRound(playerOrder);
         }
         else{
           emitReadyText(io, getAmountReady(), playerOrder.length);
@@ -206,15 +206,18 @@ function getPlayerAlias(socketId, playersTest = getPlayerCharacters()) {
 
 //TODO compare nextPlayerAlias2 vs nextPlayerAlias
 function nextPlayerAlias(playerOrder, startingIndex, playersTest = getPlayerCharacters()) {  
-  var alias = playersTest[playerOrder[startingIndex]].alias;
-  
+  console.log("pO ",playerOrder);
+  console.log("playerOrder[startingIndex]", playerOrder[startingIndex]);
+  console.log("playersTest",playersTest);
+  console.log("playersTest[playerOrder[startingIndex]]",playersTest[playerOrder[startingIndex]]);
   if (playerOrder.length > 1) {
+    var result = playersTest[playerOrder[startingIndex]];
     const id = getNextPlayerSocketId(playerOrder, startingIndex+1);
-    alias = getPlayerAlias(id[0], playersTest);
+    result = id[0];
     playerTurnIndex = id[1];
   
   }
-  return alias;
+  return result;
 }
 
 function nextPlayerAlias2(playerOrder) {
@@ -276,20 +279,20 @@ function resetPlayers(playerOrder) {
     playerData.character = newPlayer;
     playerOrder.push(id);
   });
-  console.log("b4 shuffle", playerOrder)
   playerOrder.sort(function() {  
     return 0.5 - Math.random()
   });
-  console.log("after shuffle", playerOrder)
 }
 
 function newRound(playerOrder) {
-  currentMap = terrain.createPlatformLayer();
+  gameRunning = true;
+  currentMap = terrain.createPlatformLayer(WIDTH,HEIGHT,TILESIZE);
   playerTurnIndex = 0;
   resetPlayers(playerOrder);
   io.emit("clearScene");
-  io.emit("updatePlatformLayer", currentMap);
-  startRound(playerOrder);
+  //io.emit("updatePlatformLayer", currentMap);
+  io.emit("currentPlayers", getPlayerCharacters());
+  newTurn(playerOrder);
 }
 
 // TODO: Fix bug where playerOrder is not sent to nextPlayerAlias
@@ -300,15 +303,9 @@ function newTurn(playerOrder, timeout=2000) {
   
   setTimeout(function() {
     let next = nextPlayerAlias(x, playerTurnIndex);
-    io.emit("nextPlayerTurn", next);
+    io.emit("nextPlayerTurn", players[next].character);
+    console.log(next);
   }, timeout); //delay to sync allowedToEmit and bullet destroy
-}
-
-function startRound(playerOrder) {
-  gameRunning = true;
-  currentMap = terrain.createPlatformLayer(WIDTH,HEIGHT,TILESIZE);
-  io.emit("currentPlayers", getPlayerCharacters());
-  newTurn(playerOrder);
 }
 
 function calculateDmg(explosion, player) {

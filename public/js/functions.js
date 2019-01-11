@@ -145,9 +145,9 @@ function damagePlayer(explosion, player){
 function updatePlayerPosition(scene, playerInfo){
 
   currPlayer = scene.otherPlayers[playerInfo.playerId];
-    if(typeof(currPlayer) !== 'undefined'){
-        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-        otherPlayer.setAngle(playerInfo.angle);
+    if(typeof(currPlayer) !== 'undefined' && currPlayer.body){
+        currPlayer.setPosition(playerInfo.x, playerInfo.y);
+        currPlayer.setAngle(playerInfo.angle);
       }
 }
 
