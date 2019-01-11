@@ -167,7 +167,7 @@ function startGameServer(server) {
 
     //// FOR DEVELOPMENT
     socket.on("forceStart", () => {
-      newRound(playerOrder);
+      // newRound(playerOrder);
     });
 
     socket.on("sendAlias", data => {
