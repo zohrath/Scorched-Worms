@@ -1,5 +1,5 @@
 var Bullet = new Phaser.Class({
-  Extends: Phaser.GameObjects.Image,
+  Extends: Phaser.GameObjects.Sprite,
 
   initialize: function Bullet(scene, radius, sprite, dmg) {
     this.bulletParticles = null;

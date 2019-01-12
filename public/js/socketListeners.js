@@ -74,12 +74,14 @@ function createFireBulletListener(scene) {
     console.log(bulletInfo);
     let playerToFire = scene.playerContainer;
 
-    if (bulletInfo.alias !== scene.alias) {
-      Object.values(scene.otherPlayers).forEach(function(otherPlayer) {
-        if (bulletInfo.alias === otherPlayer.alias) {
-          playerToFire = otherPlayer;
-        }
-      });
+    console.log(socket.id,bulletInfo.id)
+    if (bulletInfo.id !== socket.id) {
+        Object.entries(scene.otherPlayers).forEach(function([key,otherPlayer]) {
+          console.log("loop",bulletInfo.id,key)
+          if (bulletInfo.id === key) {
+            playerToFire = otherPlayer;
+          }
+        });
     }
 
     playerToFire.fire(scene, bulletInfo.angle, bulletInfo.power);

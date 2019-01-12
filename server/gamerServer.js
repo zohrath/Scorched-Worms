@@ -132,7 +132,7 @@ function startGameServer(server) {
         y: character.y,
         power: inputInfo.power,
         angle: inputInfo.angle,
-        alias: character.alias
+        id: character.id
       };
 
       io.emit("fireBullet", bulletInfo);
