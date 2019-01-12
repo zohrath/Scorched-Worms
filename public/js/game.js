@@ -119,14 +119,14 @@ class GameScene extends Phaser.Scene {
     //   console.log("allowedToEmit: ", allowedToEmit);
     // }
 
-    if (keyD.isDown && allowedToForce) {
-      allowedToForce = false;
-      socket.emit("forceStart");
-      this.ready = true;
-      setTimeout(function() {
-        allowedToForce = true;
-      }, 1000);
-    }
+    // if (keyD.isDown && allowedToForce) {
+    //   allowedToForce = false;
+    //   socket.emit("forceStart");
+    //   this.ready = true;
+    //   setTimeout(function() {
+    //     allowedToForce = true;
+    //   }, 1000);
+    // }
     if (!this.ready) {
       if (keyR.isDown) {
         this.ready = true;
