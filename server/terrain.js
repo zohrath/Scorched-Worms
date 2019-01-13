@@ -27,7 +27,10 @@ function updatePlatformLayer(layer,tilesToRemove) {
 
 function createPlatformLayer(width,height,tileSize) {
   let tilesToAdd = {};
-  let colHeight = getRndInteger(Math.round(0.6 * height), Math.round(0.8 * height));
+  let highYAllowed = height - 2*tileSize;
+  let lowYAllowed = 0.3*height;
+  
+  let colHeight = getRndInteger(lowYAllowed,highYAllowed);
   let nextHeight = colHeight;
   let type;
   lastHeight = colHeight;
@@ -35,8 +38,10 @@ function createPlatformLayer(width,height,tileSize) {
   for (i = 0; i < width; i += tileSize) {
     tileColumn = {};
     nextHeight = colHeight + getRndInteger(-1, 1) * tileSize;
-    if (nextHeight > height -tileSize) {
-      nextHeight = height - tileSize;
+    if (nextHeight > highYAllowed) {
+      nextHeight = highYAllowed;
+    } else if(nextHeight < lowYAllowed){
+      nextHeight = lowYAllowed
     }
 
     type = 1;
