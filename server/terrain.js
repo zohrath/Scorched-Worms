@@ -27,8 +27,8 @@ function updatePlatformLayer(layer,tilesToRemove) {
 
 function createPlatformLayer(width,height,tileSize) {
   let tilesToAdd = {};
-  let highYAllowed = height - 2*tileSize;
-  let lowYAllowed = 0.3*height;
+  let highYAllowed =  Math.floor(height - 2*tileSize);
+  let lowYAllowed = Math.floor(0.3*height);
   
   let colHeight = getRndInteger(lowYAllowed,highYAllowed);
   let nextHeight = colHeight;

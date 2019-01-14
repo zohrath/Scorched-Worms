@@ -17,6 +17,7 @@ var userName;
 var clients = {};
 
 function startGameServer(server) {
+
   var playerOrder = [];
   let state = new State(playerOrder);
   
@@ -95,7 +96,7 @@ function startGameServer(server) {
 
     socket.on("finishedTurn", explosionInfo => {
       tilesToRemove = terrain.tilesHit(explosionInfo,16);
-      terrain.updatePlatformLayer(currentMap, tilesToRemove);
+      terrain.updatePlatformLayer(currentMap, tilesToRemove)     
       //io.emit("removeTiles", tilesToRemove);
       Object.values(getPlayerCharacters()).forEach(currentPlayer => {
         let playerID = currentPlayer.playerId;
@@ -120,6 +121,7 @@ function startGameServer(server) {
         newRound(playerOrder);
       }else {
         io.emit("updateHP", getPlayerCharacters());
+        
         newTurn(playerOrder);
       }
     });
@@ -163,7 +165,7 @@ function startGameServer(server) {
 
     //// FOR DEVELOPMENT
     socket.on("forceStart", () => {
-      // newRound(playerOrder);
+       // newRound(playerOrder);
     });
 
     socket.on("sendAlias", data => {
@@ -288,7 +290,6 @@ function newRound(playerOrder) {
   playerTurnIndex = 0;
   resetPlayers(playerOrder);
   io.emit("clearScene");
-  //io.emit("updatePlatformLayer", currentMap);
   io.emit("currentPlayers", getPlayerCharacters());
   newTurn(playerOrder);
 }
