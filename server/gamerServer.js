@@ -140,11 +140,13 @@ function startGameServer(server) {
       io.emit("fireBullet", bulletInfo);
     });
 
-    socket.on("toOtherClients", data => {
-      var eventname = data["event"];
-      delete data["event"];
-      data["playerId"] = socket.id;
-      socket.broadcast.emit(eventname, data);
+    socket.on("turretMoved", turretRotation => {
+      let data = {
+
+        turretRotation: turretRotation,
+        playerId: socket.id
+      }
+      socket.broadcast.emit("moveTurret", data);
     });
 
     socket.on("clientReady", () => {

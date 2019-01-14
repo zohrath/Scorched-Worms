@@ -170,10 +170,7 @@ class GameScene extends Phaser.Scene {
         }
 
         if(diffValue(currPos.turretAngle, prevPos.turretAngle, 2)){
-          socketEmit("toOtherClients", {
-            event: "moveTurret",
-            turretRotation: currPos.turretAngle
-          });
+          socketEmit("turretMoved", currPos.turretAngle);
 
         }
 
