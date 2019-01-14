@@ -112,7 +112,6 @@ function createTurnText(scene) {
 }
 
 function updateCenterText(scene, text) {
-  console.log(text);
   if(scene.highCenterText){
     scene.highCenterText.destroy()
     delete scene.highCenterText;
@@ -133,7 +132,6 @@ function updateCenterText(scene, text) {
     scene.highCenterText.setOrigin(0.5, 0.5);
     scene.highCenterText._visible = true;
   }
-  console.log(scene.highCenterText);
 }
 
 function updateLowCenterText(scene,text){

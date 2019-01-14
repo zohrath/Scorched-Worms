@@ -71,13 +71,10 @@ function createRemovePlayerListener(scene) {
 
 function createFireBulletListener(scene) {
   socket.on("fireBullet", (bulletInfo) => {
-    console.log(bulletInfo);
     let playerToFire = scene.playerContainer;
 
-    console.log(socket.id,bulletInfo.id)
     if (bulletInfo.id !== socket.id) {
         Object.entries(scene.otherPlayers).forEach(function([key,otherPlayer]) {
-          console.log("loop",bulletInfo.id,key)
           if (bulletInfo.id === key) {
             playerToFire = otherPlayer;
           }
@@ -261,8 +258,6 @@ function createReadyTextListener(scene){
 
 function createSetReadyListener(scene){
   socket.on("setReady",(bool) => {
-    console.log("b",bool,scene.ready);
     scene.ready = bool;
-    console.log("a",bool,scene.ready);
   });
 }
