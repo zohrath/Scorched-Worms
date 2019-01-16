@@ -4,6 +4,9 @@ The game from Lords of War
 # Setup
 
 # 1. Clone this repo 
+Navigate into your workspace directory.
+
+Run: `git clone https://github.com/zohrath/Scorched-Worms.git`
 
 # 2. Install node.js and npm:
 https://nodejs.org/en/
